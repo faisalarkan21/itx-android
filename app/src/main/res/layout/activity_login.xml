@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fitsSystemWindows="true"
-    >
+    android:background="@drawable/bg2"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:orientation="vertical"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
@@ -18,10 +20,11 @@
 
 
         <ImageView
-            android:layout_width="181dp"
-            android:layout_height="69dp"
+            android:layout_width="193dp"
+            android:layout_height="81dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="40dp"
+            android:layout_marginTop="30dp"
             app:srcCompat="@drawable/logoitx" />
 
         <android.support.design.widget.TextInputLayout
@@ -34,11 +37,11 @@
                 android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:hint="Masukan email"
+                android:hint="Username"
 
-                android:inputType="textEmailAddress"
-                android:text="" />
+                android:inputType="textEmailAddress" />
+
+
         </android.support.design.widget.TextInputLayout>
 
         <!--  Password Label -->
@@ -46,16 +49,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
             android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Masukan password"
+                android:layout_marginTop="8dp"
+                android:hint="Password"
                 android:inputType="textPassword"
+                android:paddingTop="30px"
+                android:shadowColor="@android:color/background_dark"
+
                 android:text=""
-                android:paddingTop="30px" />
+
+                android:textColor="#FAFAFA" />
         </android.support.design.widget.TextInputLayout>
 
         <TextView
@@ -71,8 +80,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:layout_marginTop="20dp"
-            android:text="Login" />
-
+            android:background="#01579B"
+            android:text="Login"
+            android:textColor="#FAFAFA" />
 
 
     </LinearLayout>

@@ -8,6 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+
 public class Login extends AppCompatActivity {
 
     EditText txtUsername, txtPassword;
@@ -15,10 +20,7 @@ public class Login extends AppCompatActivity {
     TextView errorLogin;
 
     // login button
-    Button btnLogin;
-
-    // Session Manager Class
-//    SessionManager session;
+    @BindView(R.id.btn_login) Button btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,8 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
 
-        btnLogin = (Button) findViewById(R.id.btn_login);
+        ButterKnife.bind(this);
+
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
