@@ -1,4 +1,4 @@
-package com.itx.android.android_itx;
+package com.itx.android.android_itx.utils;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

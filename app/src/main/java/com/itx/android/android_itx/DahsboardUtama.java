@@ -23,7 +23,7 @@ public class DahsboardUtama extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-                Intent listUser = new Intent(DahsboardUtama.this, ListUser.class);
+                Intent listUser = new Intent(DahsboardUtama.this, ListUsers.class);
 
 
                 // Staring MainActivity
@@ -38,7 +38,7 @@ public class DahsboardUtama extends AppCompatActivity {
 //                if (username.trim().length() > 0 && password.trim().length() > 0) {
 //                    // For testing puspose username, password is checked with sample data
 //
-//                    RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+//                    RequestQueue queue = Volley.newRequestQueue(Login.this);
 //                    //this is the url where you want to send the request
 //                    //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 //                    StorageModel store = new StorageModel();
@@ -58,7 +58,7 @@ public class DahsboardUtama extends AppCompatActivity {
 //                            }, new Response.ErrorListener() {
 //                        @Override
 //                        public void onErrorResponse(VolleyError error) {
-//                            Toast.makeText(LoginActivity.this, error.toString(),
+//                            Toast.makeText(Login.this, error.toString(),
 //                                    Toast.LENGTH_LONG).show();
 //                            error.printStackTrace();
 //                        }

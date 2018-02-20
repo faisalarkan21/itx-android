@@ -1,4 +1,4 @@
-package com.itx.android.android_itx;
+package com.itx.android.android_itx.utils;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,7 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.R;
+import com.itx.android.android_itx.entity.Users;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewHol
     public void onBindViewHolder(UsersViewHolder holder, int position) {
         Users user = userList.get(position);
         holder.userName.setText(user.getFirstName()  + " " + user.getLastName());
-        holder.assets.setText(user.getAssets());
+        holder.assets.setText("Assets : " + user.getAssets());
 
     }
 

@@ -7,15 +7,16 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.entity.Users;
+import com.itx.android.android_itx.utils.RecyclerTouchListener;
+import com.itx.android.android_itx.utils.UsersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListUser extends AppCompatActivity {
+public class ListUsers extends AppCompatActivity {
 
 //    private ListView userListView ;
 //    private ArrayAdapter<String> listUserAdapter ;
@@ -28,7 +29,7 @@ public class ListUser extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_user);
+        setContentView(R.layout.activity_list_users);
 
 
 
@@ -84,6 +85,21 @@ public class ListUser extends AppCompatActivity {
         userList.add(user);
 
         user = new Users("Lea", "Sativa", "29");
+        userList.add(user);
+
+        user = new Users("Zia", "Orang", "12");
+        userList.add(user);
+
+        user = new Users("Orange", "Zizag", "90");
+        userList.add(user);
+
+        user = new Users("Tifa", "Ruki", "12");
+        userList.add(user);
+        user = new Users("Tifa", "Ruki", "12");
+        userList.add(user);
+        user = new Users("Tifa", "Ruki", "12");
+        userList.add(user);
+        user = new Users("Tifa", "Ruki", "12");
         userList.add(user);
 
         // notify adapter about data set changes

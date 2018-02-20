@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg1"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:context="com.itx.android.android_itx.DahsboardUtama">
@@ -19,8 +20,8 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="182dp"
-            android:layout_height="156dp"
+            android:layout_width="193dp"
+            android:layout_height="185dp"
             android:layout_gravity="center_horizontal"
             app:srcCompat="@drawable/seller"
             tools:layout_editor_absoluteX="101dp"
@@ -40,8 +41,8 @@
 
         <Button
             android:id="@+id/btnAssets"
-            android:layout_width="119dp"
-            android:layout_height="69dp"
+            android:layout_width="121dp"
+            android:layout_height="72dp"
             android:layout_marginRight="10dp"
             android:text="Assets"
             tools:layout_editor_absoluteX="214dp"

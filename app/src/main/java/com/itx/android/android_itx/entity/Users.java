@@ -1,4 +1,4 @@
-package com.itx.android.android_itx.Entity;
+package com.itx.android.android_itx.entity;
 
 import java.util.Date;
 

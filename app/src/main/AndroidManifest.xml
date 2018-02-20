@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +19,7 @@
         <activity
             android:name=".DahsboardUtama"
             android:label="ITX Dashboard" />
-        <activity android:name=".ListUser"></activity>
+        <activity android:label="List Pengguna" android:name=".ListUsers"></activity>
     </application>
 
 </manifest>

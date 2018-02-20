@@ -7,12 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class LoginActivity extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     EditText txtUsername, txtPassword;
 
@@ -37,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-                Intent dashboard = new Intent(LoginActivity.this, DahsboardUtama.class);
+                Intent dashboard = new Intent(Login.this, DahsboardUtama.class);
 
                 // Staring MainActivity
                 startActivity(dashboard);
@@ -51,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 //                if (username.trim().length() > 0 && password.trim().length() > 0) {
 //                    // For testing puspose username, password is checked with sample data
 //
-//                    RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+//                    RequestQueue queue = Volley.newRequestQueue(Login.this);
 //                    //this is the url where you want to send the request
 //                    //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 //                    StorageModel store = new StorageModel();
@@ -71,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 //                            }, new Response.ErrorListener() {
 //                        @Override
 //                        public void onErrorResponse(VolleyError error) {
-//                            Toast.makeText(LoginActivity.this, error.toString(),
+//                            Toast.makeText(Login.this, error.toString(),
 //                                    Toast.LENGTH_LONG).show();
 //                            error.printStackTrace();
 //                        }
