@@ -1,4 +1,4 @@
-package com.itx.android.android_itx.utils;
+package com.itx.android.android_itx.Adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.itx.android.android_itx.R;
-import com.itx.android.android_itx.entity.Users;
+import com.itx.android.android_itx.Entity.Users;
 
 import java.util.List;
 

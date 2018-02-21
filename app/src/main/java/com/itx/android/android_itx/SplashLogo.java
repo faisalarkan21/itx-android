@@ -7,10 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 
-import com.itx.android.android_itx.utils.PrefManager;
+import com.itx.android.android_itx.Utils.PrefManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
