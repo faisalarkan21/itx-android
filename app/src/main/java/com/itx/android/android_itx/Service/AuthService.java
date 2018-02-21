@@ -17,13 +17,6 @@ import retrofit2.http.Path;
 
 public interface AuthService {
 
-//    @POST("/api/login")
-//    @FormUrlEncoded
-//    Call<Users> loginPost(
-//                         @Field("email") String email,
-//                         @Field("password") String password
-//                         );
-
     @POST("/api/{login}")
     Call<ResponseBody> loginPost(@Path("login") String postfix, @Body RequestBody params);
 

@@ -91,7 +91,7 @@ public class Login extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
                 if (rawResponse.isSuccessful()) {
                     try {
-                        //get your response....
+
                         JSONObject jsonObject = new JSONObject(rawResponse.body().string());
                         String data = jsonObject.getString("data");
 
@@ -117,7 +117,9 @@ public class Login extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-                // other stuff...
+
+                Toast.makeText(Login.this, throwable.getMessage(),
+                        Toast.LENGTH_LONG).show();
             }
         });
 
