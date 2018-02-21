@@ -1,4 +1,4 @@
-package com.itx.android.android_itx.utils;
+package com.itx.android.android_itx.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

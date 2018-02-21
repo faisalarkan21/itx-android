@@ -9,9 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.itx.android.android_itx.entity.Users;
-import com.itx.android.android_itx.utils.RecyclerTouchListener;
-import com.itx.android.android_itx.utils.UsersAdapter;
+import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Utils.RecyclerTouchListener;
+import com.itx.android.android_itx.Adapter.UsersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
