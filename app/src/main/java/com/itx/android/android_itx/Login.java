@@ -8,6 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.itx.android.android_itx.Service.APIService;
+import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.SessionManager;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -16,8 +20,10 @@ import butterknife.OnClick;
 public class Login extends AppCompatActivity {
 
     EditText txtUsername, txtPassword;
-
+    private APIService mAPIService;
     TextView errorLogin;
+
+    SessionManager session;
 
     // login button
     @BindView(R.id.btn_login) Button btnLogin;
@@ -32,6 +38,9 @@ public class Login extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        session = new SessionManager(getApplicationContext());
+
+        mAPIService = ApiUtils.getAPIService();
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
@@ -39,6 +48,9 @@ public class Login extends AppCompatActivity {
             public void onClick(View arg0) {
 
                 Intent dashboard = new Intent(Login.this, ListUsers.class);
+                //String username = txtUsername.getText().toString().trim();
+                //String password = txtPassword.getText().toString().trim();
+
 
                 // Staring MainActivity
                 startActivity(dashboard);

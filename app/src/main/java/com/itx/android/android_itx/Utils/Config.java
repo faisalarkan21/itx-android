@@ -6,7 +6,7 @@ package com.itx.android.android_itx.Utils;
 
 public class Config {
 
-    private String apiUrl = "139.99.105.54:3001";
+    private String apiUrl = "http://139.99.105.54:3001/api";
 
     public String getApiUrl() {
         return apiUrl;

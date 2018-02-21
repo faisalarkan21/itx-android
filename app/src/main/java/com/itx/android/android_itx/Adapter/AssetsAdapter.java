@@ -6,8 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.itx.android.android_itx.Entity.Assets;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
+
+import java.util.List;
 
 /**
  * Created by aladhims on 21/02/18.
@@ -16,9 +19,11 @@ import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
 public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     private Context mContext;
+    private List<Assets> mListAssets;
 
-    public AssetsAdapter(Context context){
+    public AssetsAdapter(Context context, List<Assets> assets){
         this.mContext = context;
+        this.mListAssets = assets;
 
     }
     @Override
@@ -32,11 +37,19 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     @Override
     public void onBindViewHolder(AssetsViewHolder holder, int position) {
+        Assets currentAsset = mListAssets.get(position);
+        holder.mTvNamaAsset.setText(currentAsset.getName());
+        holder.mTvDeskripsiAsset.setText(currentAsset.getBrand());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mListAssets.size();
     }
 }
