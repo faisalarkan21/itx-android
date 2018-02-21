@@ -1,5 +1,6 @@
 package com.itx.android.android_itx.Entity;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
@@ -11,33 +12,63 @@ import java.util.Date;
 public class Users {
 
     @SerializedName("idUser")
+    @Expose
     private int idUser;
+ 
     @SerializedName("firstName")
+    @Expose
     private String firstName;
+
     @SerializedName("lastName")
+    @Expose
     private String lastName;
+
     @SerializedName("ktp")
+    @Expose
     private String ktp;
+
     @SerializedName("email")
+    @Expose
     private String email;
+ 
     @SerializedName("password")
+    @Expose
     private String password;
+
     @SerializedName("phone")
+    @Expose
     private String phone;
+
     @SerializedName("socials")
+    @Expose
     private String socials;
+
     @SerializedName("address")
+    @Expose
     private String address;
+
     @SerializedName("assets")
+    @Expose
     private String assets;
+
     @SerializedName("photo")
+    @Expose
     private String photo;
+
     @SerializedName("isVerified")
+    @Expose
     private boolean isVerified;
+
     @SerializedName("updatedAt")
+    @Expose
     private Date updatedAt;
+
     @SerializedName("createdAt")
-    private Date createdAt;
+    @Expose
+    private Date createdAt;    
+
+    @SerializedName("deletedAt")   
+    @Expose
     private Date deletedAt;
 
     public Users(String firstName, String lastName, String assets){
