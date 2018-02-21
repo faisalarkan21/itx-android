@@ -6,15 +6,21 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Utils.RecyclerTouchListener;
 import com.itx.android.android_itx.Adapter.UsersAdapter;
+import com.itx.android.android_itx.Utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ListUsers extends AppCompatActivity {
 
@@ -25,13 +31,30 @@ public class ListUsers extends AppCompatActivity {
     private List<Users> userList = new ArrayList<>();
     private RecyclerView recyclerView;
     private UsersAdapter uAdapter;
+    SessionManager session;
+
+    @BindView(R.id.btn_addUser)
+    Button btnAddUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
 
+        ButterKnife.bind(this);
+        session = new SessionManager(this);
 
+        btnAddUser.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+
+                String token =  session.getToken();
+                Toast.makeText(ListUsers.this, token,
+                        Toast.LENGTH_LONG).show();
+            }
+        });
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
