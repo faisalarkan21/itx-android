@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class DahsboardUtama extends AppCompatActivity {
+public class DashboardUtama extends AppCompatActivity {
 
     Button btnUsers, btnAssets;
 
@@ -23,7 +23,7 @@ public class DahsboardUtama extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-                Intent listUser = new Intent(DahsboardUtama.this, ListUsers.class);
+                Intent listUser = new Intent(DashboardUtama.this, ListUsers.class);
 
 
                 // Staring MainActivity

@@ -16,13 +16,10 @@
         android:paddingTop="5dp"
         android:weightSum="1">
 
-<<<<<<< HEAD
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_addUser"
-=======
+
+
         <Button
             android:id="@+id/btn_add_user"
->>>>>>> cdbbc6d7dd10bb03b69a4d8d0c9e507ae3ed8a22
             android:layout_width="136dp"
             android:layout_height="45dp"
             android:layout_marginBottom="24dp"

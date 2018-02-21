@@ -33,7 +33,7 @@ public class ListUsers extends AppCompatActivity {
     private UsersAdapter uAdapter;
     SessionManager session;
 
-    @BindView(R.id.btn_addUser)
+    @BindView(R.id.btn_add_user)
     Button btnAddUser;
 
     @Override
@@ -41,7 +41,7 @@ public class ListUsers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
 
-<<<<<<< HEAD
+
         ButterKnife.bind(this);
         session = new SessionManager(this);
 
@@ -57,9 +57,6 @@ public class ListUsers extends AppCompatActivity {
             }
         });
 
-
-=======
->>>>>>> cdbbc6d7dd10bb03b69a4d8d0c9e507ae3ed8a22
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         uAdapter = new UsersAdapter(userList,this);

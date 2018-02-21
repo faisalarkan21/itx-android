@@ -19,8 +19,8 @@ import butterknife.ButterKnife;
 public class ListAssets extends AppCompatActivity {
 
     private List<Assets> mListAsset = new ArrayList<>();
-    private @BindView(R.id.btn_add_asset) Button mBtnAddAsset;
-    private @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.btn_add_asset) Button mBtnAddAsset;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
     private AssetsAdapter mAdapter;
 
     @Override
