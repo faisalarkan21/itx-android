@@ -63,6 +63,7 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
+<<<<<<< HEAD
                 String username = editEmaill.getText().toString().trim();
                 String password = editPassword.getText().toString().trim();
 
@@ -78,9 +79,15 @@ public class Login extends AppCompatActivity {
         Map<String, Object> jsonParams = new ArrayMap<>();
         jsonParams.put("email", email);
         jsonParams.put("password", password);
+=======
+                Intent dashboard = new Intent(Login.this, ListUsers.class);
+                //String username = txtUsername.getText().toString().trim();
+                //String password = txtPassword.getText().toString().trim();
+>>>>>>> cdbbc6d7dd10bb03b69a4d8d0c9e507ae3ed8a22
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jsonParams)).toString());
 
+<<<<<<< HEAD
         Call<ResponseBody> response = mAuthAPIService.loginPost("login", body);
 
         response.enqueue(new Callback<ResponseBody>() {
@@ -97,6 +104,10 @@ public class Login extends AppCompatActivity {
 
 
                         session.setSession(dataToken);
+=======
+                // Staring MainActivity
+                startActivity(dashboard);
+>>>>>>> cdbbc6d7dd10bb03b69a4d8d0c9e507ae3ed8a22
 
                         Intent dashboard = new Intent(Login.this, DahsboardUtama.class);
                         startActivity(dashboard);

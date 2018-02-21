@@ -11,7 +11,11 @@ public class ApiUtils {
 
     private ApiUtils() {}
 
+<<<<<<< HEAD
     public static final String BASE_URL = "http://139.99.105.54:3001/";
+=======
+    public static final String BASE_URL = "http://139.99.105.54:3001/api/";
+>>>>>>> cdbbc6d7dd10bb03b69a4d8d0c9e507ae3ed8a22
 
     public static APIService getAPIService() {
 
