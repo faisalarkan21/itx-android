@@ -31,12 +31,9 @@ public class ListUsers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
 
-
-
-
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        uAdapter = new UsersAdapter(userList);
+        uAdapter = new UsersAdapter(userList,this);
 
         recyclerView.setHasFixedSize(true);
 
@@ -58,20 +55,6 @@ public class ListUsers extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.setAdapter(uAdapter);
-
-        // row click listener
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Users user = userList.get(position);
-                Toast.makeText(getApplicationContext(), user.getFirstName() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
 
         prepareUserData();
 

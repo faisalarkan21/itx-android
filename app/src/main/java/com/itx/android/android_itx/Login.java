@@ -38,7 +38,7 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-                Intent dashboard = new Intent(Login.this, DahsboardUtama.class);
+                Intent dashboard = new Intent(Login.this, ListUsers.class);
 
                 // Staring MainActivity
                 startActivity(dashboard);

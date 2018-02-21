@@ -16,14 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login"></activity>
-        <activity
-            android:name=".DahsboardUtama"
-            android:label="ITX Dashboard" />
+        <activity android:name=".Login" />
         <activity
             android:name=".ListUsers"
             android:label="List Pengguna" />
-        <activity android:name=".DashboardActivity"></activity>
     </application>
 
 </manifest>
