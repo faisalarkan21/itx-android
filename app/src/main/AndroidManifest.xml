@@ -9,21 +9,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".SplashLogo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
-        <activity android:name=".Login">
-        </activity>
+        <activity android:name=".Login"></activity>
         <activity
             android:name=".DahsboardUtama"
             android:label="ITX Dashboard" />
-        <activity android:label="List Pengguna" android:name=".ListUsers"></activity>
+        <activity
+            android:name=".ListUsers"
+            android:label="List Pengguna" />
+        <activity android:name=".DashboardActivity"></activity>
     </application>
 
 </manifest>
