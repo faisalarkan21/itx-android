@@ -40,15 +40,6 @@
         android:weightSum="1">
 
         <Button
-            android:id="@+id/btnAssets"
-            android:layout_width="121dp"
-            android:layout_height="72dp"
-            android:layout_marginRight="10dp"
-            android:text="Assets"
-            tools:layout_editor_absoluteX="214dp"
-            tools:layout_editor_absoluteY="266dp" />
-
-        <Button
             android:id="@+id/btnUsers"
             android:layout_width="121dp"
             android:layout_height="72dp"

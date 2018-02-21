@@ -16,7 +16,6 @@ public class DashboardUtama extends AppCompatActivity {
         setContentView(R.layout.activity_dahsboard_utama);
 
         btnUsers = (Button) findViewById(R.id.btnUsers);
-        btnAssets = (Button) findViewById(R.id.btnAssets);
 
         btnUsers.setOnClickListener(new View.OnClickListener() {
 
