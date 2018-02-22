@@ -96,7 +96,9 @@ public class ListAssets extends AppCompatActivity {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
                             Assets assets = new Assets();
+                            assets.setId(Data.get("_id").getAsString());
                             assets.setName(Data.get("name").getAsString());
+                            assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             assets.setRating(Data.get("rating").getAsFloat());
                             mListAsset.add(assets);

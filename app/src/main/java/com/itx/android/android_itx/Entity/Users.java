@@ -79,15 +79,6 @@ public class Users {
     @Expose
     private String token;
 
-//    public Users(String fullName, String firstName, String lastName, String assets){
-//        this.fullName = fullName;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.assets = assets;
-//
-//    }
-
-
     public String getIdUser() {
         return idUser;
     }

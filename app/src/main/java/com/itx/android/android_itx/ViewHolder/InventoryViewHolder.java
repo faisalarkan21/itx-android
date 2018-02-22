@@ -12,13 +12,14 @@ import com.itx.android.android_itx.R;
 
 public class InventoryViewHolder extends RecyclerView.ViewHolder  {
 
-    public TextView inventoryName, inventoryStock, inventorySpace;
+    public TextView inventoryName, inventoryStock, inventorySpace, inventoryPrice;
 
     public InventoryViewHolder(View itemView) {
         super(itemView);
         inventoryName = (TextView) itemView.findViewById(R.id.tv_inventory_name);
         inventoryStock = (TextView) itemView.findViewById(R.id.tv_inventory_stock);
         inventorySpace = (TextView) itemView.findViewById(R.id.tv_inventory_space);
+        inventoryPrice = (TextView) itemView.findViewById(R.id.tv_inventory_price);
 
     }
 

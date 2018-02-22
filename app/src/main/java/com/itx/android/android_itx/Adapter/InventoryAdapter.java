@@ -20,6 +20,7 @@ import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.ViewHolder.InventoryViewHolder;
 import com.itx.android.android_itx.ViewHolder.UsersViewHolder;
 import android.content.Intent;
+import com.itx.android.android_itx.Utils.RupiahCurrency;
 
 import java.util.List;
 
@@ -49,9 +50,12 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         holder.inventoryName.setText(invent.getName());
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
+        holder.inventoryPrice.setText("@ " + new RupiahCurrency().toRupiahFormat(invent.getPrice()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
 
             }
         });
