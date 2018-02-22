@@ -7,6 +7,101 @@
     android:orientation="vertical"
     tools:context="com.itx.android.android_itx.ListInventory">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="134dp"
+        android:layout_marginRight="5dip"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:id="@+id/thumbnail_asset_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dip"
+
+            android:padding="3dip">
+
+            <ImageView
+                android:id="@+id/iv_asset"
+                android:layout_width="47dp"
+                android:layout_height="47dp"
+                android:background="@drawable/icon_tentang_04" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_asset_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/thumbnail_asset_layout"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="3dp"
+                android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                android:text="Kontrakan Emas"
+                android:textColor="#040404"
+                android:textStyle="bold"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/tv_asset_category"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_asset_name"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="3dp"
+                android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                android:text="Premium"
+                android:textColor="#343434"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_asset_address"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_asset_category"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="3dp"
+                android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                android:text="JL. USA 15 Ciseeng"
+                android:textColor="#343434"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_asset_no_telp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_asset_address"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                android:text="+628986121212"
+                android:textColor="#343434"
+                android:textSize="15sp" />
+
+            <RatingBar
+                android:id="@+id/rating_bar_assets"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="5dp"
+                android:progressTint="@color/colorAccent" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="75dp"
