@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bg2"
     android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -62,7 +61,7 @@
                 android:inputType="textPassword"
                 android:paddingTop="30px"
                 android:shadowColor="@android:color/background_dark"
-                android:textColor="#FAFAFA" />
+               />
         </android.support.design.widget.TextInputLayout>
 
         <TextView
