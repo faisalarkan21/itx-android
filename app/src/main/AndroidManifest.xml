@@ -20,7 +20,8 @@
         <activity
             android:name=".ListUsers"
             android:label="List Pengguna" />
-        <activity android:name=".ListAssets"></activity>
+        <activity android:name=".ListAssets" />
+        <activity android:name=".ListInventory"></activity>
     </application>
 
 </manifest>
