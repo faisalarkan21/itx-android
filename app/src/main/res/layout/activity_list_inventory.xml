@@ -112,7 +112,7 @@
         android:weightSum="1">
 
         <Button
-            android:id="@+id/btn_add_asset"
+            android:id="@+id/btn_add_inventory"
             android:layout_width="197dp"
             android:layout_height="45dp"
             android:layout_marginBottom="24dp"

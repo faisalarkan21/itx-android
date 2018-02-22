@@ -1,11 +1,13 @@
 package com.itx.android.android_itx;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -65,6 +67,13 @@ public class ListAssets extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         mRecyclerView.setAdapter(mAdapter);
+
+        mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ListAssets.this, CreateNewAsset.class));
+            }
+        });
 
         prepareUserData();
 

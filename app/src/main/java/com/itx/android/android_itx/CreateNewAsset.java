@@ -32,7 +32,7 @@ public class CreateNewAsset extends AppCompatActivity {
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TOOD: implement for adding new asset to the server
+                //TODO: implement for adding new asset to the server
             }
         });
     }

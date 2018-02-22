@@ -1,11 +1,14 @@
 package com.itx.android.android_itx;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +54,9 @@ public class ListInventory extends AppCompatActivity {
     @BindView(R.id.rating_bar_assets)
     RatingBar mAssetRating;
 
+    @BindView(R.id.btn_add_inventory)
+    Button mBtnAddInvent;
+
     ListInventoryService mInventoryAPIService;
     SessionManager session;
 
@@ -76,6 +82,13 @@ public class ListInventory extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         mRecyclerView.setAdapter(mAdapter);
+
+        mBtnAddInvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ListInventory.this, CreateNewInventory.class));
+            }
+        });
 
         prepareUserData();
 

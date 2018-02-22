@@ -26,14 +26,19 @@
             android:name=".ListUsers"
             android:label="List Pengguna" />
         <activity
+            android:parentActivityName=".ListUsers"
             android:name=".ListAssets"
             android:label="List Assets" />
         <activity
+            android:parentActivityName=".ListAssets"
             android:name=".ListInventory"
             android:label="List Inventory" />
-        <activity android:name=".CreateNewUser" />
-        <activity android:name=".CreateNewAsset" />
-        <activity android:name=".CreateNewInventory"></activity>
+        <activity android:name=".CreateNewUser"
+            android:parentActivityName=".ListUsers"/>
+        <activity android:name=".CreateNewAsset"
+            android:parentActivityName=".ListAssets"/>
+        <activity android:name=".CreateNewInventory"
+            android:parentActivityName=".ListInventory"></activity>
     </application>
 
 </manifest>

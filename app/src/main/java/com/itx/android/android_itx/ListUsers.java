@@ -1,5 +1,6 @@
 package com.itx.android.android_itx;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -56,11 +57,7 @@ public class ListUsers extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-
-
-                String token =  session.getToken();
-                Toast.makeText(ListUsers.this, token,
-                        Toast.LENGTH_LONG).show();
+                startActivity(new Intent(ListUsers.this, CreateNewUser.class));
             }
         });
 
