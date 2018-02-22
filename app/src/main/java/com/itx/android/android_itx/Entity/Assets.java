@@ -18,6 +18,9 @@ public class Assets {
     @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("name")
+    @Expose
+    private String fullName;
     @SerializedName("brand")
     @Expose
     private String brand;
@@ -32,7 +35,7 @@ public class Assets {
     private String address;
     @SerializedName("rating")
     @Expose
-    private String rating;
+    private float rating;
     @SerializedName("inventories")
     @Expose
     private String inventories;
@@ -58,6 +61,14 @@ public class Assets {
     @Expose
     private String deletedAt;
 
+    public Assets(String name, String assetCategory, float rating){
+
+        this.name = name;
+        this.assetCategory = assetCategory;
+        this.rating = rating;
+
+    }
+
 
     public String getUser() {
         return user;
@@ -66,6 +77,15 @@ public class Assets {
     public void setUser(String user) {
         this.user = user;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
 
     public String getAssetCategory() {
         return assetCategory;
@@ -115,11 +135,11 @@ public class Assets {
         this.address = address;
     }
 
-    public String getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 

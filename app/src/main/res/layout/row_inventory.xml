@@ -26,29 +26,40 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tv_asset_name"
+        android:id="@+id/tv_inventory_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/thumbnail_asset_layout"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="Judul assets"
+        android:text="Inventory Name"
         android:textColor="#040404"
         android:textStyle="bold"
         android:typeface="sans" />
 
+    <TextView
+        android:id="@+id/tv_inventory_stock"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_inventory_space"
+        android:layout_alignStart="@+id/tv_inventory_space"
+        android:layout_below="@+id/tv_inventory_space"
+        android:text="Stock"
+        android:textColor="#343434"
+        android:textSize="15sp" />
+
 
     <!-- Rightend Arrow -->
     <TextView
-        android:id="@+id/tv_asset_category"
+        android:id="@+id/tv_inventory_space"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_asset_name"
+        android:layout_below="@id/tv_inventory_name"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="No Telp"
+        android:text="Space"
         android:textColor="#343434"
         android:textSize="15sp" />
 
@@ -60,18 +71,5 @@
         android:layout_marginRight="25dp"
         android:src="@drawable/arrow"
         android:id="@+id/imageView2" />
-
-    <RatingBar
-        android:id="@+id/rating_bar_assets"
-        style="?android:attr/ratingBarStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/tv_asset_name"
-        android:layout_alignLeft="@+id/tv_asset_category"
-        android:layout_alignRight="@id/tv_asset_name"
-        android:layout_alignStart="@+id/tv_asset_category"
-        android:layout_below="@+id/tv_asset_category"
-        android:layout_marginTop="5dp"
-        android:progressTint="@color/colorAccent" />
 
 </RelativeLayout>

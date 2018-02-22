@@ -71,6 +71,10 @@ public class Users {
     @Expose
     private Date deletedAt;
 
+    @SerializedName("token")
+    @Expose
+    private String token;
+
     public Users(String firstName, String lastName, String assets){
 
         this.firstName = firstName;
@@ -198,5 +202,13 @@ public class Users {
 
     public void setDeletedAt(Date deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

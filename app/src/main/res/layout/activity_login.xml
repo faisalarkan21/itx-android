@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Username"
-
+                android:text="faisalarkan21@gmail.com"
                 android:inputType="textEmailAddress" />
 
 
@@ -58,12 +58,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="Password"
+                android:text="besokmakan"
                 android:inputType="textPassword"
                 android:paddingTop="30px"
                 android:shadowColor="@android:color/background_dark"
-
-                android:text=""
-
                 android:textColor="#FAFAFA" />
         </android.support.design.widget.TextInputLayout>
 
