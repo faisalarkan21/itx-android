@@ -5,13 +5,20 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
 import com.itx.android.android_itx.Entity.Assets;
 import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.SessionManager;
 
 import org.json.JSONObject;
 
@@ -34,6 +41,8 @@ public class ListAssets extends AppCompatActivity {
     RecyclerView mRecyclerView;
 
     private AssetsAdapter mAdapter;
+    ListAssetService mAssetAPIService;
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,8 @@ public class ListAssets extends AppCompatActivity {
         setContentView(R.layout.activity_list_assets);
 
         ButterKnife.bind(this);
+
+        session = new SessionManager(this);
 
         mAdapter = new AssetsAdapter(mListAsset, this);
 
@@ -63,61 +74,58 @@ public class ListAssets extends AppCompatActivity {
     private void prepareUserData() {
 
 
-//        String token =  session.getToken();
-//        mListUsersAPIService = ApiUtils.getListUsersService(token);
-//
-//        Call<ResponseBody> response = mListUsersAPIService.getAUsers();
-//
-//        response.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
-//                if (rawResponse.isSuccessful()) {
-//                    try {
-//
-//                        JSONObject jsonObject = new JSONObject(rawResponse.body().string());
-//
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Toast.makeText(ListUsers.this, "Gagal",
-//                            Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-//
-//                Toast.makeText(ListUsers.this, throwable.getMessage(),
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        });
+        String idUser = getIntent().getStringExtra("id");
 
 
-        Assets assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4.5f);
-        mListAsset.add(assets);
+        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 2.5f);
-        mListAsset.add(assets);
+        Call<JsonObject> response = mAssetAPIService.getUserAssets(idUser);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 3);
-        mListAsset.add(assets);
+        response.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+                if (rawResponse.isSuccessful()) {
+                    try {
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4);
-        mListAsset.add(assets);
+                        JsonElement json = rawResponse.body().get("data");
+                        Log.d("lnes 102", Boolean.toString(json.isJsonArray()));
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 3.1f);
-        mListAsset.add(assets);
+                        JsonArray jsonArray = json.getAsJsonArray();
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi",4.5f);
-        mListAsset.add(assets);
+                        for (int i=0; i < jsonArray.size() ; i++ ){
+                            JsonObject Data = jsonArray.get(i).getAsJsonObject();
+
+                            Assets assets = new Assets();
+                            assets.setName(Data.get("name").getAsString());
+                            assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
+                            assets.setRating(Data.get("rating").getAsFloat());
+                            mListAsset.add(assets);
+                            mAdapter.notifyDataSetChanged();
+                        }
+
+                        Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+                                Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(ListAssets.this, "Gagal",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+
+                Toast.makeText(ListAssets.this, throwable.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
 
 
-        // notify adapter about data set changes
-        // so that it will render the list with new data
-        mAdapter.notifyDataSetChanged();
+//        Assets assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4.5f);
+//        mListAsset.add(assets);
+
     }
 
 

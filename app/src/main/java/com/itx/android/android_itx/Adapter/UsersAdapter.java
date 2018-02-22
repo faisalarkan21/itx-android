@@ -3,6 +3,7 @@ package com.itx.android.android_itx.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.itx.android.android_itx.ListUsers;
 import com.itx.android.android_itx.Login;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Utils.RecyclerTouchListener;
 import com.itx.android.android_itx.ViewHolder.UsersViewHolder;
 import android.content.Intent;
 
@@ -24,6 +26,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
     private List<Users> userList;
     private Context mContext;
+
 
 
 
@@ -41,24 +44,41 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(UsersViewHolder holder, int position) {
+    public void onBindViewHolder(UsersViewHolder holder, final int position) {
         final Users user = userList.get(position);
+
         holder.userName.setText(user.getFullName());
         holder.assets.setText("Assets : " + user.getAssets());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent ieventreport = new Intent(mContext,ListAssets.class);
-                mContext.startActivity(ieventreport);
+                Log.d("inidia", Integer.toString(position));
+                Log.d("ini stringnya",user.getIdUser());
+
+                Intent listAsset = new Intent(mContext,ListAssets.class);
+                listAsset.putExtra("id", user.getIdUser());
+
+                mContext.startActivity(listAsset);
+
 
             }
         });
 
+
+
     }
+
+
+
+
+
+
 
     @Override
     public int getItemCount() {
         return userList.size();
     }
+
+
 }

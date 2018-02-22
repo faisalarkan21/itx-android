@@ -97,10 +97,7 @@ public class ListUsers extends AppCompatActivity {
      */
     private void prepareUserData() {
 
-
-        String token =  session.getToken();
-        mListUsersAPIService = ApiUtils.getListUsersService(token);
-
+        mListUsersAPIService = ApiUtils.getListUsersService(session.getToken());
         Call<JsonObject> response = mListUsersAPIService.getAUsers();
 
         response.enqueue(new Callback<JsonObject>() {
@@ -113,6 +110,7 @@ public class ListUsers extends AppCompatActivity {
                         for (int i=0; i < jsonArray.size() ; i++ ){
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Users user = new Users();
+                            user.setIdUser(Data.get("_id").getAsString());
                             user.setFullName(Data.get("fullName").getAsString());
                             user.setAssets(Data.get("totalAssets").getAsString());
                             userList.add(user);

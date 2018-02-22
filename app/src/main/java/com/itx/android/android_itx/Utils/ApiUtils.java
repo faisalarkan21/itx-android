@@ -3,6 +3,7 @@ package com.itx.android.android_itx.Utils;
 import com.itx.android.android_itx.ListUsers;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
+import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Service.ListUsersService;
 
 /**
@@ -25,6 +26,11 @@ public class ApiUtils {
     public static ListUsersService getListUsersService(String token) {
 
         return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListUsersService.class);
+    }
+
+    public static ListAssetService getListAssetsService(String token) {
+
+        return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListAssetService.class);
     }
 
 

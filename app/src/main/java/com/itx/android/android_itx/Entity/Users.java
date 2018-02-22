@@ -13,7 +13,7 @@ public class Users {
 
     @SerializedName("idUser")
     @Expose
-    private int idUser;
+    private String idUser;
  
     @SerializedName("firstName")
     @Expose
@@ -88,11 +88,11 @@ public class Users {
 //    }
 
 
-    public int getIdUser() {
+    public String getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(int idUser) {
+    public void setIdUser(String idUser) {
         this.idUser = idUser;
     }
 

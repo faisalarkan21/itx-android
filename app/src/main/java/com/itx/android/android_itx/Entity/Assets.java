@@ -61,15 +61,6 @@ public class Assets {
     @Expose
     private String deletedAt;
 
-    public Assets(String name, String assetCategory, float rating){
-
-        this.name = name;
-        this.assetCategory = assetCategory;
-        this.rating = rating;
-
-    }
-
-
     public String getUser() {
         return user;
     }
