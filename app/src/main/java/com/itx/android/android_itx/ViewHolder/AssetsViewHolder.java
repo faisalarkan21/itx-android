@@ -3,6 +3,7 @@ package com.itx.android.android_itx.ViewHolder;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.itx.android.android_itx.R;
@@ -12,15 +13,16 @@ import com.itx.android.android_itx.R;
  */
 
 public class AssetsViewHolder extends RecyclerView.ViewHolder {
-    public TextView mTvAssetName, mTvAssetAddress, mTvAssetPhone;
+    public TextView mTvAssetName, mTvAssetCategory;
     public ImageView mIvGambarAsset;
+    public RatingBar mRatingBar;
 
     public AssetsViewHolder(View itemView) {
         super(itemView);
 
         mTvAssetName = (TextView) itemView.findViewById(R.id.tv_asset_name);
-        mTvAssetAddress = (TextView) itemView.findViewById(R.id.tv_assets_address);
-        mTvAssetPhone = (TextView) itemView.findViewById(R.id.tv_asset_no_hp);
+        mTvAssetCategory = (TextView) itemView.findViewById(R.id.tv_asset_category);
+        mRatingBar = (RatingBar) itemView.findViewById(R.id.rating_bar_assets);
 
 
     }

@@ -35,7 +35,7 @@ public class Assets {
     private String address;
     @SerializedName("rating")
     @Expose
-    private String rating;
+    private float rating;
     @SerializedName("inventories")
     @Expose
     private String inventories;
@@ -61,11 +61,11 @@ public class Assets {
     @Expose
     private String deletedAt;
 
-    public Assets(String name, String address, String phone){
+    public Assets(String name, String assetCategory, float rating){
 
         this.name = name;
-        this.address = address;
-        this.phone = phone;
+        this.assetCategory = assetCategory;
+        this.rating = rating;
 
     }
 
@@ -135,11 +135,11 @@ public class Assets {
         this.address = address;
     }
 
-    public String getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 

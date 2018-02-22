@@ -96,22 +96,22 @@ public class ListAssets extends AppCompatActivity {
 //        });
 
 
-        Assets assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        Assets assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4.5f);
         mListAsset.add(assets);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 2.5f);
         mListAsset.add(assets);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 3);
         mListAsset.add(assets);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4);
         mListAsset.add(assets);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 3.1f);
         mListAsset.add(assets);
 
-        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", "909090909");
+        assets = new Assets("Rumah Zakat", "Jalan Haji Mawi",4.5f);
         mListAsset.add(assets);
 
 

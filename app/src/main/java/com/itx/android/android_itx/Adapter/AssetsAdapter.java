@@ -41,8 +41,8 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     public void onBindViewHolder(AssetsViewHolder holder, int position) {
         Assets currentAsset = mListAssets.get(position);
         holder.mTvAssetName.setText(currentAsset.getName());
-        holder.mTvAssetAddress.setText(currentAsset.getAddress());
-        holder.mTvAssetPhone.setText(currentAsset.getPhone());
+        holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
+        holder.mRatingBar.setRating(currentAsset.getRating());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

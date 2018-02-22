@@ -38,21 +38,10 @@
         android:textStyle="bold"
         android:typeface="sans" />
 
-    <TextView
-        android:id="@+id/tv_assets_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_asset_no_hp"
-        android:layout_alignStart="@+id/tv_asset_no_hp"
-        android:layout_below="@+id/tv_asset_no_hp"
-        android:text="Alamat"
-        android:textColor="#343434"
-        android:textSize="15sp" />
-
 
     <!-- Rightend Arrow -->
     <TextView
-        android:id="@+id/tv_asset_no_hp"
+        android:id="@+id/tv_asset_category"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_asset_name"
@@ -71,5 +60,15 @@
         android:layout_marginRight="25dp"
         android:src="@drawable/arrow"
         android:id="@+id/imageView2" />
+
+    <RatingBar
+        android:id="@+id/rating_bar_assets"
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:progressTint="@color/colorAccent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/tv_asset_name"
+        android:layout_alignEnd="@+id/tv_asset_name"
+        android:layout_below="@+id/tv_asset_category" />
 
 </RelativeLayout>
