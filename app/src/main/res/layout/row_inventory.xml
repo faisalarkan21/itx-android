@@ -42,9 +42,9 @@
         android:id="@+id/tv_inventory_stock"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_inventory_space"
-        android:layout_alignStart="@+id/tv_inventory_space"
-        android:layout_below="@+id/tv_inventory_space"
+        android:layout_alignLeft="@+id/tv_inventory_name"
+        android:layout_alignStart="@+id/tv_inventory_name"
+        android:layout_centerVertical="true"
         android:text="Stock"
         android:textColor="#343434"
         android:textSize="15sp" />
@@ -55,10 +55,9 @@
         android:id="@+id/tv_inventory_space"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_inventory_name"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="3dp"
-        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+        android:layout_alignLeft="@+id/tv_inventory_name"
+        android:layout_alignStart="@+id/tv_inventory_name"
+        android:layout_below="@+id/thumbnail_asset_layout"
         android:text="Space"
         android:textColor="#343434"
         android:textSize="15sp" />
@@ -71,5 +70,18 @@
         android:layout_marginRight="25dp"
         android:src="@drawable/arrow"
         android:id="@+id/imageView2" />
+
+    <TextView
+        android:id="@+id/tv_inventory_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+        android:layout_below="@+id/tv_inventory_name"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_toEndOf="@+id/tv_inventory_name"
+        android:layout_toRightOf="@+id/tv_inventory_name"
+        android:text="harga" />
 
 </RelativeLayout>

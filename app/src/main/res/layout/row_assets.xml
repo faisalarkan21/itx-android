@@ -48,7 +48,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="No Telp"
+        android:text="Category Name"
         android:textColor="#343434"
         android:textSize="15sp" />
 
@@ -66,7 +66,6 @@
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/tv_asset_name"
         android:layout_alignLeft="@+id/tv_asset_category"
         android:layout_alignRight="@id/tv_asset_name"
         android:layout_alignStart="@+id/tv_asset_category"

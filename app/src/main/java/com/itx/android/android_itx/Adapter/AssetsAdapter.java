@@ -39,7 +39,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     @Override
     public void onBindViewHolder(AssetsViewHolder holder, int position) {
-        Assets currentAsset = mListAssets.get(position);
+        final Assets currentAsset = mListAssets.get(position);
         holder.mTvAssetName.setText(currentAsset.getName());
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(currentAsset.getRating());
@@ -49,9 +49,13 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
             public void onClick(View v) {
 
 
-                Intent ieventreport = new Intent(mContext, ListInventory.class);
-                mContext.startActivity(ieventreport);
-
+                Intent listInventory = new Intent(mContext, ListInventory.class);
+                listInventory.putExtra("idAsset", currentAsset.getId());
+                listInventory.putExtra("assetName", currentAsset.getName());
+                listInventory.putExtra("categoryName", currentAsset.getAssetCategory());
+                listInventory.putExtra("phone", currentAsset.getPhone());
+                listInventory.putExtra("rating", currentAsset.getRating());
+                mContext.startActivity(listInventory);
 
             }
         });

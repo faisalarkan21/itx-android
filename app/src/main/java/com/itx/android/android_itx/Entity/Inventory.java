@@ -15,16 +15,7 @@ public class Inventory {
     private String deletedAt;
     private String space;
     private String stock;
-    private String price;
-
-
-    public Inventory(String name, String stock, String space){
-
-        this.name = name;
-        this.stock = stock;
-        this.space = space;
-
-    }
+    private double price;
 
 
     public String getInventoryCategory() {
@@ -99,11 +90,11 @@ public class Inventory {
         this.stock = stock;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 }

@@ -9,6 +9,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Assets {
 
+    @SerializedName("idAsset")
+    @Expose
+    private String id;
     @SerializedName("user")
     @Expose
     private String user;
@@ -61,14 +64,13 @@ public class Assets {
     @Expose
     private String deletedAt;
 
-    public Assets(String name, String assetCategory, float rating){
-
-        this.name = name;
-        this.assetCategory = assetCategory;
-        this.rating = rating;
-
+    public String getId() {
+        return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUser() {
         return user;
