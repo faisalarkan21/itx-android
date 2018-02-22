@@ -33,12 +33,7 @@ import retrofit2.Callback;
 
 public class ListUsers extends AppCompatActivity {
 
-//    private ListView userListView ;
-//    private ArrayAdapter<String> listUserAdapter ;
-//    private ArrayList <Integer> listAssetAdapter;
-
     private List<Users> userList = new ArrayList<>();
-    private RecyclerView recyclerView;
     private UsersAdapter uAdapter;
     SessionManager session;
 
@@ -46,6 +41,10 @@ public class ListUsers extends AppCompatActivity {
 
     @BindView(R.id.btn_add_user)
     Button btnAddUser;
+
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,6 @@ public class ListUsers extends AppCompatActivity {
             }
         });
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         uAdapter = new UsersAdapter(userList,this);
 

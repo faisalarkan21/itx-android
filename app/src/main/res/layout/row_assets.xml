@@ -39,25 +39,37 @@
         android:typeface="sans" />
 
     <TextView
-        android:id="@+id/tv_assets_deskripsi"
+        android:id="@+id/tv_assets_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_asset_no_hp"
+        android:layout_alignStart="@+id/tv_asset_no_hp"
+        android:layout_below="@+id/tv_asset_no_hp"
+        android:text="Alamat"
+        android:textColor="#343434"
+        android:textSize="15sp" />
+
+
+    <!-- Rightend Arrow -->
+    <TextView
+        android:id="@+id/tv_asset_no_hp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_asset_name"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="deskripsi assets"
+        android:text="No Telp"
         android:textColor="#343434"
         android:textSize="15sp" />
 
-
-    <!-- Rightend Arrow -->
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="25dp"
-        android:src="@drawable/arrow" />
+        android:src="@drawable/arrow"
+        android:id="@+id/imageView2" />
 
 </RelativeLayout>

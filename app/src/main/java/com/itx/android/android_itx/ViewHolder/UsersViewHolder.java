@@ -13,10 +13,10 @@ import com.itx.android.android_itx.R;
 public class UsersViewHolder extends RecyclerView.ViewHolder {
     public TextView userName, assets, genre;
 
-    public UsersViewHolder(View view) {
-        super(view);
-        userName = (TextView) view.findViewById(R.id.userName);
-        assets = (TextView) view.findViewById(R.id.assets);
+    public UsersViewHolder(View itemView) {
+        super(itemView);
+        userName = (TextView) itemView.findViewById(R.id.userName);
+        assets = (TextView) itemView.findViewById(R.id.assets);
 
     }
 }

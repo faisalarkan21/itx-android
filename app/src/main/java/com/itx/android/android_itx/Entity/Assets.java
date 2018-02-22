@@ -18,6 +18,9 @@ public class Assets {
     @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("name")
+    @Expose
+    private String fullName;
     @SerializedName("brand")
     @Expose
     private String brand;
@@ -58,6 +61,14 @@ public class Assets {
     @Expose
     private String deletedAt;
 
+    public Assets(String name, String address, String phone){
+
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+
+    }
+
 
     public String getUser() {
         return user;
@@ -66,6 +77,15 @@ public class Assets {
     public void setUser(String user) {
         this.user = user;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
 
     public String getAssetCategory() {
         return assetCategory;

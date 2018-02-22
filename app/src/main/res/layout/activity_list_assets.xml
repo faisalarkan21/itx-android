@@ -27,7 +27,7 @@
 
     </LinearLayout>
 
-    <include layout="@layout/content_users" />
+    <include layout="@layout/content_assets" />
 
 
 </LinearLayout>

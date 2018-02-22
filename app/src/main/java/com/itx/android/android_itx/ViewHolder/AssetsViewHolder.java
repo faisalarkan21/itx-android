@@ -12,14 +12,16 @@ import com.itx.android.android_itx.R;
  */
 
 public class AssetsViewHolder extends RecyclerView.ViewHolder {
-    public TextView mTvNamaAsset, mTvDeskripsiAsset;
+    public TextView mTvAssetName, mTvAssetAddress, mTvAssetPhone;
     public ImageView mIvGambarAsset;
 
     public AssetsViewHolder(View itemView) {
         super(itemView);
 
-        mTvNamaAsset = (TextView) itemView.findViewById(R.id.tv_asset_name);
-        mTvDeskripsiAsset = (TextView) itemView.findViewById(R.id.tv_assets_deskripsi);
-        mIvGambarAsset = (ImageView) itemView.findViewById(R.id.iv_asset);
+        mTvAssetName = (TextView) itemView.findViewById(R.id.tv_asset_name);
+        mTvAssetAddress = (TextView) itemView.findViewById(R.id.tv_assets_address);
+        mTvAssetPhone = (TextView) itemView.findViewById(R.id.tv_asset_no_hp);
+
+
     }
 }
