@@ -48,7 +48,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
         android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="No Telp"
+        android:text="Category Name"
         android:textColor="#343434"
         android:textSize="15sp" />
 

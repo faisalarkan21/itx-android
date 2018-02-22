@@ -19,6 +19,10 @@ public class Users {
     @Expose
     private String firstName;
 
+    @SerializedName("fullname")
+    @Expose
+    private String fullName;
+
     @SerializedName("lastName")
     @Expose
     private String lastName;
@@ -75,13 +79,13 @@ public class Users {
     @Expose
     private String token;
 
-    public Users(String firstName, String lastName, String assets){
-
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.assets = assets;
-
-    }
+//    public Users(String fullName, String firstName, String lastName, String assets){
+//        this.fullName = fullName;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.assets = assets;
+//
+//    }
 
 
     public int getIdUser() {
@@ -106,6 +110,14 @@ public class Users {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getKtp() {

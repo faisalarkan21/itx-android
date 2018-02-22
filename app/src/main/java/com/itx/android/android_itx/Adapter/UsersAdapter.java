@@ -43,7 +43,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
     @Override
     public void onBindViewHolder(UsersViewHolder holder, int position) {
         final Users user = userList.get(position);
-        holder.userName.setText(user.getFirstName()  + " " + user.getLastName());
+        holder.userName.setText(user.getFullName());
         holder.assets.setText("Assets : " + user.getAssets());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

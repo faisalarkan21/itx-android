@@ -1,6 +1,5 @@
 package com.itx.android.android_itx;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,22 +11,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Entity.Users;
-import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
-import com.itx.android.android_itx.Utils.RecyclerTouchListener;
 import com.itx.android.android_itx.Adapter.UsersAdapter;
 import com.itx.android.android_itx.Utils.SessionManager;
 
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -104,16 +101,26 @@ public class ListUsers extends AppCompatActivity {
         String token =  session.getToken();
         mListUsersAPIService = ApiUtils.getListUsersService(token);
 
-        Call<ResponseBody> response = mListUsersAPIService.getAUsers();
+        Call<JsonObject> response = mListUsersAPIService.getAUsers();
 
-        response.enqueue(new Callback<ResponseBody>() {
+        response.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
+            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
                 if (rawResponse.isSuccessful()) {
                     try {
+                        JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
 
-                        JSONObject jsonObject = new JSONObject(rawResponse.body().string());
+                        for (int i=0; i < jsonArray.size() ; i++ ){
+                            JsonObject Data = jsonArray.get(i).getAsJsonObject();
+                            Users user = new Users();
+                            user.setFullName(Data.get("fullName").getAsString());
+                            user.setAssets(Data.get("totalAssets").getAsString());
+                            userList.add(user);
+                            uAdapter.notifyDataSetChanged();
+                        }
 
+                        Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+                                Toast.LENGTH_LONG).show();
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -126,37 +133,14 @@ public class ListUsers extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+            public void onFailure(Call<JsonObject> call, Throwable throwable) {
 
                 Toast.makeText(ListUsers.this, throwable.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
 
-        Users user = new Users("Faisal", "Arkan", "23");
-        userList.add(user);
 
-        user = new Users("Lea", "Sativa", "29");
-        userList.add(user);
-
-        user = new Users("Zia", "Orang", "12");
-        userList.add(user);
-
-        user = new Users("Orange", "Zizag", "90");
-        userList.add(user);
-
-        user = new Users("Tifa", "Ruki", "12");
-        userList.add(user);
-        user = new Users("Tifa", "Ruki", "12");
-        userList.add(user);
-        user = new Users("Tifa", "Ruki", "12");
-        userList.add(user);
-        user = new Users("Tifa", "Ruki", "12");
-        userList.add(user);
-
-        // notify adapter about data set changes
-        // so that it will render the list with new data
-        uAdapter.notifyDataSetChanged();
     }
 
 
