@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class CreateNewAsset extends AppCompatActivity {
 
@@ -28,6 +29,8 @@ public class CreateNewAsset extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_asset);
+
+        ButterKnife.bind(this);
 
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override

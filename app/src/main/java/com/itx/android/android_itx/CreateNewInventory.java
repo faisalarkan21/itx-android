@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class CreateNewInventory extends AppCompatActivity {
 
@@ -22,6 +23,8 @@ public class CreateNewInventory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_inventory);
+
+        ButterKnife.bind(this);
 
         mBtnAddInvent.setOnClickListener(new View.OnClickListener() {
             @Override

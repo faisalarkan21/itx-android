@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -45,6 +46,8 @@ public class CreateNewUser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
+
+        ButterKnife.bind(this);
 
         mBtnAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
