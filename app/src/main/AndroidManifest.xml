@@ -19,12 +19,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".Login" />
-        <activity android:name=".DashboardUtama" />
+        <activity android:label="Dahsboard Utama" android:name=".DashboardUtama" />
         <activity
             android:name=".ListUsers"
             android:label="List Pengguna" />
-        <activity android:name=".ListAssets" />
-        <activity android:name=".ListInventory"></activity>
+        <activity android:label="List Assets" android:name=".ListAssets" />
+        <activity android:label="List Inventory" android:name=".ListInventory"></activity>
     </application>
 
 </manifest>

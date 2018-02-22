@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginTop="0dp"
+    android:orientation="horizontal"
+    android:padding="5dip">
+
+    <!--  ListRow Left sied Thumbnail image -->
+    <LinearLayout
+        android:id="@+id/thumbnail_asset_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip"
+
+        android:padding="3dip">
+
+        <ImageView
+            android:id="@+id/iv_asset"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
+            android:background="@drawable/icon_tentang_04" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_inventory_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/thumbnail_asset_layout"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="3dp"
+        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+        android:text="Inventory Name"
+        android:textColor="#040404"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/tv_inventory_stock"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_inventory_space"
+        android:layout_alignStart="@+id/tv_inventory_space"
+        android:layout_below="@+id/tv_inventory_space"
+        android:text="Stock"
+        android:textColor="#343434"
+        android:textSize="15sp" />
+
+
+    <!-- Rightend Arrow -->
+    <TextView
+        android:id="@+id/tv_inventory_space"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_inventory_name"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="3dp"
+        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+        android:text="Space"
+        android:textColor="#343434"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="25dp"
+        android:src="@drawable/arrow"
+        android:id="@+id/imageView2" />
+
+</RelativeLayout>

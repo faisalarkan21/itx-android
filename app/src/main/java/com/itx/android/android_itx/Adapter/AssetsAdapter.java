@@ -1,12 +1,14 @@
 package com.itx.android.android_itx.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.itx.android.android_itx.Entity.Assets;
+import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
 
@@ -45,6 +47,11 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+                Intent ieventreport = new Intent(mContext, ListInventory.class);
+                mContext.startActivity(ieventreport);
+
 
             }
         });
