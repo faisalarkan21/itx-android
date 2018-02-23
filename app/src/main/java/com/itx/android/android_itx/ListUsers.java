@@ -1,6 +1,8 @@
 package com.itx.android.android_itx;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -35,6 +37,8 @@ public class ListUsers extends AppCompatActivity {
     private UsersAdapter uAdapter;
     SessionManager session;
 
+    ProgressDialog progressDialog;
+
     ListUsersService mListUsersAPIService;
 
     @BindView(R.id.btn_add_user)
@@ -60,26 +64,23 @@ public class ListUsers extends AppCompatActivity {
             }
         });
 
-
         uAdapter = new UsersAdapter(userList,this);
 
         recyclerView.setHasFixedSize(true);
 
-        // vertical RecyclerView
-        // keep user_list_row.xml width to `match_parent`
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        progressDialog = new ProgressDialog(ListUsers.this);
+        progressDialog.setMessage("Menyiapkan Data");
+        progressDialog.show();
 
-        // horizontal RecyclerView
-        // keep user_list_row.xml width to `wrap_content`
-        // RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+
+
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         recyclerView.setLayoutManager(mLayoutManager);
 
-        // adding inbuilt divider line
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        // adding custom divider line with padding 16dp
-        // recyclerView.addItemDecoration(new MyDividerItemDecoration(this, LinearLayoutManager.HORIZONTAL, 16));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.setAdapter(uAdapter);
@@ -111,7 +112,20 @@ public class ListUsers extends AppCompatActivity {
                             user.setAssets(Data.get("totalAssets").getAsString());
                             user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             userList.add(user);
-                            uAdapter.notifyDataSetChanged();
+
+                            new CountDownTimer(2000, 2000) {
+
+                                public void onTick(long millisUntilFinished) {
+                                    // You don't need anything here
+                                }
+
+                                public void onFinish() {
+                                    uAdapter.notifyDataSetChanged();
+                                    progressDialog.dismiss();
+                                }
+                            }.start();
+
+
                         }
                         Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
                                 Toast.LENGTH_LONG).show();

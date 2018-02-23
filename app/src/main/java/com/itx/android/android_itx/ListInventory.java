@@ -1,6 +1,8 @@
 package com.itx.android.android_itx;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,6 +62,8 @@ public class ListInventory extends AppCompatActivity {
     ListInventoryService mInventoryAPIService;
     SessionManager session;
 
+    ProgressDialog progressDialog;
+
 
     private InventoryAdapter mAdapter;
 
@@ -71,6 +75,11 @@ public class ListInventory extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mAdapter = new InventoryAdapter(mListInventory, this);
+
+
+        progressDialog = new ProgressDialog(ListInventory.this);
+        progressDialog.setMessage("Menyiapkan Data");
+        progressDialog.show();
 
         session = new SessionManager(this);
         mRecyclerView.setHasFixedSize(true);
@@ -148,7 +157,18 @@ public class ListInventory extends AppCompatActivity {
                             invent.setPrice(Data.get("price").getAsDouble());
 
                             mListInventory.add(invent);
-                            mAdapter.notifyDataSetChanged();
+
+
+                            new CountDownTimer(2000, 2000) {
+
+                                public void onTick(long millisUntilFinished) {
+                                    // You don't need anything here
+                                }
+                                public void onFinish() {
+                                    mAdapter.notifyDataSetChanged();
+                                    progressDialog.dismiss();
+                                }
+                            }.start();
                         }
 
                         Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
