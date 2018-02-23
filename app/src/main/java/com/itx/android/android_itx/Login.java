@@ -121,17 +121,13 @@ public class Login extends AppCompatActivity {
 
                             }
                         }.start();
-
-
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Log.d("TEST",rawResponse.toString());
                     Toast.makeText(Login.this, "Password / Username Salah",
                             Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
                 }
 
             }
