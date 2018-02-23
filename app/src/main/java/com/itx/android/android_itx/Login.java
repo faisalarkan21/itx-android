@@ -110,6 +110,7 @@ public class Login extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    Log.d("TEST",rawResponse.toString());
                     Toast.makeText(Login.this, "Password / Username Salah",
                             Toast.LENGTH_LONG).show();
                 }

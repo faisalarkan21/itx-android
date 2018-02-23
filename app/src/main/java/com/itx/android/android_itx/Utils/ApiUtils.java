@@ -1,5 +1,6 @@
 package com.itx.android.android_itx.Utils;
 
+import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Service.ListInventoryService;
@@ -34,6 +35,10 @@ public class ApiUtils {
     public static ListInventoryService getListInventoryService(String token) {
 
         return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListInventoryService.class);
+    }
+
+    public static APIService getAPIService(String token){
+        return  RetrofitClient.getClientPrivate(BASE_URL, token).create(APIService.class);
     }
 
 
