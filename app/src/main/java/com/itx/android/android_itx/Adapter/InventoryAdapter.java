@@ -42,6 +42,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
     public void onBindViewHolder(InventoryViewHolder holder, int position) {
         final Inventory invent = inventoryList.get(position);
         holder.inventoryName.setText(invent.getName());
+        holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
         holder.inventoryPrice.setText("@ " + new RupiahCurrency().toRupiahFormat(invent.getPrice()));

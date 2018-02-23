@@ -1,6 +1,7 @@
 package com.itx.android.android_itx.Utils;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -17,10 +18,17 @@ public class RetrofitClient {
 
     private static Retrofit retrofit = null;
 
+    static OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build();
+
     public static Retrofit getClientLogin(String baseUrl) {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
+                    .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
@@ -37,7 +45,10 @@ public class RetrofitClient {
                         .build();
                 return chain.proceed(newRequest);
             }
-        }).build();
+        }).connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();;
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(client)

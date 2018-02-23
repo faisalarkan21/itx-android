@@ -103,12 +103,14 @@ public class Login extends AppCompatActivity {
 
                         Intent dashboard = new Intent(Login.this, DashboardUtama.class);
                         startActivity(dashboard);
+                        finish();
 
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
+                    Log.d("TEST",rawResponse.toString());
                     Toast.makeText(Login.this, "Password / Username Salah",
                             Toast.LENGTH_LONG).show();
                 }

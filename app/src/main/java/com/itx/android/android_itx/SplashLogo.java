@@ -41,13 +41,13 @@ public class SplashLogo extends AppCompatActivity {
         ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(logoTelkom, "alpha", 3f, 0f);
         ValueAnimator fadeAnim3 = ObjectAnimator.ofFloat(logoWonderful, "alpha", 3f, 0f);
 
-        fadeAnim1.setDuration(1000);
+        fadeAnim1.setDuration(2700);
         fadeAnim1.start();
 
-        fadeAnim2.setDuration(1000);
+        fadeAnim2.setDuration(2700);
         fadeAnim2.start();
 
-        fadeAnim3.setDuration(1000);
+        fadeAnim3.setDuration(2700);
         fadeAnim3.start();
 
         Thread timer = new Thread() {

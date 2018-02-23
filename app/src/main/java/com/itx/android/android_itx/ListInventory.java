@@ -62,6 +62,7 @@ public class ListInventory extends AppCompatActivity {
 
 
     private InventoryAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,12 +99,14 @@ public class ListInventory extends AppCompatActivity {
     private void prepareUserData() {
 
         String idAsset = getIntent().getStringExtra("idAsset");
+        String assetAdress = getIntent().getStringExtra("address");
         String assetName = getIntent().getStringExtra("assetName");
         String categoryName = getIntent().getStringExtra("categoryName");
         String phone = getIntent().getStringExtra("phone");
-        float rating = getIntent().getFloatExtra("rating",0);
+        float rating = getIntent().getFloatExtra("rating", 0);
 
         mAssetName.setText(assetName);
+        mAssetAddress.setText(assetAdress);
         mAssetCategory.setText(categoryName);
         mAssetPhone.setText(phone);
         mAssetRating.setRating(rating);
@@ -124,12 +127,22 @@ public class ListInventory extends AppCompatActivity {
 
                         JsonArray jsonArray = json.getAsJsonArray();
 
-                        for (int i=0; i < jsonArray.size() ; i++ ){
+                        for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
 
                             Inventory invent = new Inventory();
                             invent.setName(Data.get("name").getAsString());
+
+                            JsonArray facilitiesLoop = Data.get("facilities").getAsJsonArray();
+                            String tempFacilities = "";
+
+                            for (int a = 0; a < facilitiesLoop.size(); a++) {
+                                JsonObject DataFacilities = facilitiesLoop.get(a).getAsJsonObject();
+                                tempFacilities += DataFacilities.get("name").getAsString() + ", ";
+                                invent.setFacilities(tempFacilities.substring(0,tempFacilities.length() - 2));
+                            }
+
                             invent.setStock(Data.get("stock").getAsString());
                             invent.setSpace(Data.get("space").getAsString());
                             invent.setPrice(Data.get("price").getAsDouble());
@@ -162,6 +175,7 @@ public class ListInventory extends AppCompatActivity {
 //        mListInventory.add(invent);
 
 
-
     }
+
+
 }

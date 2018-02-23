@@ -16,6 +16,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
+import com.itx.android.android_itx.Entity.Address;
 import com.itx.android.android_itx.Entity.Assets;
 import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.ListAssetService;
@@ -97,7 +98,7 @@ public class ListAssets extends AppCompatActivity {
                     try {
 
                         JsonElement json = rawResponse.body().get("data");
-                        Log.d("lnes 102", Boolean.toString(json.isJsonArray()));
+//                        Log.d("lnes 102", json.getAsString());
 
                         JsonArray jsonArray = json.getAsJsonArray();
 
@@ -106,6 +107,7 @@ public class ListAssets extends AppCompatActivity {
 
                             Assets assets = new Assets();
                             assets.setId(Data.get("_id").getAsString());
+                            assets.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
                             assets.setName(Data.get("name").getAsString());
                             assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());

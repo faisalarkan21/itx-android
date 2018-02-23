@@ -7,6 +7,7 @@ package com.itx.android.android_itx.Entity;
 public class Inventory {
 
     private String inventoryCategory;
+    private String facilities;
     private String kode;
     private String name;
     private String isVerified;
@@ -24,6 +25,14 @@ public class Inventory {
 
     public void setInventoryCategory(String inventoryCategory) {
         this.inventoryCategory = inventoryCategory;
+    }
+
+    public String getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(String facilities) {
+        this.facilities = facilities;
     }
 
     public String getKode() {
