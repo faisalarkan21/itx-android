@@ -103,6 +103,7 @@ public class Login extends AppCompatActivity {
 
                         Intent dashboard = new Intent(Login.this, DashboardUtama.class);
                         startActivity(dashboard);
+                        finish();
 
 
                     } catch (Exception e) {

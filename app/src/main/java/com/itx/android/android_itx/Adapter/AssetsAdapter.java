@@ -51,6 +51,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
                 Intent listInventory = new Intent(mContext, ListInventory.class);
                 listInventory.putExtra("idAsset", currentAsset.getId());
+                listInventory.putExtra("address", currentAsset.getAddress());
                 listInventory.putExtra("assetName", currentAsset.getName());
                 listInventory.putExtra("categoryName", currentAsset.getAssetCategory());
                 listInventory.putExtra("phone", currentAsset.getPhone());
