@@ -18,10 +18,10 @@
         android:padding="3dip">
 
         <ImageView
-            android:id="@+id/list_image"
+            android:id="@+id/list_image_users"
             android:layout_width="47dp"
             android:layout_height="47dp"
-            android:background="@drawable/icon_tentang_04" />
+             />
 
     </LinearLayout>
 
