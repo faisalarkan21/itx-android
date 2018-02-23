@@ -79,9 +79,9 @@ public class ListInventory extends AppCompatActivity {
         setContentView(R.layout.activity_list_inventory);
 
 
-        getSupportActionBar().setHomeButtonEnabled(false); // disable the button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // remove the left caret
-        getSupportActionBar().setDisplayShowHomeEnabled(false); // remove the icon
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         ButterKnife.bind(this);
 
@@ -154,7 +154,6 @@ public class ListInventory extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
-
                             Inventory invent = new Inventory();
                             invent.setName(Data.get("name").getAsString());
 
@@ -176,7 +175,6 @@ public class ListInventory extends AppCompatActivity {
                             invent.setPrice(Data.get("price").getAsDouble());
 
                             mListInventory.add(invent);
-
 
                             new CountDownTimer(1000, 1000) {
 
