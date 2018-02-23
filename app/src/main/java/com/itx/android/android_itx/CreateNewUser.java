@@ -29,6 +29,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     private SessionManager sessManager;
     String mCurrentPhotoPath;
     private File filePhoto;
+    private Uri photoURI;
 
     ListUsersService mUserService;
     APIService mApiService;
@@ -83,7 +86,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
 
-        if(filePhoto == null) {
+        if(photoURI == null) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -102,9 +105,15 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         final Address fullAddress = new Address(address,city,province ,postal,country);
 
+        URI theURIForPhoto = null;
+        try {
+            theURIForPhoto = new URI(photoURI.toString());
+        }catch (URISyntaxException ex){
+            ex.printStackTrace();
+        }
 
         //Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), filePhoto);
+        RequestBody uploadBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), new File(theURIForPhoto));
         Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(uploadBody);
 
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
@@ -130,41 +139,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                filePhoto = createImageFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            if (filePhoto != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.itx.android.android_itx",
-                        filePhoto);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
-            }
-        }
-    }
 
     private void takePhoto(){
         //show dialog for user to choose between camera or gallery
@@ -187,6 +162,13 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         });
         AlertDialog alertDialog = alertBuilder.create();
         alertDialog.show();
+    }
+
+    private void takePhotoFromCamera(){
+        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(i.resolveActivity(getPackageManager())!= null) {
+            startActivityForResult(i, CAMERA_REQUEST);
+        }
     }
 
     private void takePhotoFromGallery(){
@@ -224,9 +206,26 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(photoURI != null){
+            outState.putString("URIFOTO",photoURI.toString());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState.containsKey("URIFOTO")){
+            photoURI = Uri.parse(savedInstanceState.getString("URIFOTO"));
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
             Bundle extras = data.getExtras();
+            photoURI = data.getData();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             mIvPhoto.setImageBitmap(imageBitmap);
         } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
