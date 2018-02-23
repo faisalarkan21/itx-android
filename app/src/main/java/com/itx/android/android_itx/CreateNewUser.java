@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +29,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -45,6 +49,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     private static final int GALLERY_REQUEST = 1001;
 
     private SessionManager sessManager;
+    String mCurrentPhotoPath;
     private File filePhoto;
 
     ListUsersService mUserService;
@@ -125,6 +130,42 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void takePhotoFromCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                filePhoto = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            if (filePhoto != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.itx.android.android_itx",
+                        filePhoto);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
     private void takePhoto(){
         //show dialog for user to choose between camera or gallery
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
@@ -146,14 +187,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         });
         AlertDialog alertDialog = alertBuilder.create();
         alertDialog.show();
-    }
-
-    private void takePhotoFromCamera(){
-        /*
-            ambil foto dari kamera lalu hasilnya akan ada di onActivityResult
-        */
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
     private void takePhotoFromGallery(){
@@ -193,10 +226,9 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
-            Uri photoURI = data.getData();
-            Log.d(TAG, photoURI.toString());
-            filePhoto = new File(photoURI.getPath());
-            mIvPhoto.setImageURI(photoURI);
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mIvPhoto.setImageBitmap(imageBitmap);
         } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
             Uri photoURI = data.getData();
             filePhoto = new File(photoURI.getPath());

@@ -13,7 +13,7 @@ public class DashboardUtama extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dahsboard_utama);
+        setContentView(R.layout.activity_dashboard_utama);
 
         btnUsers = (Button) findViewById(R.id.btnUsers);
 
