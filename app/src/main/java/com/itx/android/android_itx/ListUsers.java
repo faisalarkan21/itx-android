@@ -49,7 +49,6 @@ public class ListUsers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
 
-
         ButterKnife.bind(this);
         session = new SessionManager(this);
 
@@ -107,13 +106,13 @@ public class ListUsers extends AppCompatActivity {
                         for (int i=0; i < jsonArray.size() ; i++ ){
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Users user = new Users();
-                            user.setIdUser(Data.get("_id").getAsString());
+                            user.setIdUser(Data.get("_id").getAsString());//
                             user.setFullName(Data.get("fullName").getAsString());
                             user.setAssets(Data.get("totalAssets").getAsString());
+                            user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             userList.add(user);
                             uAdapter.notifyDataSetChanged();
                         }
-
                         Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
                                 Toast.LENGTH_LONG).show();
 

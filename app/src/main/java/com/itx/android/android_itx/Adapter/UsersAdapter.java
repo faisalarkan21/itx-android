@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bumptech.glide.Glide;
 import com.itx.android.android_itx.DashboardUtama;
 import com.itx.android.android_itx.ListAssets;
 import com.itx.android.android_itx.ListUsers;
@@ -26,9 +28,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
     private List<Users> userList;
     private Context mContext;
-
-
-
 
     public UsersAdapter(List<Users> userList, Context activity) {
         this.mContext = activity;
@@ -49,6 +48,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
         holder.userName.setText(user.getFullName());
         holder.assets.setText("Assets : " + user.getAssets());
+
+//        Log.d("ini lines 52", user.getPhoto());
+
+        Glide.with(mContext)
+                .load("https://s3-ap-southeast-1.amazonaws.com/itx-storage/userdata/image/5a8a8e1c2dc00f0dce3d37ee-1519115564243-airasia-thumbnail.png")
+                .into(holder.imageUsers);
+
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
