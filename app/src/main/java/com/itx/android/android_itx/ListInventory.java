@@ -165,7 +165,7 @@ public class ListInventory extends AppCompatActivity {
                             mListInventory.add(invent);
 
 
-                            new CountDownTimer(1500, 1500) {
+                            new CountDownTimer(1000, 1000) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
@@ -177,7 +177,7 @@ public class ListInventory extends AppCompatActivity {
                             }.start();
                         }
 
-                        Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+                        Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
                                 Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();

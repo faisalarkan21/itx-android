@@ -112,11 +112,14 @@ public class ListAssets extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
                 if (rawResponse.isSuccessful()) {
                     try {
-/**/
                         JsonElement json = rawResponse.body().get("data");
-//                        Log.d("lnes 102", json.getAsString());
+                        final JsonArray jsonArray = json.getAsJsonArray();
 
-                        JsonArray jsonArray = json.getAsJsonArray();
+                        if (jsonArray.size() == 0 ){
+                            progressDialog.dismiss();
+                            Toast.makeText(ListAssets.this, "Tidak ada data.",
+                                    Toast.LENGTH_LONG).show();
+                        }
 
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
@@ -130,7 +133,7 @@ public class ListAssets extends AppCompatActivity {
                             assets.setRating(Data.get("rating").getAsFloat());
                             mListAsset.add(assets);
 
-                            new CountDownTimer(1500, 1500) {
+                            new CountDownTimer(1000, 1000) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
@@ -139,14 +142,11 @@ public class ListAssets extends AppCompatActivity {
                                 public void onFinish() {
                                     mAdapter.notifyDataSetChanged();
                                     progressDialog.dismiss();
+                                    Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
+                                            Toast.LENGTH_LONG).show();
                                 }
                             }.start();
-
-
                         }
-
-                        Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
-                                Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

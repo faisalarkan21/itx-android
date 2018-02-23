@@ -110,7 +110,7 @@ public class ListUsers extends AppCompatActivity {
                             user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             userList.add(user);
 
-                            new CountDownTimer(1500, 1500) {
+                            new CountDownTimer(1000, 1000) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
