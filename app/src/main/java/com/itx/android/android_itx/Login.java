@@ -1,6 +1,8 @@
 package com.itx.android.android_itx;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -47,6 +49,8 @@ public class Login extends AppCompatActivity {
     @BindView(R.id.input_password)
     EditText editPassword;
 
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +59,7 @@ public class Login extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        session = new SessionManager(getApplicationContext());
+
 
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -63,9 +67,12 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
-
                 String username = editEmaill.getText().toString().trim();
                 String password = editPassword.getText().toString().trim();
+                session = new SessionManager(getApplicationContext());
+                progressDialog = new ProgressDialog(Login.this);
+                progressDialog.setMessage("Mohon Tungggu");
+                progressDialog.show();
 
                 sendPost(username, password);
             }
@@ -101,9 +108,21 @@ public class Login extends AppCompatActivity {
 
                         session.setSession(dataToken);
 
-                        Intent dashboard = new Intent(Login.this, DashboardUtama.class);
-                        startActivity(dashboard);
-                        finish();
+                        new CountDownTimer(1000, 1000) {
+
+                            public void onTick(long millisUntilFinished) {
+                                // You don't need anything here
+                            }
+                            public void onFinish() {
+                                progressDialog.dismiss();
+                                Intent dashboard = new Intent(Login.this, DashboardUtama.class);
+                                startActivity(dashboard);
+                                finish();
+
+                            }
+                        }.start();
+
+
 
 
                     } catch (Exception e) {
