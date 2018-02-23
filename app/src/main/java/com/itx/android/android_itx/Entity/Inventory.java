@@ -10,6 +10,7 @@ public class Inventory {
     private String facilities;
     private String kode;
     private String name;
+    private String image;
     private String isVerified;
     private String updatedAt;
     private String createdAt;
@@ -45,6 +46,14 @@ public class Inventory {
 
     public String getName() {
         return name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public void setName(String name) {

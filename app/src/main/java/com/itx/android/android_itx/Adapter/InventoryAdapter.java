@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.R;
+import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.ViewHolder.InventoryViewHolder;
 import com.itx.android.android_itx.Utils.RupiahCurrency;
 
@@ -42,6 +44,11 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
     public void onBindViewHolder(InventoryViewHolder holder, int position) {
         final Inventory invent = inventoryList.get(position);
         holder.inventoryName.setText(invent.getName());
+
+        Glide.with(mContext)
+                .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImage())
+                .into(holder.inventoryImage);
+
         holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());

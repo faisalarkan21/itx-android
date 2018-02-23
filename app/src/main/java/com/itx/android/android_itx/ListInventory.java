@@ -12,10 +12,12 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,6 +61,9 @@ public class ListInventory extends AppCompatActivity {
 
     @BindView(R.id.btn_add_inventory)
     Button mBtnAddInvent;
+
+    @BindView(R.id.iv_asset_images)
+    ImageView mImagesAssets;
 
     ListInventoryService mInventoryAPIService;
     SessionManager session;
@@ -118,6 +123,7 @@ public class ListInventory extends AppCompatActivity {
         String assetName = getIntent().getStringExtra("assetName");
         String categoryName = getIntent().getStringExtra("categoryName");
         String phone = getIntent().getStringExtra("phone");
+        String images = getIntent().getStringExtra("images");
         float rating = getIntent().getFloatExtra("rating", 0);
 
         mAssetName.setText(assetName);
@@ -125,7 +131,10 @@ public class ListInventory extends AppCompatActivity {
         mAssetCategory.setText(categoryName);
         mAssetPhone.setText(phone);
         mAssetRating.setRating(rating);
-        Log.d("ini line 61", assetName);
+
+        Glide.with(ListInventory.this)
+                .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                .into(mImagesAssets);
 
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
 
@@ -149,6 +158,10 @@ public class ListInventory extends AppCompatActivity {
                             Inventory invent = new Inventory();
                             invent.setName(Data.get("name").getAsString());
 
+                            JsonArray imagesLoop = Data.get("images").getAsJsonArray();
+                            JsonObject DataImageInvent = imagesLoop.get(0).getAsJsonObject();
+                            invent.setImage(DataImageInvent.get("thumbnail").getAsString());
+
                             JsonArray facilitiesLoop = Data.get("facilities").getAsJsonArray();
                             String tempFacilities = "";
 
@@ -165,7 +178,7 @@ public class ListInventory extends AppCompatActivity {
                             mListInventory.add(invent);
 
 
-                            new CountDownTimer(1500, 1500) {
+                            new CountDownTimer(1000, 1000) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
@@ -177,7 +190,7 @@ public class ListInventory extends AppCompatActivity {
                             }.start();
                         }
 
-                        Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+                        Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
                                 Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -23,6 +23,7 @@ public class AssetsViewHolder extends RecyclerView.ViewHolder {
         mTvAssetName = (TextView) itemView.findViewById(R.id.tv_asset_name);
         mTvAssetCategory = (TextView) itemView.findViewById(R.id.tv_asset_category);
         mRatingBar = (RatingBar) itemView.findViewById(R.id.rating_bar_assets);
+        mIvGambarAsset = (ImageView) itemView.findViewById(R.id.iv_asset_images);
 
 
     }

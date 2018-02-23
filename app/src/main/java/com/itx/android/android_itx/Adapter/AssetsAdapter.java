@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.itx.android.android_itx.Entity.Assets;
 import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
+import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
 
 import java.util.List;
@@ -44,6 +46,10 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(currentAsset.getRating());
 
+        Glide.with(mContext)
+                .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages())
+                .into(holder.mIvGambarAsset);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +58,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                 Intent listInventory = new Intent(mContext, ListInventory.class);
                 listInventory.putExtra("idAsset", currentAsset.getId());
                 listInventory.putExtra("address", currentAsset.getAddress());
+                listInventory.putExtra("images", currentAsset.getImages());
                 listInventory.putExtra("assetName", currentAsset.getName());
                 listInventory.putExtra("categoryName", currentAsset.getAssetCategory());
                 listInventory.putExtra("phone", currentAsset.getPhone());
