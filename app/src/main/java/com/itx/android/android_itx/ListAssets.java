@@ -128,6 +128,11 @@ public class ListAssets extends AppCompatActivity {
                             assets.setId(Data.get("_id").getAsString());
                             assets.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
                             assets.setName(Data.get("name").getAsString());
+
+                            JsonArray imagesLoop = Data.get("images").getAsJsonArray();
+                            JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
+                            assets.setImages(DataImageAseets.get("thumbnail").getAsString());
+
                             assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             assets.setRating(Data.get("rating").getAsFloat());

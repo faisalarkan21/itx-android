@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
-   >
+    android:orientation="vertical">
 
 
     <LinearLayout
@@ -26,10 +25,9 @@
             android:padding="3dip">
 
             <ImageView
-                android:id="@+id/iv_asset"
+                android:id="@+id/iv_asset_images"
                 android:layout_width="47dp"
-                android:layout_height="47dp"
-                android:background="@drawable/icon_tentang_04" />
+                android:layout_height="47dp" />
 
         </LinearLayout>
 
