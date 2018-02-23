@@ -72,9 +72,6 @@ public class ListUsers extends AppCompatActivity {
         progressDialog.setMessage("Menyiapkan Data");
         progressDialog.show();
 
-
-
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         recyclerView.setLayoutManager(mLayoutManager);
@@ -113,7 +110,7 @@ public class ListUsers extends AppCompatActivity {
                             user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             userList.add(user);
 
-                            new CountDownTimer(2000, 2000) {
+                            new CountDownTimer(1500, 1500) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here

@@ -1,5 +1,6 @@
 package com.itx.android.android_itx;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -55,6 +56,12 @@ public class ListAssets extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_assets);
+
+
+        getSupportActionBar().setHomeButtonEnabled(false); // disable the button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // remove the left caret
+        getSupportActionBar().setDisplayShowHomeEnabled(false); // remove the icon
+
 
         ButterKnife.bind(this);
 
@@ -123,7 +130,7 @@ public class ListAssets extends AppCompatActivity {
                             assets.setRating(Data.get("rating").getAsFloat());
                             mListAsset.add(assets);
 
-                            new CountDownTimer(2000, 2000) {
+                            new CountDownTimer(1500, 1500) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here

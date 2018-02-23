@@ -1,5 +1,6 @@
 package com.itx.android.android_itx;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -71,6 +72,11 @@ public class ListInventory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_inventory);
+
+
+        getSupportActionBar().setHomeButtonEnabled(false); // disable the button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // remove the left caret
+        getSupportActionBar().setDisplayShowHomeEnabled(false); // remove the icon
 
         ButterKnife.bind(this);
 
@@ -159,7 +165,7 @@ public class ListInventory extends AppCompatActivity {
                             mListInventory.add(invent);
 
 
-                            new CountDownTimer(2000, 2000) {
+                            new CountDownTimer(1500, 1500) {
 
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
@@ -189,13 +195,5 @@ public class ListInventory extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             }
         });
-
-//
-//        Inventory invent = new Inventory("Superior", "3", "2");
-//        mListInventory.add(invent);
-
-
     }
-
-
 }
