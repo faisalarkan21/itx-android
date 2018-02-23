@@ -18,11 +18,13 @@ import com.itx.android.android_itx.ListUsers;
 import com.itx.android.android_itx.Login;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.RecyclerTouchListener;
 import com.itx.android.android_itx.ViewHolder.UsersViewHolder;
 import android.content.Intent;
 
 import java.util.List;
+
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
@@ -49,13 +51,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
         holder.userName.setText(user.getFullName());
         holder.assets.setText("Assets : " + user.getAssets());
 
-//        Log.d("ini lines 52", user.getPhoto());
-
         Glide.with(mContext)
-                .load("https://s3-ap-southeast-1.amazonaws.com/itx-storage/userdata/image/5a8a8e1c2dc00f0dce3d37ee-1519115564243-airasia-thumbnail.png")
+                .load(ApiUtils.BASE_URL_USERS_IMAGE + user.getPhoto())
                 .into(holder.imageUsers);
-
-
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
