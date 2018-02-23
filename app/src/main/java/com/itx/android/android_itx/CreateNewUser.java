@@ -9,12 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.itx.android.android_itx.Entity.Address;
+import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -29,6 +31,7 @@ public class CreateNewUser extends AppCompatActivity {
     private static final String TAG = CreateNewUser.class.getSimpleName();
 
     ListUsersService mUserService;
+    APIService mApiService;
 
     @BindView(R.id.et_add_user_firstname) EditText mEtFirstname;
     @BindView(R.id.et_add_user_lastname) EditText mEtLastname;
@@ -46,17 +49,20 @@ public class CreateNewUser extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
 
+        final SessionManager sessManager = new SessionManager(this);
+
         mBtnAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: implement for adding the user to the server
-                addNewUser();
+                addNewUser(sessManager.getToken());
             }
         });
     }
 
-    private void addNewUser(){
-        mUserService = ApiUtils.getListUsersService(new SessionManager(this).getToken());
+    private void addNewUser(String token){
+        mUserService = ApiUtils.getListUsersService(token);
+        mApiService = ApiUtils.getAPIService(token);
 
         //TODO: Cleaning this messy things
 
@@ -72,6 +78,8 @@ public class CreateNewUser extends AppCompatActivity {
 
         Address fullAddress = new Address(address,city,province ,postal,country);
 
+        RequestBody uploadBody = RequestBody.create("application/json; charset=utf-8",File.createTempFile("test","asal"));
+        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto()
 
         Map<String, Object> jsonParams = new ArrayMap<>();
         jsonParams.put("email", email);
@@ -83,9 +91,9 @@ public class CreateNewUser extends AppCompatActivity {
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 (new JSONObject(jsonParams).toString()));
 
-        Call<ResponseBody> response = mUserService.createUser(body);
+        Call<ResponseBody> addUserRequest = mUserService.createUser(body);
 
-        response.enqueue(new Callback<ResponseBody>() {
+        addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
