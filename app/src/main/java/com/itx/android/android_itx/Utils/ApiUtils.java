@@ -1,5 +1,6 @@
 package com.itx.android.android_itx.Utils;
 
+import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Service.ListInventoryService;
@@ -14,6 +15,7 @@ public class ApiUtils {
     private ApiUtils() {
     }
 
+    public static final String BASE_URL_USERS_IMAGE = "https://s3-ap-southeast-1.amazonaws.com/itx-storage/userdata/image/";
     public static final String BASE_URL = "http://139.99.105.54:3001/";
 
     public static AuthService getAuthAPIService() {
@@ -34,6 +36,10 @@ public class ApiUtils {
     public static ListInventoryService getListInventoryService(String token) {
 
         return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListInventoryService.class);
+    }
+
+    public static APIService getAPIService(String token){
+        return  RetrofitClient.getClientPrivate(BASE_URL, token).create(APIService.class);
     }
 
 

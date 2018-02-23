@@ -24,7 +24,9 @@
             android:label="Dahsboard Utama" />
         <activity
             android:name=".ListUsers"
-            android:label="List Pengguna" />
+            android:label="List Pengguna" >
+
+        </activity>
         <activity
             android:parentActivityName=".ListUsers"
             android:name=".ListAssets"

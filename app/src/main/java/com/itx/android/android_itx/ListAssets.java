@@ -1,6 +1,8 @@
 package com.itx.android.android_itx;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -47,6 +49,8 @@ public class ListAssets extends AppCompatActivity {
     ListAssetService mAssetAPIService;
     SessionManager session;
 
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +63,11 @@ public class ListAssets extends AppCompatActivity {
         mAdapter = new AssetsAdapter(mListAsset, this);
 
         mRecyclerView.setHasFixedSize(true);
+
+
+        progressDialog = new ProgressDialog(ListAssets.this);
+        progressDialog.setMessage("Menyiapkan Data");
+        progressDialog.show();
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -87,7 +96,7 @@ public class ListAssets extends AppCompatActivity {
         String idUser = getIntent().getStringExtra("id");
 
 
-        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());
+        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
 
         Call<JsonObject> response = mAssetAPIService.getUserAssets(idUser);
 
@@ -96,13 +105,13 @@ public class ListAssets extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
                 if (rawResponse.isSuccessful()) {
                     try {
-
+/**/
                         JsonElement json = rawResponse.body().get("data");
 //                        Log.d("lnes 102", json.getAsString());
 
                         JsonArray jsonArray = json.getAsJsonArray();
 
-                        for (int i=0; i < jsonArray.size() ; i++ ){
+                        for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
                             Assets assets = new Assets();
@@ -113,7 +122,20 @@ public class ListAssets extends AppCompatActivity {
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             assets.setRating(Data.get("rating").getAsFloat());
                             mListAsset.add(assets);
-                            mAdapter.notifyDataSetChanged();
+
+                            new CountDownTimer(2000, 2000) {
+
+                                public void onTick(long millisUntilFinished) {
+                                    // You don't need anything here
+                                }
+
+                                public void onFinish() {
+                                    mAdapter.notifyDataSetChanged();
+                                    progressDialog.dismiss();
+                                }
+                            }.start();
+
+
                         }
 
                         Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
