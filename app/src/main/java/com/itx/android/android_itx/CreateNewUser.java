@@ -62,7 +62,6 @@ import retrofit2.Response;
 public class CreateNewUser extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
-    private static final String IMAGE_DIRECTORY_NAME = "ITX";
     private static final int CAMERA_REQUEST = 1000;
     private static final int GALLERY_REQUEST = 1001;
 
@@ -170,7 +169,10 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         object.put("data", object0 );
 
                         JSONObject objectThumbnail = new JSONObject();
-                        objectThumbnail.put("thumbnail",urlFoto );
+                        objectThumbnail.put("thumbnail",firstUrl.getString("thumbnail"));
+                        objectThumbnail.put("fullsize", firstUrl.getString("fullsize"));
+                        objectThumbnail.put("large", firstUrl.getString("large"));
+                        objectThumbnail.put("medium", firstUrl.getString("medium"));
 
 
                         object.put("images",objectThumbnail);
@@ -204,7 +206,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(CreateNewUser.this, "Upload foto gagal", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateNewUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -261,9 +264,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             ambil foto dari gallery lalu hasilnya akan ada di onActivityResult
         */
 
-        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickPhoto , GALLERY_REQUEST);
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
+        openGalleryIntent.setType("image/*");
+        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(openGalleryIntent,"Select Picture"), GALLERY_REQUEST);
     }
 
     public void saveUserToServer(JSONObject jsonParams){
@@ -349,6 +354,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             }
         } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
             photoURI = data.getData();
+            filePhoto = new File(photoURI.getPath());
             mIvPhoto.setImageURI(photoURI);
         }
     }

@@ -49,12 +49,46 @@
                 android:layout_marginTop="8dp">
 
                 <EditText
-                    android:id="@+id/et_add_asset_deskripsi"
+                    android:id="@+id/et_add_asset_brand"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Description"
+                    android:hint="Brand"/>
 
-                    android:inputType="text|textMultiLine" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Spinner
+                android:id="@+id/sp_add_asset_categories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/et_add_asset_npwp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="NPWP"/>
+
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/et_add_asset_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone"/>
 
 
             </android.support.design.widget.TextInputLayout>

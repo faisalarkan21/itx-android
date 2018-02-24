@@ -47,6 +47,7 @@ public class ListAssets extends AppCompatActivity {
     RecyclerView mRecyclerView;
 
     private AssetsAdapter mAdapter;
+    private String idUser;
     ListAssetService mAssetAPIService;
     SessionManager session;
 
@@ -56,6 +57,8 @@ public class ListAssets extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_assets);
+
+        idUser = getIntent().getStringExtra("id");
 
         getSupportActionBar().setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -81,22 +84,19 @@ public class ListAssets extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         mRecyclerView.setAdapter(mAdapter);
-
+        prepareUserData();
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ListAssets.this, CreateNewAsset.class));
+                Intent addAssetIntent = new Intent(ListAssets.this, CreateNewAsset.class);
+                addAssetIntent.putExtra("idUser", idUser);
+                startActivity(addAssetIntent);
             }
         });
-        prepareUserData();
     }
 
 
     private void prepareUserData() {
-
-
-        String idUser = getIntent().getStringExtra("id");
-
 
         mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
 
@@ -163,10 +163,6 @@ public class ListAssets extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             }
         });
-
-
-//        Assets assets = new Assets("Rumah Zakat", "Jalan Haji Mawi", 4.5f);
-//        mListAsset.add(assets);
 
     }
 

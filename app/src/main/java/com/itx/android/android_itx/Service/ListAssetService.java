@@ -20,4 +20,10 @@ public interface ListAssetService {
     @GET("/api/user/assets/{id}")
     Call<JsonObject> getUserAssets(@Path("id") String postfix);
 
+    @POST("/api/asset/create")
+    Call<ResponseBody> createAsset(@Body RequestBody params);
+
+    @GET("/api/asset-categories")
+    Call<JsonObject> getAssetCategories();
+
 }
