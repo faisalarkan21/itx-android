@@ -57,11 +57,9 @@ public class ListAssets extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_assets);
 
-
-        getSupportActionBar().setHomeButtonEnabled(false); // disable the button
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // remove the left caret
-        getSupportActionBar().setDisplayShowHomeEnabled(false); // remove the icon
-
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         ButterKnife.bind(this);
 
@@ -70,7 +68,6 @@ public class ListAssets extends AppCompatActivity {
         mAdapter = new AssetsAdapter(mListAsset, this);
 
         mRecyclerView.setHasFixedSize(true);
-
 
         progressDialog = new ProgressDialog(ListAssets.this);
         progressDialog.setMessage("Menyiapkan Data");
@@ -91,9 +88,7 @@ public class ListAssets extends AppCompatActivity {
                 startActivity(new Intent(ListAssets.this, CreateNewAsset.class));
             }
         });
-
         prepareUserData();
-
     }
 
 
