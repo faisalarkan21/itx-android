@@ -37,7 +37,7 @@ public interface APIService {
 
 
     @Multipart
-    @POST
+    @POST("/api/upload")
     Call<ResponseBody> uploadPhoto(@Part("photos") RequestBody photos);
 
 
