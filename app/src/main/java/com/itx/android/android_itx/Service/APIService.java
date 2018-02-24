@@ -2,6 +2,7 @@ package com.itx.android.android_itx.Service;
 
 import com.itx.android.android_itx.Entity.Users;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -38,7 +39,7 @@ public interface APIService {
 
     @Multipart
     @POST("/api/upload")
-    Call<ResponseBody> uploadPhoto(@Part("photos") RequestBody photos);
+    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part photos);
 
 
 }

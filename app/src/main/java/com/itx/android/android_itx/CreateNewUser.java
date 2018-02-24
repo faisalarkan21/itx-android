@@ -29,6 +29,8 @@ import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -46,6 +48,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -138,23 +141,32 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final Address fullAddress = new Address(address,city,province ,postal,country);
 
         //Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), filePhoto);
-        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(uploadBody);
+        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
+        MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
+        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG, response.body().toString());
                 if(response.isSuccessful()){
-                    Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-                    Map<String, Object> jsonParams = new ArrayMap<>();
-                    jsonParams.put("email", email);
-                    jsonParams.put("firstName", firstName);
-                    jsonParams.put("lastName", lastName);
-                    jsonParams.put("ktp", noKTP);
-                    jsonParams.put("address",fullAddress);
+                    try {
+                        JSONArray responseJson = new JSONArray(response.body().string());
+                        JSONObject firstUrl = responseJson.getJSONObject(0);
+                        String urlFoto = firstUrl.getString("thumbnail");
+                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil, url: " + urlFoto, Toast.LENGTH_SHORT).show();
+                        Map<String, Object> jsonParams = new ArrayMap<>();
+                        jsonParams.put("email", email);
+                        jsonParams.put("firstName", firstName);
+                        jsonParams.put("lastName", lastName);
+                        jsonParams.put("ktp", noKTP);
+                        jsonParams.put("address",fullAddress);
 
-                    saveUserToServer(jsonParams);
+                        saveUserToServer(jsonParams);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
 
