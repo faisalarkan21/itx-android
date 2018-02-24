@@ -33,7 +33,7 @@
         android:orientation="vertical"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:paddingTop="15dp">
+        android:paddingTop="5dp">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -169,6 +169,14 @@
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="10dp"
+            android:text="Beri Rating" />
 
         <RatingBar
             android:id="@+id/rb_new_asset"
