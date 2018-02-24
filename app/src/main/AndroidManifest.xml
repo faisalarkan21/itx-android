@@ -38,11 +38,11 @@
             android:parentActivityName=".ListAssets"
             android:name=".ListInventory"
             android:label="List Inventory" />
-        <activity android:name=".CreateNewUser"
+        <activity android:label="New User" android:name=".CreateNewUser"
             android:parentActivityName=".ListUsers"/>
-        <activity android:name=".CreateNewAsset"
+        <activity android:label="New Asset" android:name=".CreateNewAsset"
             android:parentActivityName=".ListAssets"/>
-        <activity android:name=".CreateNewInventory"
+        <activity android:label="New Inventory" android:name=".CreateNewInventory"
             android:parentActivityName=".ListInventory"></activity>
     </application>
 
