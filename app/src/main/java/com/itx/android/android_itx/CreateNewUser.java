@@ -1,13 +1,17 @@
 package com.itx.android.android_itx;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
@@ -28,11 +32,15 @@ import com.itx.android.android_itx.Utils.SessionManager;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -40,6 +48,8 @@ import butterknife.ButterKnife;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,16 +57,18 @@ import retrofit2.Response;
 public class CreateNewUser extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
+    private static final String IMAGE_DIRECTORY_NAME = "ITX";
     private static final int CAMERA_REQUEST = 1000;
     private static final int GALLERY_REQUEST = 1001;
 
     private SessionManager sessManager;
-    String mCurrentPhotoPath;
     private File filePhoto;
     private Uri photoURI;
 
     ListUsersService mUserService;
     APIService mApiService;
+
+    String mCurrentPhotoPath;
 
     @BindView(R.id.iv_add_user) ImageView mIvPhoto;
     @BindView(R.id.et_add_user_firstname) EditText mEtFirstname;
@@ -86,6 +98,22 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         mIvPhoto.setOnClickListener(this);
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
     private void addNewUser(String token){
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
@@ -109,38 +137,32 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         final Address fullAddress = new Address(address,city,province ,postal,country);
 
-        URI theURIForPhoto = null;
-        try {
-            theURIForPhoto = new URI(photoURI.toString());
-        }catch (URISyntaxException ex){
-            ex.printStackTrace();
-        }
-
         //Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), new File(theURIForPhoto));
+        RequestBody uploadBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), filePhoto);
         Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(uploadBody);
 
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Map<String, Object> jsonParams = new ArrayMap<>();
-                jsonParams.put("email", email);
-                jsonParams.put("firstName", firstName);
-                jsonParams.put("lastName", lastName);
-                jsonParams.put("ktp", noKTP);
-                jsonParams.put("address",fullAddress);
+                Log.d(TAG, response.body().toString());
+                if(response.isSuccessful()){
+                    Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+                    Map<String, Object> jsonParams = new ArrayMap<>();
+                    jsonParams.put("email", email);
+                    jsonParams.put("firstName", firstName);
+                    jsonParams.put("lastName", lastName);
+                    jsonParams.put("ktp", noKTP);
+                    jsonParams.put("address",fullAddress);
 
-                saveUserToServer(jsonParams);
+                    saveUserToServer(jsonParams);
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                Toast.makeText(CreateNewUser.this, "Upload foto gagal", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
     }
 
 
@@ -154,7 +176,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                takePhotoFromCamera();
+                takePhotoWithPermission();
             }
         });
         alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
@@ -169,9 +191,24 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     private void takePhotoFromCamera(){
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(i.resolveActivity(getPackageManager())!= null) {
-            startActivityForResult(i, CAMERA_REQUEST);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                filePhoto = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (filePhoto != null) {
+                photoURI = FileProvider.getUriForFile(CreateNewUser.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        filePhoto);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
         }
     }
 
@@ -209,6 +246,29 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    @AfterPermissionGranted(13)
+    private void takePhotoWithPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromCamera();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
+                    13, perms);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 13){
+            takePhotoFromCamera();
+        }
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -228,13 +288,16 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
-            Bundle extras = data.getExtras();
-            photoURI = data.getData();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mIvPhoto.setImageBitmap(imageBitmap);
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                InputStream ims = new FileInputStream(file);
+                mIvPhoto.setImageBitmap(BitmapFactory.decodeStream(ims));
+            } catch (FileNotFoundException e) {
+                return;
+            }
         } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
-            Uri photoURI = data.getData();
-            filePhoto = new File(photoURI.getPath());
+            photoURI = data.getData();
             mIvPhoto.setImageURI(photoURI);
         }
     }
