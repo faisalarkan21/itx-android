@@ -23,6 +23,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Entity.Address;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListUsersService;
@@ -155,14 +157,44 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         JSONObject firstUrl = responseJson.getJSONObject(0);
                         String urlFoto = firstUrl.getString("thumbnail");
                         Toast.makeText(CreateNewUser.this, "Upload foto berhasil, url: " + urlFoto, Toast.LENGTH_SHORT).show();
-                        Map<String, Object> jsonParams = new ArrayMap<>();
-                        jsonParams.put("email", email);
-                        jsonParams.put("firstName", firstName);
-                        jsonParams.put("lastName", lastName);
-                        jsonParams.put("ktp", noKTP);
-                        jsonParams.put("address",fullAddress);
 
-                        saveUserToServer(jsonParams);
+
+
+                        JSONObject object0 = new JSONObject();
+                        object0.put("firstName", firstName);
+                        object0.put("lastName", lastName);
+                        object0.put("ktp", noKTP);
+                        object0.put("email", email);
+
+                        JSONObject object = new JSONObject();
+                        object.put("data", object0 );
+
+                        JSONObject objectThumbnail = new JSONObject();
+                        objectThumbnail.put("thumbnail",urlFoto );
+
+
+                        object.put("images",objectThumbnail);
+
+                        Log.d("asasas", object.toString());
+
+//                        Gson gson = new Gson();
+//
+//                        JsonObject jsonTestLevel0 = new JsonObject();
+//
+//
+//
+//                        JsonObject jsonTestLevel1 = new JsonObject();
+//                        jsonTestLevel1.addProperty("firstName", firstName);
+//                        jsonTestLevel1.addProperty("email", email);
+//                        jsonTestLevel1.addProperty("lastName", lastName);
+//                        jsonTestLevel1.addProperty("ktp", noKTP);
+//
+//                        jsonTestLevel0.addProperty("data", jsonTestLevel1.getAsJsonObject().toString());
+
+
+
+
+                        saveUserToServer(object);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -234,9 +266,16 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         startActivityForResult(pickPhoto , GALLERY_REQUEST);
     }
 
-    public void saveUserToServer(Map<String, Object> jsonParams){
+    public void saveUserToServer(JSONObject jsonParams){
+
+
+
+
+
+
+
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                (new JSONObject(jsonParams).toString()));
+                (jsonParams).toString());
 
         Call<ResponseBody> addUserRequest = mUserService.createUser(body);
 

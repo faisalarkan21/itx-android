@@ -102,12 +102,14 @@ public class ListUsers extends AppCompatActivity {
                         JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
 
                         for (int i=0; i < jsonArray.size() ; i++ ){
+
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Users user = new Users();
                             user.setIdUser(Data.get("_id").getAsString());//
                             user.setFullName(Data.get("fullName").getAsString());
                             user.setAssets(Data.get("totalAssets").getAsString());
-                            user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
+//                            user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
+
                             userList.add(user);
 
                             new CountDownTimer(1000, 1000) {
