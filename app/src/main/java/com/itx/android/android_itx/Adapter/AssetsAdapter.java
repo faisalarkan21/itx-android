@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
         final Assets currentAsset = mListAssets.get(position);
         holder.mTvAssetName.setText(currentAsset.getName());
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
-        holder.mRatingBar.setRating(currentAsset.getRating());
+        holder.mRatingBar.setRating(Math.round(currentAsset.getRating()));
 
         if (currentAsset.getImages() != null) {
             Glide.with(mContext)
