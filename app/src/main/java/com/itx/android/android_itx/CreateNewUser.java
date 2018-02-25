@@ -133,13 +133,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String lastName = mEtLastname.getText().toString().trim();
         final String email = mEtEmail.getText().toString().trim();
         final String noKTP = mEtNoKTP.getText().toString().trim();
-        String address = mEtAddress.getText().toString().trim();
-        String city = mEtCity.getText().toString().trim();
-        String postal = mEtPostalCode.getText().toString().trim();
-        String province = mEtProvince.getText().toString().trim();
-        String country = mEtCountry.getText().toString().trim();
+        final String address = mEtAddress.getText().toString().trim();
+        final String city = mEtCity.getText().toString().trim();
+        final String postal = mEtPostalCode.getText().toString().trim();
+        final String province = mEtProvince.getText().toString().trim();
+        final String country = mEtCountry.getText().toString().trim();
 
-        final Address fullAddress = new Address(address,city,province ,postal,country);
 
         //Upload Photo first then on callback save the new User
         RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
@@ -153,8 +152,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                 if(response.isSuccessful()){
                     try {
                         JSONArray responseJson = new JSONArray(response.body().string());
-                        JSONObject firstUrl = responseJson.getJSONObject(0);
-                        String urlFoto = firstUrl.getString("thumbnail");
+                        JSONObject images = responseJson.getJSONObject(0);
+                        String urlFoto = images.getString("thumbnail");
                         Toast.makeText(CreateNewUser.this, "Upload foto berhasil, url: " + urlFoto, Toast.LENGTH_SHORT).show();
 
 
@@ -165,17 +164,17 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         object0.put("ktp", noKTP);
                         object0.put("email", email);
 
+                        JSONObject location = new JSONObject();
+                        location.put("address", address);
+                        location.put("province", province);
+                        location.put("city", city);
+                        location.put("postalCode", postal);
+                        location.put("country", country);
+
                         JSONObject object = new JSONObject();
                         object.put("data", object0 );
-
-                        JSONObject objectThumbnail = new JSONObject();
-                        objectThumbnail.put("thumbnail",firstUrl.getString("thumbnail"));
-                        objectThumbnail.put("fullsize", firstUrl.getString("fullsize"));
-                        objectThumbnail.put("large", firstUrl.getString("large"));
-                        objectThumbnail.put("medium", firstUrl.getString("medium"));
-
-
-                        object.put("images",objectThumbnail);
+                        object.put("location", location);
+                        object.put("images",images);
 
                         Log.d("asasas", object.toString());
 
@@ -272,12 +271,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     public void saveUserToServer(JSONObject jsonParams){
-
-
-
-
-
-
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 (jsonParams).toString());

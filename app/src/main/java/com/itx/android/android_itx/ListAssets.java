@@ -127,26 +127,19 @@ public class ListAssets extends AppCompatActivity {
                             JsonArray imagesLoop = Data.get("images").getAsJsonArray();
                             JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
                             assets.setImages(DataImageAseets.get("thumbnail").getAsString());
-
-                            assets.setPhone(Data.get("phone").getAsString());
+                            if(Data.get("phone") != null){
+                                assets.setPhone(Data.get("phone").getAsString());
+                            }
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             assets.setRating(Data.get("rating").getAsFloat());
                             mListAsset.add(assets);
 
-                            new CountDownTimer(1000, 1000) {
-
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
-
-                                public void onFinish() {
-                                    mAdapter.notifyDataSetChanged();
-                                    progressDialog.dismiss();
-                                    Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }.start();
                         }
+
+                        mAdapter.notifyDataSetChanged();
+                        progressDialog.dismiss();
+                        Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
+                                Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
