@@ -1,129 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true">
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="134dp"
-        android:layout_marginRight="5dip"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/thumbnail_asset_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="5dip"
-
-            android:padding="3dip">
-
-            <ImageView
-                android:id="@+id/iv_asset_images"
-                android:layout_width="47dp"
-                android:layout_height="47dp"
-                android:src="@drawable/icon_tentang_06"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
+        <android.support.v7.widget.CardView
+            app:cardElevation="8dp"
+            android:layout_margin="8dp"
             android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_asset_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/thumbnail_asset_layout"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="3dp"
-                android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                android:text="Kontrakan Emas"
-                android:textColor="#040404"
-                android:textStyle="bold"
-                android:typeface="sans" />
-
-            <TextView
-                android:id="@+id/tv_asset_category"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_asset_name"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="3dp"
-                android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                android:text="Premium"
-                android:textColor="#343434"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/tv_asset_address"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_asset_category"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="3dp"
-                android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                android:text="JL. USA 15 Ciseeng"
-                android:textColor="#343434"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/tv_asset_no_telp"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_asset_address"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                android:text="+628986121212"
-                android:textColor="#343434"
-                android:textSize="15sp" />
-
-            <RatingBar
-                android:id="@+id/rating_bar_assets"
-                style="?android:attr/ratingBarStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="13dp"
-                android:layout_marginTop="5dp"
-                android:progressTint="@color/colorAccent" />
+            android:layout_height="134dp">
 
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dip"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/thumbnail_asset_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginRight="5dip"
+
+                    android:padding="3dip">
+
+                    <ImageView
+                        android:id="@+id/iv_asset_images"
+                        android:layout_width="47dp"
+                        android:layout_height="47dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="128dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_asset_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/thumbnail_asset_layout"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                        android:text="Kontrakan Emas"
+                        android:textColor="#040404"
+                        android:textStyle="bold"
+                        android:typeface="sans" />
+
+                    <TextView
+                        android:id="@+id/tv_asset_category"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_asset_name"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                        android:text="Premium"
+                        android:textColor="#343434"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tv_asset_address"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_asset_category"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                        android:text="JL. USA 15 Ciseeng"
+                        android:textColor="#343434"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tv_asset_no_telp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_asset_address"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                        android:text="+628986121212"
+                        android:textColor="#343434"
+                        android:textSize="15sp" />
+
+                    <RatingBar
+                        android:id="@+id/rating_bar_assets"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="13dp"
+                        android:layout_marginTop="5dp"
+                        android:progressTint="@color/colorAccent" />
 
 
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <View
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:layout_gravity="center"
+            android:text="List Inventory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"/>
+
+
+        <include layout="@layout/content_inventory" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/pb_list_invent"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:background="#1565C0"
-        android:orientation="vertical"
-
-        android:paddingTop="5dp"
-        android:weightSum="1">
-
-        <Button
-            android:id="@+id/btn_add_inventory"
-            android:layout_width="197dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="24dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:text="Add new Inventory" />
-
-    </LinearLayout>
-
-    <include layout="@layout/content_inventory" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_add_inventory"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_add"
+        app:fabSize="normal"
+        android:scaleType="center"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"/>
 
 
-</LinearLayout>
+</RelativeLayout>

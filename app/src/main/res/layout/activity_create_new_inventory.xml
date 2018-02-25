@@ -117,6 +117,19 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/select_image_inventory"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="12dp"
+                android:text="Add Inventory Images" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_preview_img_new_invent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
         </LinearLayout>
 
     </ScrollView>

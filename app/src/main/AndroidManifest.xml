@@ -38,6 +38,7 @@
             android:name=".DashboardUtama"
             android:label="Dahsboard Utama" />
         <activity
+            android:launchMode="singleTop"
             android:name=".ListUsers"
             android:label="List Pengguna" >
 
@@ -45,8 +46,10 @@
         <activity
             android:parentActivityName=".ListUsers"
             android:name=".ListAssets"
-            android:label="List Assets" />
+            android:label="List Assets"
+            android:launchMode="singleTop"/>
         <activity
+            android:launchMode="singleTop"
             android:parentActivityName=".ListAssets"
             android:name=".ListInventory"
             android:label="List Inventory" />

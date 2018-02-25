@@ -10,6 +10,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import com.itx.android.android_itx.Utils.PrefManager;
+import com.itx.android.android_itx.Utils.SessionManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,16 +60,14 @@ public class SplashLogo extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-
-                    PrefManager prefManager = new PrefManager(getApplicationContext());
-
-                    // make first time launch TRUE
-                    prefManager.setFirstTimeLaunch(true);
-
-                    startActivity(new Intent(SplashLogo.this, Login.class));
-                    finish();
-
-
+                    SessionManager sessionManager = new SessionManager(SplashLogo.this);
+                    if(sessionManager.getToken() != null){
+                        startActivity(new Intent(SplashLogo.this, ListUsers.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(SplashLogo.this, Login.class));
+                        finish();
+                    }
                 }
             }
         };
