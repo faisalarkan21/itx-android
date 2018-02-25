@@ -47,6 +47,7 @@ public class CreateNewInventory extends AppCompatActivity {
 
 
     private List<String> mListFacilitiesChecked = new ArrayList<>();
+    private List<String> mListInventoryImages = new ArrayList<>();
     @BindView(R.id.et_add_inventory_name)
     EditText mEtInventName;
     @BindView(R.id.et_add_inventory_deskripsi)
@@ -173,18 +174,9 @@ public class CreateNewInventory extends AppCompatActivity {
                                         object0.put("space", inventorySpace);
                                         object0.put("price", "6000");
                                         object0.put("stock", inventoryStock);
-                                        Gson gson = new Gson();
-
-
-
-                                        JsonElement element = gson.toJsonTree(mListFacilitiesChecked, new TypeToken<List>() {}.getType());
-                                        JsonArray jsonArray = element.getAsJsonArray();
 
 
                                         JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
-
-
-
 
                                         object0.put("facilities",jsonArrayChecked);
 

@@ -110,7 +110,7 @@ public class ListAssets extends AppCompatActivity {
                         JsonElement json = rawResponse.body().get("data");
                         final JsonArray jsonArray = json.getAsJsonArray();
 
-                        if (jsonArray.size() == 0 ){
+                        if (jsonArray.size() == 0) {
                             progressDialog.dismiss();
                             Toast.makeText(ListAssets.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
@@ -124,14 +124,20 @@ public class ListAssets extends AppCompatActivity {
                             assets.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
                             assets.setName(Data.get("name").getAsString());
 
-                            JsonArray imagesLoop = Data.get("images").getAsJsonArray();
-                            JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
-                            assets.setImages(DataImageAseets.get("thumbnail").getAsString());
-                            if(Data.get("phone") != null){
-                                assets.setPhone(Data.get("phone").getAsString());
+                            if (Data.get("images").getAsJsonArray().size() != 0) {
+                                JsonArray imagesLoop = Data.get("images").getAsJsonArray();
+                                JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
+                                assets.setImages(DataImageAseets.get("thumbnail").getAsString());
                             }
+
+
+                            assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
-                            assets.setRating(Data.get("rating").getAsFloat());
+                            if (Data.get("rating") != null) {
+                                assets.setRating(Data.get("rating").getAsFloat());
+                            }
+                            assets.setRating(0f);
+
                             mListAsset.add(assets);
 
                         }

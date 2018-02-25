@@ -161,9 +161,12 @@ public class ListInventory extends AppCompatActivity {
                             Inventory invent = new Inventory();
                             invent.setName(Data.get("name").getAsString());
 
-                            JsonArray imagesLoop = Data.get("images").getAsJsonArray();
-                            JsonObject DataImageInvent = imagesLoop.get(0).getAsJsonObject();
-                            invent.setImage(DataImageInvent.get("thumbnail").getAsString());
+                            if (Data.get("images").getAsJsonArray().size() != 0) {
+                                JsonArray imagesLoop = Data.get("images").getAsJsonArray();
+                                JsonObject DataImageInvent = imagesLoop.get(0).getAsJsonObject();
+                                invent.setImage(DataImageInvent.get("thumbnail").getAsString());
+
+                            }
 
                             JsonArray facilitiesLoop = Data.get("facilities").getAsJsonArray();
                             String tempFacilities = "";
@@ -171,7 +174,7 @@ public class ListInventory extends AppCompatActivity {
                             for (int a = 0; a < facilitiesLoop.size(); a++) {
                                 JsonObject DataFacilities = facilitiesLoop.get(a).getAsJsonObject();
                                 tempFacilities += DataFacilities.get("name").getAsString() + ", ";
-                                invent.setFacilities(tempFacilities.substring(0,tempFacilities.length() - 2));
+                                invent.setFacilities(tempFacilities.substring(0, tempFacilities.length() - 2));
                             }
 
                             invent.setStock(Data.get("stock").getAsString());
@@ -185,6 +188,7 @@ public class ListInventory extends AppCompatActivity {
                                 public void onTick(long millisUntilFinished) {
                                     // You don't need anything here
                                 }
+
                                 public void onFinish() {
                                     mAdapter.notifyDataSetChanged();
                                     progressDialog.dismiss();
