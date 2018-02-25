@@ -27,7 +27,9 @@
             <ImageView
                 android:id="@+id/iv_asset_images"
                 android:layout_width="47dp"
-                android:layout_height="47dp" />
+                android:layout_height="47dp"
+                android:src="@drawable/icon_tentang_06"
+                />
 
         </LinearLayout>
 

@@ -45,9 +45,14 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         final Inventory invent = inventoryList.get(position);
         holder.inventoryName.setText(invent.getName());
 
-        Glide.with(mContext)
-                .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImage())
-                .into(holder.inventoryImage);
+
+        if (invent.getImage() != null){
+            Glide.with(mContext)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImage())
+                    .into(holder.inventoryImage);
+        }
+
+
 
         holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
         holder.inventoryStock.setText("Stock : " + invent.getStock());

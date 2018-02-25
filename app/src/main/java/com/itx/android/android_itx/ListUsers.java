@@ -114,6 +114,7 @@ public class ListUsers extends AppCompatActivity {
                                 user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             }
 
+
                             userList.add(user);
 
                             new CountDownTimer(1000, 1000) {
