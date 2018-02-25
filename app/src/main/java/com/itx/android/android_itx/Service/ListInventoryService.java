@@ -2,8 +2,14 @@ package com.itx.android.android_itx.Service;
 
 import com.google.gson.JsonObject;
 
+import org.json.JSONObject;
+
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 /**
@@ -14,5 +20,11 @@ public interface ListInventoryService {
 
     @GET("/api/asset/inventory-categories/{id}")
     Call<JsonObject> getUserInventory(@Path("id") String postfix);
+
+    @GET("/api/facilities")
+    Call<JsonObject> getAllFacilities();
+
+    @POST("/api/inventory-category/create")
+    Call<ResponseBody> createInventoryCategory (@Body RequestBody params);
 
 }

@@ -107,7 +107,11 @@ public class ListInventory extends AppCompatActivity {
         mBtnAddInvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ListInventory.this, CreateNewInventory.class));
+
+
+                Intent createInventory = new Intent(ListInventory.this, CreateNewInventory.class);
+                createInventory.putExtra("idAsset", getIntent().getStringExtra("idAsset"));
+                startActivity(createInventory);
             }
         });
 
