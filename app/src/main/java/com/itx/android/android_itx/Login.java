@@ -66,11 +66,11 @@ public class Login extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.login_bg_1);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bg_login_2);
 
         Blurry.with(this)
-                .radius(25)
-                .sampling(10)
+                .radius(10)
+                .sampling(5)
                 .from(bitmap)
                 .into(mRootView);
         btnLogin.setOnClickListener(new View.OnClickListener() {
