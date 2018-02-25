@@ -124,7 +124,6 @@ public class ListAssets extends AppCompatActivity {
                             assets.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
                             assets.setName(Data.get("name").getAsString());
 
-
                             if (Data.get("images").getAsJsonArray().size() != 0) {
                                 JsonArray imagesLoop = Data.get("images").getAsJsonArray();
                                 JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
@@ -141,20 +140,12 @@ public class ListAssets extends AppCompatActivity {
 
                             mListAsset.add(assets);
 
-                            new CountDownTimer(1000, 1000) {
-
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
-
-                                public void onFinish() {
-                                    mAdapter.notifyDataSetChanged();
-                                    progressDialog.dismiss();
-                                    Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }.start();
                         }
+
+                        mAdapter.notifyDataSetChanged();
+                        progressDialog.dismiss();
+                        Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
+                                Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

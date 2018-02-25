@@ -39,7 +39,11 @@ public interface APIService {
 
     @Multipart
     @POST("/api/upload")
-    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part photos);
+    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part photo);
+
+    @Multipart
+    @POST("/api/upload")
+    Call<ResponseBody> uploadPhotos(@Part MultipartBody.Part[] photos);
 
 
 }
