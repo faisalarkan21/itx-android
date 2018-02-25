@@ -26,6 +26,10 @@ public class SessionManager {
         String token = prefs.getString("token","");
         return token;
     }
+
+    public void removeToken(){
+        prefs.edit().remove("token").apply();
+    }
 }
 
 

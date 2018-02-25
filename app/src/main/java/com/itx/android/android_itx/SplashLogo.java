@@ -37,20 +37,6 @@ public class SplashLogo extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        logoItx.setAlpha(0f);
-        ValueAnimator fadeAnim1 = ObjectAnimator.ofFloat(logoItx, "alpha", 3f, 0f);
-        ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(logoTelkom, "alpha", 3f, 0f);
-        ValueAnimator fadeAnim3 = ObjectAnimator.ofFloat(logoWonderful, "alpha", 3f, 0f);
-
-        fadeAnim1.setDuration(2700);
-        fadeAnim1.start();
-
-        fadeAnim2.setDuration(2700);
-        fadeAnim2.start();
-
-        fadeAnim3.setDuration(2700);
-        fadeAnim3.start();
-
         Thread timer = new Thread() {
             public void run() {
                 try {
@@ -61,7 +47,7 @@ public class SplashLogo extends AppCompatActivity {
                     e.printStackTrace();
                 } finally {
                     SessionManager sessionManager = new SessionManager(SplashLogo.this);
-                    if(sessionManager.getToken() != null){
+                    if(sessionManager.getToken().length() > 0){
                         startActivity(new Intent(SplashLogo.this, ListUsers.class));
                         finish();
                     } else {

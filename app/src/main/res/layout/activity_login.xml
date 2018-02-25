@@ -1,86 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <ImageView
+        android:scaleType="centerCrop"
+        android:id="@+id/iv_blurry"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:orientation="vertical"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingTop="60dp"
-        android:weightSum="1">
+        android:layout_height="match_parent" />
 
+    <android.support.v7.widget.CardView
+        app:cardElevation="8dp"
+        android:layout_margin="32dp"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:layout_width="193dp"
-            android:layout_height="81dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="40dp"
-            android:layout_marginTop="30dp"
-            app:srcCompat="@drawable/logoitx" />
+        <LinearLayout
 
-        <android.support.design.widget.TextInputLayout
+            android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:weightSum="1">
 
-            <EditText
-                android:id="@+id/input_email"
+
+            <ImageView
+                android:layout_width="193dp"
+                android:layout_height="81dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="40dp"
+                android:layout_marginTop="30dp"
+                app:srcCompat="@drawable/logoitx" />
+
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username"
-                android:text="faisalarkan21@gmail.com"
-                android:inputType="textEmailAddress" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/input_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Username"
+                    android:text="faisalarkan21@gmail.com"
+                    android:inputType="textEmailAddress" />
 
 
-        </android.support.design.widget.TextInputLayout>
+            </android.support.design.widget.TextInputLayout>
 
-        <!--  Password Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-            android:layout_marginTop="8dp">
-
-            <EditText
-                android:id="@+id/input_password"
+            <!--  Password Label -->
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Password"
-                android:text="besokmakan"
-                android:inputType="textPassword"
-                android:paddingTop="30px"
-                android:shadowColor="@android:color/background_dark"
-               />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginBottom="8dp"
+                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                android:layout_marginTop="8dp">
 
-        <TextView
-            android:id="@+id/errorLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.13"
-            android:text="" />
+                <EditText
+                    android:id="@+id/input_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Password"
+                    android:text="besokmakan"
+                    android:inputType="textPassword"
+                    android:paddingTop="30px"
+                    android:shadowColor="@android:color/background_dark"
+                    />
+            </android.support.design.widget.TextInputLayout>
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_login"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout_marginTop="20dp"
-            android:background="#01579B"
-            android:text="Login"
-            android:textColor="#FAFAFA" />
+            <TextView
+                android:id="@+id/errorLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.13"
+                android:text="" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="20dp"
+                android:background="#01579B"
+                android:text="Login"
+                android:textColor="#FAFAFA" />
 
 
-    </LinearLayout>
-</LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+
+</FrameLayout>

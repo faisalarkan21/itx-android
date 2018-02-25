@@ -2,6 +2,8 @@ package com.itx.android.android_itx;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +30,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import jp.wasabeef.blurry.Blurry;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -48,6 +53,8 @@ public class Login extends AppCompatActivity {
     EditText editEmaill;
     @BindView(R.id.input_password)
     EditText editPassword;
+    @BindView(R.id.iv_blurry)
+    ImageView mRootView;
 
     ProgressDialog progressDialog;
 
@@ -59,9 +66,13 @@ public class Login extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.login_bg_1);
 
-
-
+        Blurry.with(this)
+                .radius(25)
+                .sampling(10)
+                .from(bitmap)
+                .into(mRootView);
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
             @Override
