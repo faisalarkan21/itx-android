@@ -169,6 +169,7 @@ public class ListInventory extends AppCompatActivity {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
                             Inventory invent = new Inventory();
+                            invent.setIdAsset(Data.get("asset").getAsString());
                             invent.setName(Data.get("name").getAsString());
 
                             if (Data.get("images").getAsJsonArray().size() != 0) {

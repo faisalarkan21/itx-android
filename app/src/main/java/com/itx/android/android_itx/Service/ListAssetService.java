@@ -26,4 +26,7 @@ public interface ListAssetService {
     @GET("/api/asset-categories")
     Call<JsonObject> getAssetCategories();
 
+    @POST("/api/asset/delete/{id}")
+    Call<ResponseBody> deleteAssets(@Path("id") String postfix);
+
 }

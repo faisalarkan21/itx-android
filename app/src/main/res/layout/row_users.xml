@@ -59,6 +59,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="25dp"
+        android:id="@+id/iv_delete"
         android:src="@mipmap/ic_delete" />
 
 </RelativeLayout>

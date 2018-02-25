@@ -27,4 +27,7 @@ public interface ListInventoryService {
     @POST("/api/inventory-category/create")
     Call<ResponseBody> createInventoryCategory (@Body RequestBody params);
 
+    @POST("/api/inventory-category/delete/{id}")
+    Call<ResponseBody> deleteInventoryCategory (@Path("id") String params);
+
 }

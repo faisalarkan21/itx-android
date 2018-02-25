@@ -6,6 +6,7 @@ package com.itx.android.android_itx.Entity;
 
 public class Inventory {
 
+    private String idAsset;
     private String inventoryCategory;
     private String facilities;
     private String kode;
@@ -19,6 +20,14 @@ public class Inventory {
     private String stock;
     private double price;
 
+
+    public String getIdAsset() {
+        return idAsset;
+    }
+
+    public void setIdAsset(String idAsset) {
+        this.idAsset = idAsset;
+    }
 
     public String getInventoryCategory() {
         return inventoryCategory;

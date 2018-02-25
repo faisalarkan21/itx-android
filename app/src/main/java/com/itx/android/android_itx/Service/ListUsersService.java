@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * Created by faisal on 2/22/18.
@@ -20,5 +21,8 @@ public interface ListUsersService {
 
     @POST("/api/user/create")
     Call<ResponseBody> createUser(@Body RequestBody params);
+
+    @POST("/api/user/delete/{id}")
+    Call<ResponseBody> deleteUser(@Path("id") String postfix);
 
 }
