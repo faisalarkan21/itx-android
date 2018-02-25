@@ -11,9 +11,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +50,9 @@ public class ListInventory extends AppCompatActivity {
     @BindView(R.id.tv_asset_name)
     TextView mAssetName;
 
+    @BindView(R.id.pb_list_invent)
+    ProgressBar mPbListInvent;
+
     @BindView(R.id.tv_asset_category)
     TextView mAssetCategory;
 
@@ -69,7 +74,8 @@ public class ListInventory extends AppCompatActivity {
     ListInventoryService mInventoryAPIService;
     SessionManager session;
 
-    ProgressDialog progressDialog;
+    private String idAsset;
+
 
 
     private InventoryAdapter mAdapter;
@@ -80,18 +86,13 @@ public class ListInventory extends AppCompatActivity {
         setContentView(R.layout.activity_list_inventory);
 
 
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
-
         ButterKnife.bind(this);
 
         mAdapter = new InventoryAdapter(mListInventory, this);
 
+        showLoading();
 
-        progressDialog = new ProgressDialog(ListInventory.this);
-        progressDialog.setMessage("Menyiapkan Data");
-        progressDialog.show();
+        idAsset = getIntent().getStringExtra("idAsset");
 
         session = new SessionManager(this);
         mRecyclerView.setHasFixedSize(true);
@@ -111,7 +112,7 @@ public class ListInventory extends AppCompatActivity {
 
 
                 Intent createInventory = new Intent(ListInventory.this, CreateNewInventory.class);
-                createInventory.putExtra("idAsset", getIntent().getStringExtra("idAsset"));
+                createInventory.putExtra("idAsset", idAsset);
                 startActivity(createInventory);
             }
         });
@@ -119,6 +120,16 @@ public class ListInventory extends AppCompatActivity {
         prepareUserData();
 
 
+    }
+
+    private void showLoading(){
+        mPbListInvent.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideLoading(){
+        mPbListInvent.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void prepareUserData() {
@@ -161,7 +172,7 @@ public class ListInventory extends AppCompatActivity {
                         JsonArray jsonArray = json.getAsJsonArray();
 
                         if (jsonArray.size() == 0) {
-                            progressDialog.dismiss();
+                            hideLoading();
                             Toast.makeText(ListInventory.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -202,7 +213,7 @@ public class ListInventory extends AppCompatActivity {
 
                                 public void onFinish() {
                                     mAdapter.notifyDataSetChanged();
-                                    progressDialog.dismiss();
+                                    hideLoading();
                                 }
                             }.start();
                         }

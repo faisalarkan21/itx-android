@@ -9,11 +9,21 @@
 
     <include layout="@layout/content_users" />
 
+    <ProgressBar
+        android:id="@+id/pb_list_user"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add_user"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_add"
+        app:fabSize="normal"
+        android:scaleType="center"
         android:backgroundTint="@color/colorAccent"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"

@@ -107,9 +107,6 @@ public class CreateNewAsset extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_asset);
 
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
         ButterKnife.bind(this);
 
         idUser = getIntent().getStringExtra("idUser");

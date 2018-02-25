@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -47,12 +48,13 @@ public class ListAssets extends AppCompatActivity {
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
 
+    @BindView(R.id.pb_list_asset)
+    ProgressBar mPbListAsset;
+
     private AssetsAdapter mAdapter;
     private String idUser;
     ListAssetService mAssetAPIService;
     SessionManager session;
-
-    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +72,7 @@ public class ListAssets extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        progressDialog = new ProgressDialog(ListAssets.this);
-        progressDialog.setMessage("Menyiapkan Data");
-        progressDialog.show();
+        showLoading();
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -93,6 +93,16 @@ public class ListAssets extends AppCompatActivity {
         });
     }
 
+    private void showLoading(){
+        mPbListAsset.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideLoading(){
+        mPbListAsset.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
 
     private void prepareUserData() {
 
@@ -109,7 +119,7 @@ public class ListAssets extends AppCompatActivity {
                         final JsonArray jsonArray = json.getAsJsonArray();
 
                         if (jsonArray.size() == 0) {
-                            progressDialog.dismiss();
+                            hideLoading();
                             Toast.makeText(ListAssets.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -141,7 +151,7 @@ public class ListAssets extends AppCompatActivity {
                         }
 
                         mAdapter.notifyDataSetChanged();
-                        progressDialog.dismiss();
+                        hideLoading();
                         Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
                                 Toast.LENGTH_LONG).show();
                     } catch (Exception e) {

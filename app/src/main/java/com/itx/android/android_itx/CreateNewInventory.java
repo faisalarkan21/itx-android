@@ -109,10 +109,6 @@ public class CreateNewInventory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_inventory);
 
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
-
         session = new SessionManager(this);
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
         ButterKnife.bind(this);

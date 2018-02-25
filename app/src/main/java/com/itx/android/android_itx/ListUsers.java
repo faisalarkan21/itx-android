@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -38,12 +39,13 @@ public class ListUsers extends AppCompatActivity {
     private UsersAdapter uAdapter;
     SessionManager session;
 
-    ProgressDialog progressDialog;
-
     ListUsersService mListUsersAPIService;
 
     @BindView(R.id.btn_add_user)
     FloatingActionButton btnAddUser;
+
+    @BindView(R.id.pb_list_user)
+    ProgressBar mPbListUser;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -69,9 +71,7 @@ public class ListUsers extends AppCompatActivity {
 
         recyclerView.setHasFixedSize(true);
 
-        progressDialog = new ProgressDialog(ListUsers.this);
-        progressDialog.setMessage("Menyiapkan Data");
-        progressDialog.show();
+        showLoading();
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
@@ -85,6 +85,16 @@ public class ListUsers extends AppCompatActivity {
 
         prepareUserData();
 
+    }
+
+    private void showLoading(){
+        mPbListUser.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideLoading(){
+        mPbListUser.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -126,7 +136,7 @@ public class ListUsers extends AppCompatActivity {
 
                                 public void onFinish() {
                                     uAdapter.notifyDataSetChanged();
-                                    progressDialog.dismiss();
+                                    hideLoading();
                                 }
                             }.start();
 

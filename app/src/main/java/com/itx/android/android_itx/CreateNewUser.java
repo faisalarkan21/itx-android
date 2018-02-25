@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -90,10 +91,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
-
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         sessManager = new SessionManager(this);
         ButterKnife.bind(this);
@@ -265,9 +262,27 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
         openGalleryIntent.setType("image/*");
-        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(openGalleryIntent,"Select Picture"), GALLERY_REQUEST);
+    }
+
+    public String getPath(Uri uri)
+    {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        @SuppressWarnings("deprecation")
+        Cursor cursor = managedQuery(uri, projection, null,
+                null, null);
+        if (cursor == null)
+            return null;
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        if (cursor.moveToFirst()) {
+            String s = cursor.getString(column_index);
+            // cursor.close();
+            return s;
+        }
+        // cursor.close();
+        return null;
     }
 
     public void saveUserToServer(JSONObject jsonParams){
@@ -347,7 +362,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             }
         } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
             photoURI = data.getData();
-            filePhoto = new File(photoURI.getPath());
+            filePhoto = new File(getPath(photoURI));
             mIvPhoto.setImageURI(photoURI);
         }
     }
