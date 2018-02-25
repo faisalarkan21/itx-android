@@ -301,6 +301,7 @@ public class CreateNewAsset extends AppCompatActivity {
         final String city = mEtAssetCity.getText().toString().trim();
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mEtAssetCountry.getText().toString().trim();
+        final int rating = Math.round(mRbAsset.getRating());
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i=0; i < fileImages.size(); i++){
@@ -321,6 +322,8 @@ public class CreateNewAsset extends AppCompatActivity {
                     data.put("npwp", npwp);
                     data.put("phone", phone);
                     data.put("user", idUser);
+                    data.put("rating", rating);
+
 
                     JSONObject location = new JSONObject();
                     location.put("address", address);

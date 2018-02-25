@@ -72,6 +72,7 @@
         android:layout_alignStart="@+id/tv_asset_category"
         android:layout_below="@+id/tv_asset_category"
         android:layout_marginTop="5dp"
-        android:progressTint="@color/colorAccent" />
+        android:isIndicator="true"
+        android:numStars="5"/>
 
 </RelativeLayout>
