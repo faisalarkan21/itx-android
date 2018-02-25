@@ -109,6 +109,7 @@ public class ListUsers extends AppCompatActivity {
                             user.setIdUser(Data.get("_id").getAsString());//
                             user.setFullName(Data.get("fullName").getAsString());
                             user.setAssets(Data.get("totalAssets").getAsString());
+
                             if(Data.get("photo") != null){
                                 user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             }
