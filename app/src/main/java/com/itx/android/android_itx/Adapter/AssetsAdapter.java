@@ -25,11 +25,12 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     private Context mContext;
     private List<Assets> mListAssets;
 
-    public AssetsAdapter( List<Assets> assets,Context context){
+    public AssetsAdapter(List<Assets> assets, Context context) {
         this.mContext = context;
         this.mListAssets = assets;
 
     }
+
     @Override
     public AssetsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -46,9 +47,13 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(currentAsset.getRating());
 
-        Glide.with(mContext)
-                .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages())
-                .into(holder.mIvGambarAsset);
+        if (currentAsset.getImages() != null) {
+            Glide.with(mContext)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages())
+                    .into(holder.mIvGambarAsset);
+        }
+      
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

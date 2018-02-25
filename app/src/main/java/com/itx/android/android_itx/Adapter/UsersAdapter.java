@@ -51,9 +51,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
         holder.userName.setText(user.getFullName());
         holder.assets.setText("Assets : " + user.getAssets());
 
-        Glide.with(mContext)
-                .load(ApiUtils.BASE_URL_USERS_IMAGE + user.getPhoto())
-                .into(holder.imageUsers);
+        if (user.getPhoto() != null){
+            Glide.with(mContext)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + user.getPhoto())
+                    .into(holder.imageUsers);
+        }
+
+
+
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -137,9 +137,13 @@ public class ListInventory extends AppCompatActivity {
         mAssetPhone.setText(phone);
         mAssetRating.setRating(rating);
 
-        Glide.with(ListInventory.this)
-                .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
-                .into(mImagesAssets);
+        if (images != null){
+            Glide.with(ListInventory.this)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                    .into(mImagesAssets);
+        }
+
+
 
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
 
@@ -155,6 +159,12 @@ public class ListInventory extends AppCompatActivity {
                         Log.d("lnes 102", Boolean.toString(json.isJsonArray()));
 
                         JsonArray jsonArray = json.getAsJsonArray();
+
+                        if (jsonArray.size() == 0) {
+                            progressDialog.dismiss();
+                            Toast.makeText(ListInventory.this, "Tidak ada data.",
+                                    Toast.LENGTH_LONG).show();
+                        }
 
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
