@@ -54,21 +54,40 @@
         android:textColor="#343434"
         android:textSize="15sp" />
 
-
-    <TextView
-        android:id="@+id/tv_inventory_stock"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-
+    <LinearLayout
+        android:id="@+id/ll_stock_harga"
         android:layout_alignLeft="@+id/tv_inventory_facilities"
         android:layout_alignStart="@+id/tv_inventory_facilities"
         android:layout_below="@+id/tv_inventory_facilities"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
 
-        android:layout_marginTop="5dp"
-        android:text="Stock"
-        android:textColor="#343434"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tv_inventory_stock"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+
+
+
+            android:layout_marginTop="5dp"
+            android:text="Stock"
+            android:textColor="#343434"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_inventory_price"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+
+            android:text="harga" />
+
+    </LinearLayout>
+
+
 
 
     <!-- Rightend Arrow -->
@@ -76,9 +95,9 @@
         android:id="@+id/tv_inventory_space"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_inventory_stock"
-        android:layout_alignStart="@+id/tv_inventory_stock"
-        android:layout_below="@+id/tv_inventory_stock"
+        android:layout_alignLeft="@+id/ll_stock_harga"
+        android:layout_alignStart="@+id/ll_stock_harga"
+        android:layout_below="@+id/ll_stock_harga"
         android:layout_marginTop="3dp"
         android:text="Space"
         android:textColor="#343434"
@@ -93,17 +112,6 @@
         android:src="@drawable/arrow"
         android:id="@+id/imageView2" />
 
-    <TextView
-        android:id="@+id/tv_inventory_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
 
-
-        android:layout_alignTop="@+id/tv_inventory_stock"
-        android:layout_marginLeft="14dp"
-        android:layout_marginStart="14dp"
-        android:layout_toEndOf="@+id/tv_inventory_name"
-        android:layout_toRightOf="@+id/tv_inventory_name"
-        android:text="harga" />
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.CountDownTimer;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -41,7 +42,7 @@ public class ListAssets extends AppCompatActivity {
 
     private List<Assets> mListAsset = new ArrayList<>();
     @BindView(R.id.btn_add_asset)
-    Button mBtnAddAsset;
+    FloatingActionButton mBtnAddAsset;
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
@@ -60,9 +61,6 @@ public class ListAssets extends AppCompatActivity {
 
         idUser = getIntent().getStringExtra("id");
 
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         ButterKnife.bind(this);
 
@@ -164,6 +162,5 @@ public class ListAssets extends AppCompatActivity {
         });
 
     }
-
 
 }

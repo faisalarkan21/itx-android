@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -15,6 +16,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +30,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -69,6 +73,8 @@ public class CreateNewAsset extends AppCompatActivity {
     private String categoryIdSelected;
     private APIService mApiSevice;
 
+    private PreviewAdapter mPreviewAdapter;
+
     ArrayAdapter<String> spAdapter;
 
     @BindView(R.id.et_add_asset_name) EditText mEtAssetName;
@@ -80,6 +86,8 @@ public class CreateNewAsset extends AppCompatActivity {
     @BindView(R.id.et_add_asset_city) EditText mEtAssetCity;
     @BindView(R.id.et_add_asset_postal) EditText mEtAssetPostal;
     @BindView(R.id.et_add_asset_country) EditText mEtAssetCountry;
+    @BindView(R.id.rv_preview_img_new_asset)
+    RecyclerView mRvPreviewImageAsset;
     @BindView(R.id.sp_add_asset_categories)
     Spinner mSpCategories;
     @BindView(R.id.rb_new_asset)
@@ -90,7 +98,6 @@ public class CreateNewAsset extends AppCompatActivity {
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
-    private static final int REQUEST_GALLERY_CODE = 200;
     private static final int CAMERA_REQUEST = 201;
 
 
@@ -113,6 +120,18 @@ public class CreateNewAsset extends AppCompatActivity {
 
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
         prepareAssetCategories();
+        mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this,2));
+        mRvPreviewImageAsset.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                int space = 16;
+                outRect.left = space;
+                outRect.right = space;
+                outRect.top = space;
+            }
+        });
+        mPreviewAdapter = new PreviewAdapter(uriImages,this);
+        mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
         mBtnAddImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -372,6 +391,8 @@ public class CreateNewAsset extends AppCompatActivity {
                 uriImages.add(imageUri);
                 fileImages.add(new File(imageUri.getEncodedPath()));
 
+
+
             } else {
                 if (data.getClipData() != null) {
                     ClipData mClipData = data.getClipData();
@@ -387,7 +408,11 @@ public class CreateNewAsset extends AppCompatActivity {
                 }
             }
 
+            mPreviewAdapter.notifyDataSetChanged();
+
             Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
+        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+            mPreviewAdapter.notifyDataSetChanged();
         }
     }
 }

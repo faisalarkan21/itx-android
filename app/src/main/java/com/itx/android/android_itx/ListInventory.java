@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.CountDownTimer;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,7 +61,7 @@ public class ListInventory extends AppCompatActivity {
     RatingBar mAssetRating;
 
     @BindView(R.id.btn_add_inventory)
-    Button mBtnAddInvent;
+    FloatingActionButton mBtnAddInvent;
 
     @BindView(R.id.iv_asset_images)
     ImageView mImagesAssets;

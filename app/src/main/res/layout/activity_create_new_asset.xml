@@ -10,7 +10,7 @@
         android:id="@+id/sv_new_asset"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btn_add_new_inventory">
+        android:layout_above="@id/btn_add_new_asset">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -218,9 +218,14 @@
                 android:id="@+id/select_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="190dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Add Assets Images" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_preview_img_new_asset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
