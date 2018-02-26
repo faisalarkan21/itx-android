@@ -132,7 +132,7 @@ public class CreateNewAsset extends AppCompatActivity {
         mBtnAddImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                takePhoto();
+                takePhotoWithPermission();
             }
         });
 

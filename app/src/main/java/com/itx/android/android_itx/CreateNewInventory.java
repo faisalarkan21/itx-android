@@ -146,7 +146,7 @@ public class CreateNewInventory extends AppCompatActivity {
         mBtnAddImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                takePhoto();
+                takePhotoWithPermission();
             }
         });
 
