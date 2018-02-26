@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -44,6 +45,9 @@ public class ListAssets extends AppCompatActivity {
     private List<Assets> mListAsset = new ArrayList<>();
     @BindView(R.id.btn_add_asset)
     FloatingActionButton mBtnAddAsset;
+
+    @BindView(R.id.userName)
+    TextView mUserName;
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
@@ -107,6 +111,11 @@ public class ListAssets extends AppCompatActivity {
 
     private void prepareUserData() {
 
+
+        String userName = getIntent().getStringExtra("userName");
+
+        mUserName.setText(userName);
+
         mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
 
         Call<JsonObject> response = mAssetAPIService.getUserAssets(idUser);
@@ -116,7 +125,7 @@ public class ListAssets extends AppCompatActivity {
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
                 if (rawResponse.isSuccessful()) {
                     try {
-                        JsonElement json = rawResponse.body().get("data");
+                        JsonElement json = rawResponse.body().get("data").getAsJsonObject().get("assets");
                         final JsonArray jsonArray = json.getAsJsonArray();
 
                         if (jsonArray.size() == 0) {
