@@ -374,7 +374,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                 addNewUser(sessManager.getToken());
                 break;
             case R.id.iv_add_user:
-                takePhotoFromCamera();
+                takePhotoWithPermission();
                 break;
             default:
                 break;
