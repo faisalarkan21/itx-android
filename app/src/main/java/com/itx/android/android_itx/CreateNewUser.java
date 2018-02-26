@@ -123,7 +123,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
         //TODO: Cleaning this messy things
 
         final String firstName = mEtFirstname.getText().toString().trim();
@@ -151,7 +151,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         JSONArray responseJson = new JSONArray(response.body().string());
                         JSONObject images = responseJson.getJSONObject(0);
                         String urlFoto = images.getString("thumbnail");
-                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil, url: " + urlFoto, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
 
 
 
