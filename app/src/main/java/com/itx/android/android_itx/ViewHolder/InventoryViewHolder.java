@@ -15,7 +15,7 @@ import com.itx.android.android_itx.R;
 public class InventoryViewHolder extends RecyclerView.ViewHolder  {
 
     public TextView inventoryName, inventoryStock, inventorySpace, inventoryPrice, inventoryFacilities;
-    public ImageView inventoryImage, btnImgDelete;;
+    public ImageView inventoryImage, btnImgDelete;
 
     public InventoryViewHolder(View itemView) {
         super(itemView);

@@ -71,6 +71,8 @@ public class ListInventory extends AppCompatActivity {
     @BindView(R.id.iv_asset_images)
     ImageView mImagesAssets;
 
+    ProgressDialog progressDialog;
+
     ListInventoryService mInventoryAPIService;
     SessionManager session;
 

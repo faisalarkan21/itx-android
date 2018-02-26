@@ -62,7 +62,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         holder.inventoryName.setText(invent.getName());
 
 
-        if (invent.getImage() != null){
+        if (invent.getImage() != null) {
             Glide.with(mContext)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImage())
                     .into(holder.inventoryImage);
@@ -107,7 +107,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
                                             Toast.makeText(mContext, "Berhasil Mengapus",
                                                     Toast.LENGTH_LONG).show();
 
-                                            ((Activity)mContext).finish();
+                                            ((Activity) mContext).finish();
                                             mContext.startActivity(((Activity) mContext).getIntent());
                                             progressDialog.dismiss();
                                         }
@@ -142,8 +142,13 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         });
 
 
+        if (invent.getFacilities() != null) {
+            holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
+        } else{
 
-        holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
+            holder.inventoryFacilities.setText("Facilities : Tidak ada fasilitas" );
+
+        }
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
         holder.inventoryPrice.setText("@ " + new RupiahCurrency().toRupiahFormat(invent.getPrice()));

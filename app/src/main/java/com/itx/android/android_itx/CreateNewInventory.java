@@ -41,6 +41,7 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListInventoryService;
 import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.NumberTextWatcher;
 import com.itx.android.android_itx.Utils.SessionManager;
 
 import org.json.JSONArray;
@@ -49,10 +50,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -95,6 +99,9 @@ public class CreateNewInventory extends AppCompatActivity {
     @BindView(R.id.layoutFacilities)
     LinearLayout layoutFacilities;
 
+    @BindView(R.id.et_add_price)
+    EditText mEtAddPrice;
+
     CheckBox checkFacilities;
 
     int totalFacilities;
@@ -112,6 +119,8 @@ public class CreateNewInventory extends AppCompatActivity {
         session = new SessionManager(this);
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
         ButterKnife.bind(this);
+
+        mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
         prepareFacilitiesData();
 
@@ -339,10 +348,17 @@ public class CreateNewInventory extends AppCompatActivity {
     }
 
     public void uploadImagesToServer(){
+
+        progressDialog = new ProgressDialog(CreateNewInventory.this);
+        progressDialog.setMessage("Menyimpan Data");
+        progressDialog.show();
+
         final String inventoryName = mEtInventName.getText().toString().trim();
         final String inventoryDescription = mEtInventDeskripsi.getText().toString().trim();
         final String inventoryStock = mEtInventStock.getText().toString().trim();
         final String inventorySpace = mEtInventSpace.getText().toString().trim();
+        String inventoryPrice = mEtAddPrice.getText().toString().trim();
+
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
@@ -356,7 +372,23 @@ public class CreateNewInventory extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
+                    Locale localeID = new Locale("in", "ID");
+                    NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
+                    String inventoryPrice = mEtAddPrice.getText().toString().trim();
+
+
+
+
+
+
                     try {
+                        String unformated = null ;
+
+
+                        unformated = inventoryPrice.replaceAll("[Rp,]", "");
+
+                        Log.d("uang", unformated);
+
                         JSONArray images = new JSONArray(response.body().string());
                         String idAsset = getIntent().getStringExtra("idAsset");
                         JSONObject object0 = new JSONObject();
@@ -364,7 +396,7 @@ public class CreateNewInventory extends AppCompatActivity {
                         object0.put("name", inventoryName);
                         object0.put("description", inventoryDescription);
                         object0.put("space", inventorySpace);
-                        object0.put("price", "6000");
+                        object0.put("price", unformated);
                         object0.put("stock", inventoryStock);
 
 
@@ -407,6 +439,7 @@ public class CreateNewInventory extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
+                    progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
                     startActivity(new Intent(CreateNewInventory.this, ListUsers.class));

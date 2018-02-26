@@ -179,7 +179,7 @@ public class CreateNewAsset extends AppCompatActivity {
     }
 
     private void prepareAssetCategories(){
-        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
         Call<JsonObject> categoriesRequest = mListAssetService.getAssetCategories();
         categoriesRequest.enqueue(new Callback<JsonObject>() {
             @Override

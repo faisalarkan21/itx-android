@@ -92,7 +92,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Stock"
-                        android:inputType="text" />
+                        android:inputType="number" />
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -110,12 +110,32 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Space"
-                        android:inputType="text" />
+                        android:inputType="number" />
 
 
                 </android.support.design.widget.TextInputLayout>
 
+
+
             </LinearLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/et_add_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Harga"
+
+                    android:inputType="numberDecimal" />
+
+
+            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/select_image_inventory"
