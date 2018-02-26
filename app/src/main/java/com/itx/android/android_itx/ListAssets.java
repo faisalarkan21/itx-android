@@ -67,6 +67,7 @@ public class ListAssets extends AppCompatActivity {
         ButterKnife.bind(this);
 
         session = new SessionManager(this);
+        Log.d("TOKEN", session.getToken());
 
         mAdapter = new AssetsAdapter(mListAsset, this);
 
@@ -144,7 +145,6 @@ public class ListAssets extends AppCompatActivity {
                             if (Data.get("rating") != null) {
                                 assets.setRating(Data.get("rating").getAsFloat());
                             }
-                            assets.setRating(0f);
 
                             mListAsset.add(assets);
 
