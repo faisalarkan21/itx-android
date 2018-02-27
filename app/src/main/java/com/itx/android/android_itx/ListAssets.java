@@ -78,10 +78,6 @@ public class ListAssets extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_assets);
-
-
-
-
         ButterKnife.bind(this);
 
         session = new SessionManager(this);
