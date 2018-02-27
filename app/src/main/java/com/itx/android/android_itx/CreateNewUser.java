@@ -19,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,6 +32,7 @@ import com.itx.android.android_itx.Entity.Address;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.AutoCompleteUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 
 import org.json.JSONArray;
@@ -75,17 +78,28 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     String mCurrentPhotoPath;
 
-    @BindView(R.id.iv_add_user) ImageView mIvPhoto;
-    @BindView(R.id.et_add_user_firstname) EditText mEtFirstname;
-    @BindView(R.id.et_add_user_lastname) EditText mEtLastname;
-    @BindView(R.id.et_add_user_no_ktp) EditText mEtNoKTP;
-    @BindView(R.id.et_add_user_email) EditText mEtEmail;
-    @BindView(R.id.et_add_user_address) EditText mEtAddress;
-    @BindView(R.id.et_add_user_city) EditText mEtCity;
-    @BindView(R.id.et_add_user_postal) EditText mEtPostalCode;
-    @BindView(R.id.et_add_user_province) EditText mEtProvince;
-    @BindView(R.id.btn_add_new_user) Button mBtnAddUser;
-    @BindView(R.id.et_add_user_country) EditText mEtCountry;
+    @BindView(R.id.iv_add_user)
+    ImageView mIvPhoto;
+    @BindView(R.id.et_add_user_firstname)
+    EditText mEtFirstname;
+    @BindView(R.id.et_add_user_lastname)
+    EditText mEtLastname;
+    @BindView(R.id.et_add_user_no_ktp)
+    EditText mEtNoKTP;
+    @BindView(R.id.et_add_user_email)
+    EditText mEtEmail;
+    @BindView(R.id.et_add_user_address)
+    EditText mEtAddress;
+    @BindView(R.id.et_add_user_city)
+    AutoCompleteTextView mAcCity;
+    @BindView(R.id.et_add_user_postal)
+    EditText mEtPostalCode;
+    @BindView(R.id.et_add_user_province)
+    AutoCompleteTextView mAcProvince;
+    @BindView(R.id.btn_add_new_user)
+    Button mBtnAddUser;
+    @BindView(R.id.et_add_user_country)
+    AutoCompleteTextView mAcCountry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +108,32 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         sessManager = new SessionManager(this);
         ButterKnife.bind(this);
+
+
+        AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
+
+        ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
+
+        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson());
+
+        String country[] = {"Indonesia"};
+
+        ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, country);
+
+
+        mAcProvince.setAdapter(adapterProvince);
+        mAcProvince.setThreshold(1);
+
+        mAcCity.setAdapter(adapterCity);
+        mAcCity.setThreshold(1);
+
+        mAcCountry.setAdapter(adapterCountry);
+        mAcCountry.setThreshold(1);
+
+
 
         mBtnAddUser.setOnClickListener(this);
         mIvPhoto.setOnClickListener(this);
@@ -115,11 +155,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         return image;
     }
 
-    private void addNewUser(String token){
+    private void addNewUser(String token) {
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
 
-        if(photoURI == null) {
+        if (photoURI == null) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -131,10 +171,10 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String email = mEtEmail.getText().toString().trim();
         final String noKTP = mEtNoKTP.getText().toString().trim();
         final String address = mEtAddress.getText().toString().trim();
-        final String city = mEtCity.getText().toString().trim();
+        final String city = mAcCity.getText().toString().trim();
         final String postal = mEtPostalCode.getText().toString().trim();
-        final String province = mEtProvince.getText().toString().trim();
-        final String country = mEtCountry.getText().toString().trim();
+        final String province = mAcProvince.getText().toString().trim();
+        final String country = mAcCountry.getText().toString().trim();
 
 
         //Upload Photo first then on callback save the new User
@@ -146,13 +186,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.d(TAG, response.body().toString());
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     try {
                         JSONArray responseJson = new JSONArray(response.body().string());
                         JSONObject images = responseJson.getJSONObject(0);
                         String urlFoto = images.getString("thumbnail");
                         Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-
 
 
                         JSONObject object0 = new JSONObject();
@@ -169,28 +208,9 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         location.put("country", country);
 
                         JSONObject object = new JSONObject();
-                        object.put("data", object0 );
+                        object.put("data", object0);
                         object.put("location", location);
-                        object.put("images",images);
-
-                        Log.d("asasas", object.toString());
-
-//                        Gson gson = new Gson();
-//
-//                        JsonObject jsonTestLevel0 = new JsonObject();
-//
-//
-//
-//                        JsonObject jsonTestLevel1 = new JsonObject();
-//                        jsonTestLevel1.addProperty("firstName", firstName);
-//                        jsonTestLevel1.addProperty("email", email);
-//                        jsonTestLevel1.addProperty("lastName", lastName);
-//                        jsonTestLevel1.addProperty("ktp", noKTP);
-//
-//                        jsonTestLevel0.addProperty("data", jsonTestLevel1.getAsJsonObject().toString());
-
-
-
+                        object.put("images", images);
 
                         saveUserToServer(object);
                     } catch (Exception e) {
@@ -209,8 +229,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
 
-
-    private void takePhoto(){
+    private void takePhoto() {
         //show dialog for user to choose between camera or gallery
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Pilih Foto");
@@ -233,7 +252,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         alertDialog.show();
     }
 
-    private void takePhotoFromCamera(){
+    private void takePhotoFromCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -255,7 +274,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void takePhotoFromGallery(){
+    private void takePhotoFromGallery() {
         /*
             ambil foto dari gallery lalu hasilnya akan ada di onActivityResult
         */
@@ -263,12 +282,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
         openGalleryIntent.setType("image/*");
         openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(openGalleryIntent,"Select Picture"), GALLERY_REQUEST);
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_REQUEST);
     }
 
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
         @SuppressWarnings("deprecation")
         Cursor cursor = managedQuery(uri, projection, null,
                 null, null);
@@ -285,7 +303,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         return null;
     }
 
-    public void saveUserToServer(JSONObject jsonParams){
+    public void saveUserToServer(JSONObject jsonParams) {
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 (jsonParams).toString());
@@ -295,7 +313,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
                     startActivity(new Intent(CreateNewUser.this, ListUsers.class));
@@ -326,7 +344,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == 13){
+        if (requestCode == 13) {
             takePhotoFromCamera();
         }
 
@@ -336,22 +354,22 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(photoURI != null){
-            outState.putString("URIFOTO",photoURI.toString());
+        if (photoURI != null) {
+            outState.putString("URIFOTO", photoURI.toString());
         }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState.containsKey("URIFOTO")){
+        if (savedInstanceState.containsKey("URIFOTO")) {
             photoURI = Uri.parse(savedInstanceState.getString("URIFOTO"));
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
             try {
@@ -360,7 +378,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             } catch (FileNotFoundException e) {
                 return;
             }
-        } else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             photoURI = data.getData();
             filePhoto = new File(getPath(photoURI));
             mIvPhoto.setImageURI(photoURI);
@@ -369,7 +387,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_add_new_user:
                 addNewUser(sessManager.getToken());
                 break;

@@ -7,7 +7,6 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
@@ -29,23 +28,17 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
-import com.itx.android.android_itx.Utils.GetDataJson;
+import com.itx.android.android_itx.Utils.AutoCompleteUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
-import com.itx.android.android_itx.Utils.SuggestionAdapter;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -155,31 +148,13 @@ public class CreateNewAsset extends AppCompatActivity {
             }
         });
 
-        ArrayList<String> arrListProvince = new ArrayList<String>();
-        ArrayList<String> arrListCity = new ArrayList<String>();
-
-        String dataJsonProvince = new GetDataJson(this).loadJSONFromAssetProvince();
-        JsonArray gsonProvince = new JsonParser().parse(dataJsonProvince).getAsJsonObject().get("features").getAsJsonArray();
-
-        String dataJsonCity = new GetDataJson(this).loadJSONFromAssetCity();
-        JsonArray gsonCity = new JsonParser().parse(dataJsonCity).getAsJsonObject().get("features").getAsJsonArray();
-
-        for (int i = 0; i < gsonProvince.size(); i++) {
-            String nameProvice = gsonProvince.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("name").getAsString();
-            arrListProvince.add(nameProvice);
-        }
-
-        for (int i = 0; i < gsonCity.size(); i++) {
-            String nameCity = gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("NAME").getAsString();
-            arrListCity.add(nameCity);
-        }
-
+        AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, arrListProvince);
+                (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
 
         ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, arrListCity);
+                (this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson());
 
         String country[] = {"Indonesia"};
 
