@@ -22,19 +22,27 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.GetDataJson;
 import com.itx.android.android_itx.Utils.SessionManager;
+import com.itx.android.android_itx.Utils.SuggestionAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,15 +85,24 @@ public class CreateNewAsset extends AppCompatActivity {
 
     ArrayAdapter<String> spAdapter;
 
-    @BindView(R.id.et_add_asset_name) EditText mEtAssetName;
-    @BindView(R.id.et_add_asset_brand) EditText mEtAssetBrand;
-    @BindView(R.id.et_add_asset_npwp) EditText mEtAssetNPWP;
-    @BindView(R.id.et_add_asset_phone) EditText mEtAssetPhone;
-    @BindView(R.id.et_add_asset_address) EditText mEtAssetAddress;
-    @BindView(R.id.et_add_asset_province) EditText mEtAssetProvince;
-    @BindView(R.id.et_add_asset_city) EditText mEtAssetCity;
-    @BindView(R.id.et_add_asset_postal) EditText mEtAssetPostal;
-    @BindView(R.id.et_add_asset_country) EditText mEtAssetCountry;
+    @BindView(R.id.et_add_asset_name)
+    EditText mEtAssetName;
+    @BindView(R.id.et_add_asset_brand)
+    EditText mEtAssetBrand;
+    @BindView(R.id.et_add_asset_npwp)
+    EditText mEtAssetNPWP;
+    @BindView(R.id.et_add_asset_phone)
+    EditText mEtAssetPhone;
+    @BindView(R.id.et_add_asset_address)
+    EditText mEtAssetAddress;
+    @BindView(R.id.et_add_asset_province)
+    AutoCompleteTextView mAcAssetProvince;
+    @BindView(R.id.et_add_asset_city)
+    EditText mEtAssetCity;
+    @BindView(R.id.et_add_asset_postal)
+    EditText mEtAssetPostal;
+    @BindView(R.id.et_add_asset_country)
+    EditText mEtAssetCountry;
     @BindView(R.id.rv_preview_img_new_asset)
     RecyclerView mRvPreviewImageAsset;
     @BindView(R.id.sp_add_asset_categories)
@@ -98,8 +115,10 @@ public class CreateNewAsset extends AppCompatActivity {
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
-    private static final int CAMERA_REQUEST = 201;
+    ArrayAdapter<String> adapter;
 
+
+    private static final int CAMERA_REQUEST = 201;
 
 
     @Override
@@ -111,13 +130,13 @@ public class CreateNewAsset extends AppCompatActivity {
 
         idUser = getIntent().getStringExtra("idUser");
         mSpCategories.setVisibility(View.GONE);
-        spAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item);
+        spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
-        mListAssetService =  ApiUtils.getListAssetsService(new SessionManager(this).getToken());
+        mListAssetService = ApiUtils.getListAssetsService(new SessionManager(this).getToken());
 
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
         prepareAssetCategories();
-        mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this,2));
+        mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this, 2));
         mRvPreviewImageAsset.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -127,7 +146,7 @@ public class CreateNewAsset extends AppCompatActivity {
                 outRect.top = space;
             }
         });
-        mPreviewAdapter = new PreviewAdapter(uriImages,this);
+        mPreviewAdapter = new PreviewAdapter(uriImages, this);
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
         mBtnAddImages.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +154,34 @@ public class CreateNewAsset extends AppCompatActivity {
                 takePhotoWithPermission();
             }
         });
+
+//        String[] fruits = {"Apple", "Banana", "Cherry", "Date", "Grape", "Kiwi", "Mango", "Pear"};
+
+
+        ArrayList<String> arrList = new ArrayList<String>();
+
+        String dataJson = new GetDataJson(this).loadJSONFromAsset();
+
+
+        JsonArray gson = new JsonParser().parse(dataJson).getAsJsonObject().get("features").getAsJsonArray();
+
+
+
+
+
+        for (int i = 0; i < gson.size(); i++) {
+            String nameProvice =gson.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("name").getAsString();
+            arrList.add(nameProvice);
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, arrList);
+
+            mAcAssetProvince.setAdapter(adapter);
+            mAcAssetProvince.setThreshold(1);
+
+
 
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,7 +193,7 @@ public class CreateNewAsset extends AppCompatActivity {
 
     }
 
-    private void takePhoto(){
+    private void takePhoto() {
         //show dialog for user to choose between camera or gallery
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Pilih Foto");
@@ -169,24 +216,24 @@ public class CreateNewAsset extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void pickImagesFromGallery(){
+    private void pickImagesFromGallery() {
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
         openGalleryIntent.setType("image/*");
         openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         openGalleryIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(Intent.createChooser(openGalleryIntent,"Select Picture"), GALLERY_RC);
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_RC);
     }
 
-    private void prepareAssetCategories(){
+    private void prepareAssetCategories() {
 //        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
         Call<JsonObject> categoriesRequest = mListAssetService.getAssetCategories();
         categoriesRequest.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     JsonArray res = response.body().get("data").getAsJsonArray();
-                    for(int i=0; i < res.size(); i++){
+                    for (int i = 0; i < res.size(); i++) {
                         JsonObject category = res.get(i).getAsJsonObject();
                         spAdapter.add(category.get("name").getAsString());
                         categories.add(category.get("_id").getAsString());
@@ -229,7 +276,7 @@ public class CreateNewAsset extends AppCompatActivity {
     }
 
 
-    private void takePhotoFromCamera(){
+    private void takePhotoFromCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -242,10 +289,10 @@ public class CreateNewAsset extends AppCompatActivity {
             }
             // Continue only if the File was successfully created
             if (fileImages.get(fileImages.size() - 1) != null) {
-                 uriImages.add(FileProvider.getUriForFile(CreateNewAsset.this,
-                         BuildConfig.APPLICATION_ID + ".provider",
-                         fileImages.get(fileImages.size() -1)));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() -1));
+                uriImages.add(FileProvider.getUriForFile(CreateNewAsset.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        fileImages.get(fileImages.size() - 1)));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
@@ -263,9 +310,8 @@ public class CreateNewAsset extends AppCompatActivity {
         }
     }
 
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
         @SuppressWarnings("deprecation")
         Cursor cursor = managedQuery(uri, projection, null,
                 null, null);
@@ -282,9 +328,9 @@ public class CreateNewAsset extends AppCompatActivity {
         return null;
     }
 
-    private void createAsset(){
+    private void createAsset() {
 
-        if (categoryIdSelected == null){
+        if (categoryIdSelected == null) {
             Toast.makeText(this, "Pilih kategorinya", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -297,17 +343,17 @@ public class CreateNewAsset extends AppCompatActivity {
         final String npwp = mEtAssetNPWP.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
         final String address = mEtAssetAddress.getText().toString().trim();
-        final String province = mEtAssetProvince.getText().toString().trim();
+//        final String province = mEtAssetProvince.getText().toString().trim();
         final String city = mEtAssetCity.getText().toString().trim();
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mEtAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i=0; i < fileImages.size(); i++){
+        for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
             RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos",file.getName(),uploadBody);
+            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
         }
         Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
@@ -327,7 +373,7 @@ public class CreateNewAsset extends AppCompatActivity {
 
                     JSONObject location = new JSONObject();
                     location.put("address", address);
-                    location.put("province", province);
+//                    location.put("province", province);
                     location.put("city", city);
                     location.put("postalCode", postal);
                     location.put("country", country);
@@ -337,14 +383,14 @@ public class CreateNewAsset extends AppCompatActivity {
                     request.put("location", location);
                     request.put("images", images);
 
-                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),request.toString());
+                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
                     Call<ResponseBody> res = mListAssetService.createAsset(requestBody);
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if(response.isSuccessful()){
-                                Intent i = new Intent(CreateNewAsset.this, ListAssets.class );
+                            if (response.isSuccessful()) {
+                                Intent i = new Intent(CreateNewAsset.this, ListAssets.class);
                                 i.putExtra("id", idUser);
                                 startActivity(i);
                                 finish();
@@ -374,7 +420,7 @@ public class CreateNewAsset extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == 13){
+        if (requestCode == 13) {
             takePhotoFromCamera();
         }
 
@@ -384,13 +430,12 @@ public class CreateNewAsset extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode ==  GALLERY_RC && resultCode == Activity.RESULT_OK){
-            if(data.getData()!=null){
+        if (requestCode == GALLERY_RC && resultCode == Activity.RESULT_OK) {
+            if (data.getData() != null) {
 
                 Uri imageUri = data.getData();
                 uriImages.add(imageUri);
                 fileImages.add(new File(imageUri.getEncodedPath()));
-
 
 
             } else {
@@ -411,7 +456,7 @@ public class CreateNewAsset extends AppCompatActivity {
             mPreviewAdapter.notifyDataSetChanged();
 
             Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
-        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
     }
