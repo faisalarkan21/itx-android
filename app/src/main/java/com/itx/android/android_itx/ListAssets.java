@@ -130,10 +130,6 @@ public class ListAssets extends AppCompatActivity {
         String images = getIntent().getStringExtra("photo");
         String role = getIntent().getStringExtra("role");
 
-
-
-
-
         mUserName.setText(userName);
         mUserRole.setText(role);
         mUserAddress.setText(userAdress);

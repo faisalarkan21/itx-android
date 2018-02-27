@@ -1,9 +1,11 @@
 package com.itx.android.android_itx.Utils;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.itx.android.android_itx.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +19,6 @@ public class AutoCompleteUtils {
     private Context mContext;
 
 
-
     public AutoCompleteUtils(Context mContext){
         this.mContext = mContext;
 
@@ -26,7 +27,7 @@ public class AutoCompleteUtils {
     public String loadJSONFromAssetProvince() {
         String json = null;
         try {
-            InputStream is = mContext.getAssets().open("states_provinces.json");
+            InputStream is = mContext.getResources().openRawResource(R.raw.states_provinces);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -42,7 +43,7 @@ public class AutoCompleteUtils {
     public String loadJSONFromAssetCity() {
         String json = null;
         try {
-            InputStream is = mContext.getAssets().open("places.json");
+            InputStream is = mContext.getResources().openRawResource(R.raw.places);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);

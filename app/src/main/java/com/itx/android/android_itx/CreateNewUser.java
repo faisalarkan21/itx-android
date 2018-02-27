@@ -100,6 +100,9 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     Button mBtnAddUser;
     @BindView(R.id.et_add_user_country)
     AutoCompleteTextView mAcCountry;
+    @BindView(R.id.et_add_asset_phone)
+    EditText mEtAssetPhone;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +178,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String postal = mEtPostalCode.getText().toString().trim();
         final String province = mAcProvince.getText().toString().trim();
         final String country = mAcCountry.getText().toString().trim();
+        final String phone = mEtAssetPhone.getText().toString().trim();
 
 
         //Upload Photo first then on callback save the new User
@@ -199,6 +203,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         object0.put("lastName", lastName);
                         object0.put("ktp", noKTP);
                         object0.put("email", email);
+                        object0.put("phone", phone);
 
                         JSONObject location = new JSONObject();
                         location.put("address", address);
