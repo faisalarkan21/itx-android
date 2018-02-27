@@ -20,6 +20,12 @@ import android.widget.ProgressBar;
 
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Entity.Users;
@@ -37,11 +43,19 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public class ListUsers extends AppCompatActivity {
+public class ListUsers extends AppCompatActivity implements OnMapReadyCallback {
 
     private List<Users> userList = new ArrayList<>();
     private UsersAdapter uAdapter;
     SessionManager session;
+
+    GoogleApiClient mGoogleApiClient;
+    GoogleMap mMap;
+
+    private LatLng mPosMarker = new LatLng(-6.3660756,106.8346144);
+
+    private MarkerOptions markerOptions;
+    private Marker marker;
 
     ListUsersService mListUsersAPIService;
 
@@ -87,9 +101,6 @@ public class ListUsers extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.setAdapter(uAdapter);
-
-
-
 
         prepareUserData();
 
@@ -202,6 +213,34 @@ public class ListUsers extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setIndoorEnabled(true);
+        markerOptions = new MarkerOptions();
+        markerOptions.draggable(true);
+        markerOptions.position(mPosMarker);
+        marker = mMap.addMarker(markerOptions);
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                mPosMarker = marker.getPosition();
+            }
+        });
+
 
     }
 }
