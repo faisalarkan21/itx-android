@@ -17,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -148,13 +150,10 @@ public class CreateNewAsset extends AppCompatActivity {
             }
         });
 
-        AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
+        final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
-
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson());
 
         String country[] = {"Indonesia"};
 
@@ -164,9 +163,28 @@ public class CreateNewAsset extends AppCompatActivity {
 
         mAcAssetProvince.setAdapter(adapterProvince);
         mAcAssetProvince.setThreshold(1);
-
-        mAcAssetCity.setAdapter(adapterCity);
         mAcAssetCity.setThreshold(1);
+
+        mAcAssetCity.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                        (CreateNewAsset.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcAssetProvince.getText().toString()));
+                mAcAssetCity.setAdapter(adapterCity);
+                mAcAssetCity.setThreshold(1);
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         mAcAssetCountry.setAdapter(adapterCountry);
         mAcAssetCountry.setThreshold(1);
@@ -177,7 +195,6 @@ public class CreateNewAsset extends AppCompatActivity {
                 createAsset();
             }
         });
-
 
     }
 

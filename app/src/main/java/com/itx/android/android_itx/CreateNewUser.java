@@ -17,6 +17,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -113,13 +115,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         ButterKnife.bind(this);
 
 
-        AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
+        final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
 
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson());
 
         String country[] = {"Indonesia"};
 
@@ -130,12 +130,31 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         mAcProvince.setAdapter(adapterProvince);
         mAcProvince.setThreshold(1);
 
-        mAcCity.setAdapter(adapterCity);
-        mAcCity.setThreshold(1);
+
+
+        mAcCity.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                        (CreateNewUser.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcProvince.getText().toString()));
+                mAcCity.setAdapter(adapterCity);
+                mAcCity.setThreshold(1);
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         mAcCountry.setAdapter(adapterCountry);
         mAcCountry.setThreshold(1);
-
 
 
         mBtnAddUser.setOnClickListener(this);

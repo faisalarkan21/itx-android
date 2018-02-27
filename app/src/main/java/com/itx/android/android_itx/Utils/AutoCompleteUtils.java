@@ -69,18 +69,23 @@ public class AutoCompleteUtils {
         return arrListProvince;
     }
 
-    public ArrayList<String> getArrayCityJson(){
+    public ArrayList<String> getArrayCityJson(String byProvince){
         ArrayList<String> arrListCity = new ArrayList<String>();
 
         String dataJsonCity = loadJSONFromAssetCity();
         JsonArray gsonCity = new JsonParser().parse(dataJsonCity).getAsJsonObject().get("features").getAsJsonArray();
 
-        for (int i = 0; i < gsonCity.size(); i++) {
-            String nameCity = gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("NAME").getAsString();
-            arrListCity.add(nameCity);
+
+        if (!byProvince.isEmpty()) {
+            for (int i = 0; i < gsonCity.size(); i++) {
+                ;
+                if (gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("ADM1NAME").getAsString().equals(byProvince)) {
+                    String nameCity = gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("NAME").getAsString();
+                    arrListCity.add(nameCity);
+                }
+            }
+
         }
-
-
         return arrListCity;
     }
 
