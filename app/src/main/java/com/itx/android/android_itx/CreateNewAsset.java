@@ -98,11 +98,11 @@ public class CreateNewAsset extends AppCompatActivity {
     @BindView(R.id.et_add_asset_province)
     AutoCompleteTextView mAcAssetProvince;
     @BindView(R.id.et_add_asset_city)
-    EditText mEtAssetCity;
+    AutoCompleteTextView mAcAssetCity;
     @BindView(R.id.et_add_asset_postal)
     EditText mEtAssetPostal;
     @BindView(R.id.et_add_asset_country)
-    EditText mEtAssetCountry;
+    AutoCompleteTextView mAcAssetCountry;
     @BindView(R.id.rv_preview_img_new_asset)
     RecyclerView mRvPreviewImageAsset;
     @BindView(R.id.sp_add_asset_categories)
@@ -155,33 +155,46 @@ public class CreateNewAsset extends AppCompatActivity {
             }
         });
 
-//        String[] fruits = {"Apple", "Banana", "Cherry", "Date", "Grape", "Kiwi", "Mango", "Pear"};
+        ArrayList<String> arrListProvince = new ArrayList<String>();
+        ArrayList<String> arrListCity = new ArrayList<String>();
 
+        String dataJsonProvince = new GetDataJson(this).loadJSONFromAssetProvince();
+        JsonArray gsonProvince = new JsonParser().parse(dataJsonProvince).getAsJsonObject().get("features").getAsJsonArray();
 
-        ArrayList<String> arrList = new ArrayList<String>();
+        String dataJsonCity = new GetDataJson(this).loadJSONFromAssetCity();
+        JsonArray gsonCity = new JsonParser().parse(dataJsonCity).getAsJsonObject().get("features").getAsJsonArray();
 
-        String dataJson = new GetDataJson(this).loadJSONFromAsset();
+        for (int i = 0; i < gsonProvince.size(); i++) {
+            String nameProvice = gsonProvince.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("name").getAsString();
+            arrListProvince.add(nameProvice);
+        }
 
-
-        JsonArray gson = new JsonParser().parse(dataJson).getAsJsonObject().get("features").getAsJsonArray();
-
-
-
-
-
-        for (int i = 0; i < gson.size(); i++) {
-            String nameProvice =gson.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("name").getAsString();
-            arrList.add(nameProvice);
+        for (int i = 0; i < gsonCity.size(); i++) {
+            String nameCity = gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("NAME").getAsString();
+            arrListCity.add(nameCity);
         }
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, arrList);
+        ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, arrListProvince);
 
-            mAcAssetProvince.setAdapter(adapter);
-            mAcAssetProvince.setThreshold(1);
+        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, arrListCity);
+
+        String country[] = {"Indonesia"};
+
+        ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, country);
 
 
+        mAcAssetProvince.setAdapter(adapterProvince);
+        mAcAssetProvince.setThreshold(1);
+
+        mAcAssetCity.setAdapter(adapterCity);
+        mAcAssetCity.setThreshold(1);
+
+        mAcAssetCountry.setAdapter(adapterCountry);
+        mAcAssetCountry.setThreshold(1);
 
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -343,10 +356,10 @@ public class CreateNewAsset extends AppCompatActivity {
         final String npwp = mEtAssetNPWP.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
         final String address = mEtAssetAddress.getText().toString().trim();
-//        final String province = mEtAssetProvince.getText().toString().trim();
-        final String city = mEtAssetCity.getText().toString().trim();
+        final String province = mAcAssetProvince.getText().toString().trim();
+        final String city = mAcAssetCity.getText().toString().trim();
         final String postal = mEtAssetPostal.getText().toString().trim();
-        final String country = mEtAssetCountry.getText().toString().trim();
+        final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
@@ -373,7 +386,7 @@ public class CreateNewAsset extends AppCompatActivity {
 
                     JSONObject location = new JSONObject();
                     location.put("address", address);
-//                    location.put("province", province);
+                    location.put("province", province);
                     location.put("city", city);
                     location.put("postalCode", postal);
                     location.put("country", country);

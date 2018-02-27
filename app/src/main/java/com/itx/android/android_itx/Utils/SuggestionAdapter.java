@@ -45,7 +45,7 @@ public class SuggestionAdapter extends ArrayAdapter<String> {
 
                     JsonObject jsonResponse = null;
 
-                    String dataJson = new GetDataJson(getContext()).loadJSONFromAsset();
+                    String dataJson = new GetDataJson(getContext()).loadJSONFromAssetProvince();
 
 
                     JsonArray gson = new JsonParser().parse(dataJson).getAsJsonObject().get("features").getAsJsonArray();

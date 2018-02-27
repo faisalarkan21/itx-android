@@ -19,10 +19,26 @@ public class GetDataJson {
 
     }
 
-    public String loadJSONFromAsset() {
+    public String loadJSONFromAssetProvince() {
         String json = null;
         try {
             InputStream is = mContext.getAssets().open("states_provinces.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
+    public String loadJSONFromAssetCity() {
+        String json = null;
+        try {
+            InputStream is = mContext.getAssets().open("places.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
