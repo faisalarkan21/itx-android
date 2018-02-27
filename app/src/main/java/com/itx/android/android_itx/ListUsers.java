@@ -125,9 +125,18 @@ public class ListUsers extends AppCompatActivity {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Log.d("TEST", Data.toString());
                             Users user = new Users();
-                            user.setIdUser(Data.get("_id").getAsString());//
+                            user.setIdUser(Data.get("_id").getAsString());
+                            user.setRole(Data.get("role").getAsJsonObject().get("name").getAsString());
                             user.setFullName(Data.get("fullName").getAsString());
                             user.setAssets(Data.get("totalAssets").getAsString());
+
+                            if(Data.get("phone") != null){
+                                user.setPhone(Data.get("phone").getAsString());
+                            }
+
+                            if(Data.get("address").getAsJsonObject().get("address") != null){
+                                user.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
+                            }
 
                             if(Data.get("photo") != null){
                                 user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());

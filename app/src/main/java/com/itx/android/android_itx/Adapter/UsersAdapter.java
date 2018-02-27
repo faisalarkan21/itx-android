@@ -158,6 +158,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
                 Intent listAsset = new Intent(mContext, ListAssets.class);
                 listAsset.putExtra("id", user.getIdUser());
+                listAsset.putExtra("name", user.getFullName());
+                listAsset.putExtra("address", user.getAddress());
+                listAsset.putExtra("phone", user.getPhone());
+                listAsset.putExtra("photo", user.getPhoto());
+                listAsset.putExtra("role", user.getRole());
 
                 mContext.startActivity(listAsset);
 

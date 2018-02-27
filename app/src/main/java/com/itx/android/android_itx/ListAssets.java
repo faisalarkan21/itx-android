@@ -13,10 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,14 +51,26 @@ public class ListAssets extends AppCompatActivity {
     @BindView(R.id.userName)
     TextView mUserName;
 
+    @BindView(R.id.tv_user_role)
+    TextView mUserRole;
+
+    @BindView(R.id.tv_user_address)
+    TextView mUserAddress;
+
+    @BindView(R.id.tv_user_no_telp)
+    TextView mUserTelp;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+
+    @BindView(R.id.iv_user_images)
+    ImageView mIvUserImages;
 
     @BindView(R.id.pb_list_asset)
     ProgressBar mPbListAsset;
 
     private AssetsAdapter mAdapter;
-    private String idUser;
+    String idUser;
     ListAssetService mAssetAPIService;
     SessionManager session;
 
@@ -65,7 +79,7 @@ public class ListAssets extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_assets);
 
-        idUser = getIntent().getStringExtra("id");
+
 
 
         ButterKnife.bind(this);
@@ -98,12 +112,12 @@ public class ListAssets extends AppCompatActivity {
         });
     }
 
-    private void showLoading(){
+    private void showLoading() {
         mPbListAsset.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
     }
 
-    private void hideLoading(){
+    private void hideLoading() {
         mPbListAsset.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -112,9 +126,27 @@ public class ListAssets extends AppCompatActivity {
     private void prepareUserData() {
 
 
-        String userName = getIntent().getStringExtra("userName");
+
+        idUser = getIntent().getStringExtra("id");
+        String userAdress = getIntent().getStringExtra("address");
+        String userName = getIntent().getStringExtra("name");
+        String phone = getIntent().getStringExtra("phone");
+        String images = getIntent().getStringExtra("photo");
+        String role = getIntent().getStringExtra("role");
+
+
+
+
 
         mUserName.setText(userName);
+        mUserRole.setText(role);
+        mUserAddress.setText(userAdress);
+        mUserTelp.setText(phone);
+        if (images != null){
+            Glide.with(ListAssets.this)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                    .into(mIvUserImages);
+        }
 
         mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
 
