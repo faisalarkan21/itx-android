@@ -133,10 +133,10 @@ public class ListUsers extends AppCompatActivity {
                             if(Data.get("phone") != null){
                                 user.setPhone(Data.get("phone").getAsString());
                             }
-
-                            if(Data.get("address").getAsJsonObject().get("address") != null){
-                                user.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
-                            }
+//
+//                            if(Data.get("address").getAsJsonObject().get("address") != null){
+//                                user.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
+//                            }
 
                             if(Data.get("photo") != null){
                                 user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());

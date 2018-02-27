@@ -7,143 +7,183 @@
     android:fitsSystemWindows="true">
 
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.CardView
-            app:cardElevation="8dp"
-            android:layout_margin="8dp"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="134dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-
-            <LinearLayout
+            <RelativeLayout
+                android:layout_margin="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="5dip"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:layout_height="200dp">
+
+                <ProgressBar
+                    android:id="@+id/pb_asset_details"
+                    android:layout_centerInParent="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/vp_asset_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
                 <LinearLayout
-                    android:id="@+id/thumbnail_asset_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginRight="5dip"
+                    android:id="@+id/layoutDots_asset_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dots_height"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="@dimen/dots_margin_bottom"
+                    android:gravity="center"
+                    android:orientation="horizontal"/>
 
-                    android:padding="3dip">
+            </RelativeLayout>
 
-                    <ImageView
-                        android:id="@+id/iv_asset_images"
-                        android:layout_width="47dp"
-                        android:layout_height="47dp"
-                        android:src="@drawable/icon_tentang_06"
-                        />
+            <android.support.v7.widget.CardView
+                app:cardElevation="8dp"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="134dp">
 
-                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="128dp"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dip"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
-                    <TextView
-                        android:id="@+id/tv_asset_name"
+                    <LinearLayout
+                        android:id="@+id/thumbnail_asset_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignTop="@+id/thumbnail_asset_layout"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Kontrakan Emas"
-                        android:textColor="#040404"
-                        android:textStyle="bold"
-                        android:typeface="sans" />
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginRight="5dip"
 
-                    <TextView
-                        android:id="@+id/tv_asset_category"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_name"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Premium"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                        android:padding="3dip">
 
-                    <TextView
-                        android:id="@+id/tv_asset_address"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_category"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="JL. USA 15 Ciseeng"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                        <ImageView
+                            android:id="@+id/iv_asset_images"
+                            android:layout_width="47dp"
+                            android:layout_height="47dp"
+                            android:src="@drawable/icon_tentang_06"
+                            />
 
-                    <TextView
-                        android:id="@+id/tv_asset_no_telp"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_address"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="+628986121212"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                    </LinearLayout>
 
-                    <RatingBar
-                        android:id="@+id/rating_bar_assets"
-                        style="?android:attr/ratingBarStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="13dp"
-                        android:layout_marginTop="5dp"
-                        android:progressTint="@color/colorAccent" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="128dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_asset_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@+id/thumbnail_asset_layout"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="3dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="Kontrakan Emas"
+                            android:textColor="#040404"
+                            android:textStyle="bold"
+                            android:typeface="sans" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_category"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_name"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="3dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="Premium"
+                            android:textColor="#343434"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_address"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_category"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="3dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="JL. USA 15 Ciseeng"
+                            android:textColor="#343434"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_no_telp"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_address"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="+628986121212"
+                            android:textColor="#343434"
+                            android:textSize="15sp" />
+
+                        <RatingBar
+                            android:id="@+id/rating_bar_assets"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="13dp"
+                            android:layout_marginTop="5dp"
+                            android:progressTint="@color/colorAccent" />
+
+
+                    </LinearLayout>
 
 
                 </LinearLayout>
 
+            </android.support.v7.widget.CardView>
 
-            </LinearLayout>
+            <View
+                android:layout_margin="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
 
-        </android.support.v7.widget.CardView>
+            <TextView
+                android:layout_gravity="center"
+                android:text="List Inventory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <View
-            android:layout_margin="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"/>
-
-        <TextView
-            android:layout_gravity="center"
-            android:text="List Inventory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_margin="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"/>
+            <View
+                android:layout_margin="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
 
 
-        <include layout="@layout/content_inventory" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/pb_list_invent"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
 
-    <ProgressBar
-        android:id="@+id/pb_list_invent"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+                <include layout="@layout/content_inventory" />
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add_inventory"

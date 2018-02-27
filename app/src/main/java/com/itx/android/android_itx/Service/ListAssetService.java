@@ -1,5 +1,6 @@
 package com.itx.android.android_itx.Service;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import okhttp3.RequestBody;
@@ -19,6 +20,9 @@ public interface ListAssetService {
 
     @GET("/api/user/assets/{id}")
     Call<JsonObject> getUserAssets(@Path("id") String postfix);
+
+    @GET("/api/asset/{id}/images")
+    Call<JsonObject> getAssetImages(@Path("id") String id);
 
     @POST("/api/asset/create")
     Call<ResponseBody> createAsset(@Body RequestBody params);
