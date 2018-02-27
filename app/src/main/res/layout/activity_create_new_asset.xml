@@ -122,12 +122,14 @@
                     android:layout_marginTop="8dp"
                     android:layout_weight="1">
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/et_add_asset_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Province"
-                        android:inputType="text" />
+                        android:ems="10"
+
+                       />
 
 
                 </android.support.design.widget.TextInputLayout>
