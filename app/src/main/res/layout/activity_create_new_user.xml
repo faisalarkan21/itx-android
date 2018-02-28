@@ -231,7 +231,7 @@
     <Button
         android:id="@+id/btn_add_new_user"
         android:background="@color/colorPrimary"
-        android:text="ADD NEW USER"
+        android:text="SUBMIT"
         android:textColor="@android:color/white"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"

@@ -269,7 +269,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
-        android:text="ADD NEW ASSET"
+        android:text="SUBMIT"
         android:textColor="@android:color/white" />
 
 
