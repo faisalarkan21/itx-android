@@ -6,12 +6,15 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Rect;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +33,8 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +43,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
@@ -84,11 +92,13 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private String categoryIdSelected;
     private APIService mApiSevice;
 
+    private FusedLocationProviderClient mFusedLocationClient;
+
     private GoogleMap mMap;
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
 
-    private LatLng assetLocation = new LatLng(-6.3660756,106.8346144);
+    private LatLng assetLocation = new LatLng(-7.348868,108.535240);
 
     private PreviewAdapter mPreviewAdapter;
 
@@ -139,6 +149,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.asset_map);
         mapFragment.getMapAsync(this);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         idUser = getIntent().getStringExtra("idUser");
         userAdress = getIntent().getStringExtra("address");
@@ -325,6 +337,45 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
+    private void getCurrentLocation(){
+
+        try {
+            Task<Location> result = mFusedLocationClient.getLastLocation();
+            result.addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        Log.d("currlocation", "berhasil :" + location.getLongitude());
+                        assetLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        updateMapUI();
+                    }
+                }
+            });
+        }catch (SecurityException e){
+
+            e.printStackTrace();
+        }
+    }
+
+    private void updateMapUI(){
+        if(mMap != null && mAssetMarker != null){
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
+            mAssetMarker.setPosition(assetLocation);
+        }
+    }
+
+    @AfterPermissionGranted(12)
+    private void getCurrentLocationWithPermission(){
+
+        String[] locPerms = {Manifest.permission.ACCESS_FINE_LOCATION};
+        if(EasyPermissions.hasPermissions(this,locPerms)){
+            getCurrentLocation();
+
+        } else {
+            EasyPermissions.requestPermissions(this,"Izinkan aplikasi untuk mengakses lokasi anda",12,locPerms);
+        }
+    }
+
     @AfterPermissionGranted(13)
     private void takePhotoWithPermission() {
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -455,6 +506,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         if (requestCode == 13) {
             takePhotoFromCamera();
+        } else if (requestCode == 12){
+            getCurrentLocation();
         }
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
@@ -522,8 +575,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 assetLocation = marker.getPosition();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
                 Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
             }
         });
+
+        getCurrentLocationWithPermission();
     }
 }
