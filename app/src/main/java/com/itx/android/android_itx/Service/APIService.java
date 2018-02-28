@@ -48,11 +48,12 @@ public interface APIService {
     @POST("/api/upload")
     Call<ResponseBody> uploadPhotos(@Part MultipartBody.Part[] photos);
 
-    @FormUrlEncoded
-    @POST("https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={key}")
-    Call<JsonObject> reverseGeocode(@Path("lat") double lat,
-                                    @Path("lng") double lng,
-                                    @Path("key") String key);
+
+
+
+    @POST("https://maps.googleapis.com/maps/api/geocode/json")
+    Call<JsonObject> reverseGeocode(@Query("latlng") String langlat,
+                                    @Query("key") String key);
 
 
 }

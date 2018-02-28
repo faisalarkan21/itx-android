@@ -360,7 +360,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                         Log.d("currlocation", "berhasil :" + location.getLongitude());
                         assetLocation = new LatLng(location.getLatitude(), location.getLongitude());
                         getAddressByLocation(location.getLatitude(),location.getLongitude());
-                        updateMapUI();
                     }
                 }
             });
@@ -371,13 +370,15 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void getAddressByLocation(double lat, double lng){
-         Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(lat,lng, getString(R.string.geocode_key));
+        String formattedLangLat = Double.toString(lat) + "," + Double.toString(lng);
+         Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(formattedLangLat, getString(R.string.geocode_key));
          geoRequest.enqueue(new Callback<JsonObject>() {
              @Override
              public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                  JsonArray results = response.body().getAsJsonArray("results");
                  JsonObject firstAddress = results.get(0).getAsJsonObject();
                  mAddress = firstAddress.get("formatted_address").getAsString();
+                 updateMapUI();
              }
 
              @Override
@@ -616,6 +617,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
 
                 assetLocation = marker.getPosition();
+                getAddressByLocation(assetLocation.latitude,assetLocation.longitude);
                 updateMapUI();
                 Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
             }
