@@ -30,9 +30,16 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.ListAssetService;
@@ -61,7 +68,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewAsset extends AppCompatActivity {
+public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback {
 
     private final static int GALLERY_RC = 299;
 
@@ -75,6 +82,12 @@ public class CreateNewAsset extends AppCompatActivity {
     private ListAssetService mListAssetService;
     private String categoryIdSelected;
     private APIService mApiSevice;
+
+    private GoogleMap mMap;
+    private Marker mAssetMarker;
+    private MarkerOptions mAssetMarkerOptions;
+
+    private LatLng assetLocation = new LatLng(-6.3660756,106.8346144);
 
     private PreviewAdapter mPreviewAdapter;
 
@@ -110,7 +123,6 @@ public class CreateNewAsset extends AppCompatActivity {
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
-    ArrayAdapter<String> adapter;
 
 
     private static final int CAMERA_REQUEST = 201;
@@ -122,6 +134,10 @@ public class CreateNewAsset extends AppCompatActivity {
         setContentView(R.layout.activity_create_new_asset);
 
         ButterKnife.bind(this);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.asset_map);
+        mapFragment.getMapAsync(this);
 
         idUser = getIntent().getStringExtra("idUser");
         mSpCategories.setVisibility(View.GONE);
@@ -464,5 +480,38 @@ public class CreateNewAsset extends AppCompatActivity {
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setIndoorEnabled(true);
+
+        mAssetMarkerOptions = new MarkerOptions();
+        mAssetMarkerOptions.position(assetLocation);
+        mAssetMarkerOptions.draggable(true);
+        mAssetMarkerOptions.title("Lokasi Asset");
+        mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
+
+        mAssetMarker.showInfoWindow();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
+
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                assetLocation = marker.getPosition();
+                Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
