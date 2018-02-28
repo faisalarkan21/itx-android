@@ -82,9 +82,11 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.PermissionRequest;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.POST;
 
 public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
 
@@ -110,7 +112,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
-    private LatLng assetLocation = new LatLng(-7.348868,108.535240);
+    private LatLng assetLocation = new LatLng(-7.348868, 108.535240);
 
 
     private PreviewAdapter mPreviewAdapter;
@@ -170,6 +172,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
 
     private static final int CAMERA_REQUEST = 201;
+    private static final int LOCATION_REQUEST = 201;
 
 
     @Override
@@ -201,8 +204,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mSpCategories.setAdapter(spAdapter);
         mListAssetService = ApiUtils.getListAssetsService(new SessionManager(this).getToken());
 
-
-        prepareAssetCategories();
         mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this, 2));
         mRvPreviewImageAsset.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -216,11 +217,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mPreviewAdapter = new PreviewAdapter(uriImages, this);
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
 
+        prepareAssetCategories();
         setAutoComplete();
     }
 
 
-    public void setAutoComplete(){
+    public void setAutoComplete() {
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
@@ -349,7 +351,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
-    private void getCurrentLocation(){
+    private void getCurrentLocation() {
 
         try {
             Task<Location> result = mFusedLocationClient.getLastLocation();
@@ -359,52 +361,52 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     if (location != null) {
                         Log.d("currlocation", "berhasil :" + location.getLongitude());
                         assetLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                        getAddressByLocation(location.getLatitude(),location.getLongitude());
+                        getAddressByLocation(location.getLatitude(), location.getLongitude());
                     }
                 }
             });
-        }catch (SecurityException e){
+        } catch (SecurityException e) {
 
             e.printStackTrace();
         }
     }
 
-    private void getAddressByLocation(double lat, double lng){
+    private void getAddressByLocation(double lat, double lng) {
         String formattedLangLat = Double.toString(lat) + "," + Double.toString(lng);
-         Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(formattedLangLat, getString(R.string.geocode_key));
-         geoRequest.enqueue(new Callback<JsonObject>() {
-             @Override
-             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                 JsonArray results = response.body().getAsJsonArray("results");
-                 JsonObject firstAddress = results.get(0).getAsJsonObject();
-                 mAddress = firstAddress.get("formatted_address").getAsString();
-                 updateMapUI();
-             }
+        Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(formattedLangLat, getString(R.string.geocode_key));
+        geoRequest.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                JsonArray results = response.body().getAsJsonArray("results");
+                JsonObject firstAddress = results.get(0).getAsJsonObject();
+                mAddress = firstAddress.get("formatted_address").getAsString();
+                updateMapUI();
+            }
 
-             @Override
-             public void onFailure(Call<JsonObject> call, Throwable t) {
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
 
-             }
-         });
+            }
+        });
     }
 
-    private void updateMapUI(){
-        if(mMap != null && mAssetMarker != null){
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
+    private void updateMapUI() {
+        if (mMap != null && mAssetMarker != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
             mAssetMarker.setPosition(assetLocation);
             mEtAssetAddress.setText(mAddress);
         }
     }
 
     @AfterPermissionGranted(12)
-    private void getCurrentLocationWithPermission(){
+    private void getCurrentLocationWithPermission() {
 
-        String[] locPerms = {Manifest.permission.ACCESS_FINE_LOCATION};
-        if(EasyPermissions.hasPermissions(this,locPerms)){
+        String[] locPerms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (EasyPermissions.hasPermissions(this, locPerms)) {
             getCurrentLocation();
 
         } else {
-            EasyPermissions.requestPermissions(this,"Izinkan aplikasi untuk mengakses lokasi anda",12,locPerms);
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", 12, locPerms);
         }
     }
 
@@ -530,8 +532,17 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         if (requestCode == 13) {
             takePhotoFromCamera();
-        } else if (requestCode == 12){
+        } else if (requestCode == 12) {
             getCurrentLocation();
+
+            // TODO HERE TOO
+        } else if (requestCode == LOCATION_REQUEST) {
+            if (permissions.length == 1 &&
+                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mMap.setMyLocationEnabled(true);
+
+            }
         }
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
@@ -573,32 +584,56 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+
         mMap = googleMap;
         mMap.setIndoorEnabled(true);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
+
+
+        // TODO HERE where the shit began..... dim
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Show rationale and request permission.
+
+            ActivityCompat.requestPermissions(CreateNewAsset.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_REQUEST);
+
+        }
+
 
         mAssetMarkerOptions = new MarkerOptions();
         mAssetMarkerOptions.position(assetLocation);
         mAssetMarkerOptions.draggable(true);
         mAssetMarkerOptions.title("Lokasi Asset");
         mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
-
         mAssetMarker.showInfoWindow();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 12.0f));
 
 
-        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public void onMarkerDragStart(Marker marker) {
+            public boolean onMarkerClick(Marker marker) {
+
+
+                mMap.getUiSettings().setMapToolbarEnabled(true);
+                // return true will prevent any further map action from happening
+                return false;
 
             }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
-            public void onMarkerDrag(Marker marker) {
+            public void onMapClick(LatLng point) {
+                // TODO Auto-generated method stub
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(point));
 
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
                 Geocoder gcd = new Geocoder(CreateNewAsset.this, Locale.getDefault());
                 try {
 
@@ -611,15 +646,17 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     }
 
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    assetLocation = point;
+                    getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
+                    updateMapUI();
+                    Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
+
+
+                } catch (Exception e) {
+                    Toast.makeText(CreateNewAsset.this, e.getMessage(), Toast.LENGTH_LONG);
                 }
 
 
-                assetLocation = marker.getPosition();
-                getAddressByLocation(assetLocation.latitude,assetLocation.longitude);
-                updateMapUI();
-                Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
             }
         });
 
