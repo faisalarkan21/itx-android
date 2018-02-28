@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Rect;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
@@ -56,6 +58,10 @@ import com.itx.android.android_itx.Service.ListAssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,6 +71,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -78,12 +86,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback {
+public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
 
     private final static int GALLERY_RC = 299;
 
-    String idUser,userAdress,userName,phone,role,imagesDetail ;
+    String idUser, userAdress, userName, phone, role, imagesDetail;
 
+    final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
     //URI List for the images that will be on the server
     ArrayList<Uri> uriImages = new ArrayList<>();
@@ -97,47 +106,67 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private String mAddress = "";
 
     private FusedLocationProviderClient mFusedLocationClient;
-
     private GoogleMap mMap;
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
-
+    Validator validator;
     private LatLng assetLocation = new LatLng(-7.348868,108.535240);
+
 
     private PreviewAdapter mPreviewAdapter;
 
     ArrayAdapter<String> spAdapter;
 
-    @BindView(R.id.et_add_asset_name)
-    EditText mEtAssetName;
-    @BindView(R.id.et_add_asset_brand)
-    EditText mEtAssetBrand;
-    @BindView(R.id.et_add_asset_npwp)
-    EditText mEtAssetNPWP;
-    @BindView(R.id.et_add_asset_phone)
-    EditText mEtAssetPhone;
-    @BindView(R.id.et_add_asset_address)
-    EditText mEtAssetAddress;
-    @BindView(R.id.et_add_asset_province)
-    AutoCompleteTextView mAcAssetProvince;
-    @BindView(R.id.et_add_asset_city)
-    AutoCompleteTextView mAcAssetCity;
-    @BindView(R.id.et_add_asset_postal)
-    EditText mEtAssetPostal;
-    @BindView(R.id.et_add_asset_country)
-    AutoCompleteTextView mAcAssetCountry;
     @BindView(R.id.rv_preview_img_new_asset)
     RecyclerView mRvPreviewImageAsset;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_name)
+    EditText mEtAssetName;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_brand)
+    EditText mEtAssetBrand;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_npwp)
+    EditText mEtAssetNPWP;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_phone)
+    EditText mEtAssetPhone;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_address)
+    EditText mEtAssetAddress;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_province)
+    AutoCompleteTextView mAcAssetProvince;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_city)
+    AutoCompleteTextView mAcAssetCity;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_postal)
+    EditText mEtAssetPostal;
+
+    @NotEmpty
+    @BindView(R.id.et_add_asset_country)
+    AutoCompleteTextView mAcAssetCountry;
+
     @BindView(R.id.sp_add_asset_categories)
     Spinner mSpCategories;
+
     @BindView(R.id.rb_new_asset)
     RatingBar mRbAsset;
+
     @BindView(R.id.btn_add_new_asset)
     Button mBtnAddAsset;
 
     @BindView(R.id.select_image)
     Button mBtnAddImages;
-
 
 
     private static final int CAMERA_REQUEST = 201;
@@ -149,8 +178,9 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_create_new_asset);
 
         ButterKnife.bind(this);
-
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
+        validator = new Validator(this);
+        validator.setValidationListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.asset_map);
@@ -164,6 +194,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         phone = getIntent().getStringExtra("phone");
         imagesDetail = getIntent().getStringExtra("photo");
         role = getIntent().getStringExtra("role");
+
+
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
@@ -183,14 +215,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         });
         mPreviewAdapter = new PreviewAdapter(uriImages, this);
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
-        mBtnAddImages.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                takePhotoWithPermission();
-            }
-        });
 
-        final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
+        setAutoComplete();
+    }
+
+
+    public void setAutoComplete(){
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
@@ -200,42 +230,18 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, country);
 
-
         mAcAssetProvince.setAdapter(adapterProvince);
         mAcAssetProvince.setThreshold(1);
         mAcAssetCity.setThreshold(1);
 
-        mAcAssetCity.addTextChangedListener(new TextWatcher() {
+        mAcAssetCity.addTextChangedListener(this);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                        (CreateNewAsset.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcAssetProvince.getText().toString()));
-                mAcAssetCity.setAdapter(adapterCity);
-                mAcAssetCity.setThreshold(1);
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+        mBtnAddAsset.setOnClickListener(this);
+        mBtnAddImages.setOnClickListener(this);
 
         mAcAssetCountry.setAdapter(adapterCountry);
         mAcAssetCountry.setThreshold(1);
-
-        mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createAsset();
-            }
-        });
-
     }
 
     private void takePhoto() {
@@ -433,14 +439,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     private void createAsset() {
 
-        if (categoryIdSelected == null) {
-            Toast.makeText(this, "Pilih kategorinya", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Toast.makeText(this, "Sedang membuat asset", Toast.LENGTH_SHORT).show();
-
-
         final String name = mEtAssetName.getText().toString().trim();
         final String brand = mEtAssetBrand.getText().toString().trim();
         final String npwp = mEtAssetNPWP.getText().toString().trim();
@@ -584,7 +582,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
 
         mAssetMarker.showInfoWindow();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 12.0f));
+
 
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -599,6 +598,23 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
+                Geocoder gcd = new Geocoder(CreateNewAsset.this, Locale.getDefault());
+                try {
+
+                    List<Address> address = gcd.getFromLocation(assetLocation.latitude, assetLocation.longitude, 1);
+                    if (address.size() > 0) {
+                        System.out.println(address.get(0).getLocality());
+                    } else {
+                        // do your stuff
+                        Toast.makeText(CreateNewAsset.this, address.toString(), Toast.LENGTH_LONG).show();
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
                 assetLocation = marker.getPosition();
                 updateMapUI();
                 Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
@@ -606,5 +622,70 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         });
 
         getCurrentLocationWithPermission();
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+
+        if (mRbAsset.getRating() == 0) {
+            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (uriImages.size() == 0) {
+            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Sedang Membuat Asset", Toast.LENGTH_SHORT).show();
+        createAsset();
+
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+
+            // Display error messages ;)
+            if (view instanceof EditText) {
+                ((EditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.btn_add_new_asset:
+                validator.validate();
+                break;
+            case R.id.select_image:
+                takePhotoWithPermission();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                (CreateNewAsset.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcAssetProvince.getText().toString()));
+        mAcAssetCity.setAdapter(adapterCity);
+        mAcAssetCity.setThreshold(1);
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

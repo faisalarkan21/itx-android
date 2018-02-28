@@ -11,13 +11,19 @@ import java.util.Locale;
 
 public class RupiahCurrency {
 
-    Locale locale = null;
-    NumberFormat rupiahFormat = null;
+    static String unformated = null;
 
-    public String toRupiahFormat(double nominal) {
+    public static String toRupiahFormat(double nominal) {
         Locale localeID = new Locale("in", "ID");
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
         return formatRupiah.format(nominal);
+    }
+
+    public static String unformatRupiah(String nominal) {
+        Locale localeID = new Locale("in", "ID");
+        NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
+        unformated = nominal.replaceAll("[Rp,]", "");
+        return unformated;
     }
 
 }
