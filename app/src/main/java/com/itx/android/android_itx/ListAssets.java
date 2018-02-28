@@ -70,7 +70,7 @@ public class ListAssets extends AppCompatActivity {
     ProgressBar mPbListAsset;
 
     private AssetsAdapter mAdapter;
-    String idUser;
+    String idUser,userAdress,userName,phone,images,role ;
     ListAssetService mAssetAPIService;
     SessionManager session;
 
@@ -103,6 +103,11 @@ public class ListAssets extends AppCompatActivity {
             public void onClick(View v) {
                 Intent addAssetIntent = new Intent(ListAssets.this, CreateNewAsset.class);
                 addAssetIntent.putExtra("idUser", idUser);
+                addAssetIntent.putExtra("name", userName);
+                addAssetIntent.putExtra("address", userAdress);
+                addAssetIntent.putExtra("phone", phone);
+                addAssetIntent.putExtra("photo", images);
+                addAssetIntent.putExtra("role", role);
                 startActivity(addAssetIntent);
             }
         });
@@ -124,11 +129,11 @@ public class ListAssets extends AppCompatActivity {
 
 
         idUser = getIntent().getStringExtra("id");
-        String userAdress = getIntent().getStringExtra("address");
-        String userName = getIntent().getStringExtra("name");
-        String phone = getIntent().getStringExtra("phone");
-        String images = getIntent().getStringExtra("photo");
-        String role = getIntent().getStringExtra("role");
+        userAdress = getIntent().getStringExtra("address");
+        userName = getIntent().getStringExtra("name");
+        phone = getIntent().getStringExtra("phone");
+        images = getIntent().getStringExtra("photo");
+        role = getIntent().getStringExtra("role");
 
         mUserName.setText(userName);
         mUserRole.setText(role);

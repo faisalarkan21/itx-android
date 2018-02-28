@@ -72,7 +72,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     private final static int GALLERY_RC = 299;
 
-    private String idUser;
+    String idUser,userAdress,userName,phone,role,imagesDetail ;
+
 
     //URI List for the images that will be on the server
     ArrayList<Uri> uriImages = new ArrayList<>();
@@ -140,6 +141,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
 
         idUser = getIntent().getStringExtra("idUser");
+        userAdress = getIntent().getStringExtra("address");
+        userName = getIntent().getStringExtra("name");
+        phone = getIntent().getStringExtra("phone");
+        imagesDetail = getIntent().getStringExtra("photo");
+        role = getIntent().getStringExtra("role");
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
@@ -381,7 +387,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
-                    JSONArray images = new JSONArray(response.body().string());
+                    final JSONArray images = new JSONArray(response.body().string());
                     JSONObject data = new JSONObject();
                     data.put("assetCategory", categoryIdSelected);
                     data.put("name", name);
@@ -413,6 +419,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                             if (response.isSuccessful()) {
                                 Intent i = new Intent(CreateNewAsset.this, ListAssets.class);
                                 i.putExtra("id", idUser);
+                                i.putExtra("idUser", idUser);
+                                i.putExtra("name", userName);
+                                i.putExtra("address", userAdress);
+                                i.putExtra("phone", phone);
+                                i.putExtra("photo", imagesDetail);
+                                i.putExtra("role", role);
                                 startActivity(i);
                                 finish();
                             }
