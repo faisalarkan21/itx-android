@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Rect;
@@ -36,8 +37,18 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -91,6 +102,7 @@ import retrofit2.http.POST;
 public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
 
     private final static int GALLERY_RC = 299;
+    private final static int LOCATION_SETTING_RC = 122;
 
     String idUser, userAdress, userName, phone, role, imagesDetail;
 
@@ -113,6 +125,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
     private LatLng assetLocation = new LatLng(-7.348868, 108.535240);
+    private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
 
     private PreviewAdapter mPreviewAdapter;
@@ -199,6 +212,13 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         role = getIntent().getStringExtra("role");
 
 
+        // ask user to on the GPS when the activity is created
+
+        if(EasyPermissions.hasPermissions(this, locationPerm)){
+            askUserToTurnOnGPS();
+        } else {
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
+        }
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
@@ -219,6 +239,62 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         prepareAssetCategories();
         setAutoComplete();
+    }
+
+    private void askUserToTurnOnGPS(){
+        try {
+            GoogleApiClient
+                    googleApiClient = new GoogleApiClient.Builder( this )
+                    .addApi( LocationServices.API )
+                    .build();
+
+            googleApiClient.connect();
+
+            LocationRequest request = new LocationRequest();
+            request.setInterval(1000000)
+                    .setFastestInterval(500000)
+                    .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+            builder.addLocationRequest(request);
+
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    final LocationSettingsStates state = result.getLocationSettingsStates();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            // All location settings are satisfied. The client can initialize location
+                            // requests here.
+                            if(state.isGpsUsable() && state.isLocationUsable() && state.isNetworkLocationUsable()){
+                                return;
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the user
+                            // a dialog.
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(
+                                        CreateNewAsset.this, LOCATION_SETTING_RC);
+                            } catch (IntentSender.SendIntentException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // Location settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            });
+        } catch( Exception exception ) {
+            // Log exception
+        }
     }
 
 
@@ -537,12 +613,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             // TODO HERE TOO
         } else if (requestCode == LOCATION_REQUEST) {
-            if (permissions.length == 1 &&
-                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mMap.setMyLocationEnabled(true);
-
-            }
+            mMap.setMyLocationEnabled(true);
         }
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
@@ -579,6 +650,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
+        } else if(requestCode == LOCATION_SETTING_RC && resultCode == RESULT_OK){
+            LocationSettingsStates settingsStates = LocationSettingsStates.fromIntent(data);
+            if(settingsStates.isNetworkLocationUsable() && settingsStates.isGpsUsable() && settingsStates.isLocationUsable()){
+                return;
+            }
         }
     }
 
@@ -593,16 +669,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         // TODO HERE where the shit began..... dim
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if(EasyPermissions.hasPermissions(this,locationPerm)){
             mMap.setMyLocationEnabled(true);
         } else {
-            // Show rationale and request permission.
-
-            ActivityCompat.requestPermissions(CreateNewAsset.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_REQUEST);
-
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
         }
 
 
