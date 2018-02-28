@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
@@ -91,6 +93,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private ListAssetService mListAssetService;
     private String categoryIdSelected;
     private APIService mApiSevice;
+
+    private String mAddress = "";
 
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -146,6 +150,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         ButterKnife.bind(this);
 
+        mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.asset_map);
         mapFragment.getMapAsync(this);
@@ -163,7 +169,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mSpCategories.setAdapter(spAdapter);
         mListAssetService = ApiUtils.getListAssetsService(new SessionManager(this).getToken());
 
-        mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
+
         prepareAssetCategories();
         mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this, 2));
         mRvPreviewImageAsset.addItemDecoration(new RecyclerView.ItemDecoration() {
@@ -347,6 +353,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     if (location != null) {
                         Log.d("currlocation", "berhasil :" + location.getLongitude());
                         assetLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        getAddressByLocation(location.getLatitude(),location.getLongitude());
                         updateMapUI();
                     }
                 }
@@ -357,10 +364,28 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
+    private void getAddressByLocation(double lat, double lng){
+         Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(lat,lng, getString(R.string.geocode_key));
+         geoRequest.enqueue(new Callback<JsonObject>() {
+             @Override
+             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                 JsonArray results = response.body().getAsJsonArray("results");
+                 JsonObject firstAddress = results.get(0).getAsJsonObject();
+                 mAddress = firstAddress.get("formatted_address").getAsString();
+             }
+
+             @Override
+             public void onFailure(Call<JsonObject> call, Throwable t) {
+
+             }
+         });
+    }
+
     private void updateMapUI(){
         if(mMap != null && mAssetMarker != null){
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
             mAssetMarker.setPosition(assetLocation);
+            mEtAssetAddress.setText(mAddress);
         }
     }
 
@@ -575,7 +600,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 assetLocation = marker.getPosition();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation,12.0f));
+                updateMapUI();
                 Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
             }
         });
