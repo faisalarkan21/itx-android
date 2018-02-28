@@ -36,6 +36,11 @@ import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Digits;
+import com.mobsandgeeks.saripaar.annotation.Email;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +55,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -65,9 +71,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewUser extends AppCompatActivity implements View.OnClickListener {
+public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, TextWatcher {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
+    final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
     private static final int CAMERA_REQUEST = 1000;
     private static final int GALLERY_REQUEST = 1001;
 
@@ -80,28 +87,53 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     String mCurrentPhotoPath;
 
+    Validator validator;
+
     @BindView(R.id.iv_add_user)
     ImageView mIvPhoto;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_firstname)
     EditText mEtFirstname;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_lastname)
     EditText mEtLastname;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_no_ktp)
     EditText mEtNoKTP;
+
+    @NotEmpty
+    @Email
     @BindView(R.id.et_add_user_email)
     EditText mEtEmail;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_address)
     EditText mEtAddress;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_city)
     AutoCompleteTextView mAcCity;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_postal)
     EditText mEtPostalCode;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_province)
     AutoCompleteTextView mAcProvince;
+
+    @NotEmpty
     @BindView(R.id.btn_add_new_user)
     Button mBtnAddUser;
+
+    @NotEmpty
     @BindView(R.id.et_add_user_country)
     AutoCompleteTextView mAcCountry;
+
+    @NotEmpty
     @BindView(R.id.et_add_asset_phone)
     EditText mEtAssetPhone;
 
@@ -114,52 +146,37 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         sessManager = new SessionManager(this);
         ButterKnife.bind(this);
 
+        validator = new Validator(this);
+        validator.setValidationListener(this);
 
-        final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
+        mBtnAddUser.setOnClickListener(this);
+        mIvPhoto.setOnClickListener(this);
+
+        setAutoComplete();
+    }
+
+
+
+    public void setAutoComplete(){
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
-
 
         String country[] = {"Indonesia"};
 
         ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, country);
 
-
         mAcProvince.setAdapter(adapterProvince);
         mAcProvince.setThreshold(1);
 
-
-
-        mAcCity.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                        (CreateNewUser.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcProvince.getText().toString()));
-                mAcCity.setAdapter(adapterCity);
-                mAcCity.setThreshold(1);
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+        mAcCity.addTextChangedListener(this);
 
         mAcCountry.setAdapter(adapterCountry);
         mAcCountry.setThreshold(1);
 
-
-        mBtnAddUser.setOnClickListener(this);
-        mIvPhoto.setOnClickListener(this);
     }
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -181,13 +198,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
 
-        if (photoURI == null) {
-            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
-        //TODO: Cleaning this messy things
-
         final String firstName = mEtFirstname.getText().toString().trim();
         final String lastName = mEtLastname.getText().toString().trim();
         final String email = mEtEmail.getText().toString().trim();
@@ -199,7 +209,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
-
+        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
         //Upload Photo first then on callback save the new User
         RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
@@ -413,7 +423,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add_new_user:
-                addNewUser(sessManager.getToken());
+                validator.validate();
                 break;
             case R.id.iv_add_user:
                 takePhotoWithPermission();
@@ -421,5 +431,53 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+
+        if (photoURI == null) {
+            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Sedang Membuat User", Toast.LENGTH_SHORT).show();
+        addNewUser(sessManager.getToken());
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+
+            // Display error messages ;)
+            if (view instanceof EditText) {
+                ((EditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
+                (CreateNewUser.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcProvince.getText().toString()));
+        mAcCity.setAdapter(adapterCity);
+        mAcCity.setThreshold(1);
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

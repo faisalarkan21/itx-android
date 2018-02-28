@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="No. KTP"
-                    android:inputType="text" />
+                    android:inputType="number" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -134,7 +134,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Address"
-                    android:inputType="textPostalAddress" />
+                    android:inputType="text" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -198,7 +198,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Postal Code"
-                        android:inputType="text" />
+                        android:inputType="number" />
 
 
                 </android.support.design.widget.TextInputLayout>

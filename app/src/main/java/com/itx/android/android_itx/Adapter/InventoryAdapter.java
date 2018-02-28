@@ -147,11 +147,11 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         } else{
 
             holder.inventoryFacilities.setText("Facilities : Tidak ada fasilitas" );
-
         }
+
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
-        holder.inventoryPrice.setText("@ " + new RupiahCurrency().toRupiahFormat(invent.getPrice()));
+        holder.inventoryPrice.setText("@ " +  RupiahCurrency.toRupiahFormat(invent.getPrice()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

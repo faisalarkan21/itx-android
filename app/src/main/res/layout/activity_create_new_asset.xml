@@ -73,8 +73,9 @@
                     android:id="@+id/et_add_asset_npwp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="NPWP"/>
-
+                    android:hint="NPWP"
+                    android:inputType="number"
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -111,6 +112,14 @@
 
 
             </android.support.design.widget.TextInputLayout>
+
+            <fragment
+                xmlns:map="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/asset_map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -173,7 +182,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Postal Code"
-                        android:inputType="text" />
+                        android:inputType="number" />
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -198,13 +207,7 @@
 
             </LinearLayout>
 
-            <fragment
-                xmlns:map="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/asset_map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"/>
+
 
             <TextView
                 android:layout_width="match_parent"

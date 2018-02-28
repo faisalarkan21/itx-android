@@ -42,7 +42,12 @@ import com.itx.android.android_itx.Service.ListInventoryService;
 import com.itx.android.android_itx.Service.ListUsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.NumberTextWatcher;
+import com.itx.android.android_itx.Utils.RupiahCurrency;
 import com.itx.android.android_itx.Utils.SessionManager;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +76,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewInventory extends AppCompatActivity {
+public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     private static final int RC_CAMERA = 1000;
     private static final int RC_GALLERY = 1001;
@@ -79,52 +84,68 @@ public class CreateNewInventory extends AppCompatActivity {
 
     ArrayList<Uri> uriImages = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
+
     private APIService mApiSevice;
     private PreviewAdapter mPreviewAdapter;
     private List<String> mListFacilitiesChecked = new ArrayList<>();
-    @BindView(R.id.et_add_inventory_name)
-    EditText mEtInventName;
-    @BindView(R.id.et_add_inventory_deskripsi)
-    EditText mEtInventDeskripsi;
-    @BindView(R.id.et_add_inventory_space)
-    EditText mEtInventSpace;
-    @BindView(R.id.et_add_inventory_stock)
-    EditText mEtInventStock;
-    @BindView(R.id.btn_add_new_inventory)
-    Button mBtnAddInvent;
-    @BindView(R.id.rv_preview_img_new_invent)
-    RecyclerView mRvPreviewImageInvent;
-    @BindView(R.id.select_image_inventory) Button mBtnAddImage;
-
-    @BindView(R.id.layoutFacilities)
-    LinearLayout layoutFacilities;
-
-    @BindView(R.id.et_add_price)
-    EditText mEtAddPrice;
-
-    CheckBox checkFacilities;
-
-    int totalFacilities;
-
 
     SessionManager session;
     ListInventoryService mInventoryAPIService;
     ProgressDialog progressDialog;
+    Validator validator;
+
+
+    @BindView(R.id.btn_add_new_inventory)
+    Button mBtnAddInvent;
+
+    @BindView(R.id.select_image_inventory)
+    Button mBtnAddImage;
+
+    @BindView(R.id.layoutFacilities)
+    LinearLayout layoutFacilities;
+
+    @BindView(R.id.rv_preview_img_new_invent)
+    RecyclerView mRvPreviewImageInvent;
+
+    @NotEmpty
+    @BindView(R.id.et_add_inventory_name)
+    EditText mEtInventName;
+
+    @NotEmpty
+    @BindView(R.id.et_add_inventory_deskripsi)
+    EditText mEtInventDeskripsi;
+
+    @NotEmpty
+    @BindView(R.id.et_add_inventory_space)
+    EditText mEtInventSpace;
+
+    @NotEmpty
+    @BindView(R.id.et_add_inventory_stock)
+    EditText mEtInventStock;
+
+    @NotEmpty
+    @BindView(R.id.et_add_price)
+    EditText mEtAddPrice;
+
+    CheckBox checkFacilities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_inventory);
 
+        ButterKnife.bind(this);
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+        mBtnAddInvent.setOnClickListener(this);
+        mBtnAddImage.setOnClickListener(this);
+
         session = new SessionManager(this);
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
-        ButterKnife.bind(this);
 
         mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
-        prepareFacilitiesData();
-
-        mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this,2));
+        mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this, 2));
         mPreviewAdapter = new PreviewAdapter(uriImages, this);
         mRvPreviewImageInvent.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -137,22 +158,17 @@ public class CreateNewInventory extends AppCompatActivity {
         });
 
         mRvPreviewImageInvent.setAdapter(mPreviewAdapter);
-
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
         progressDialog = new ProgressDialog(CreateNewInventory.this);
         progressDialog.setMessage("Menyiapkan Data");
         progressDialog.show();
 
-        mBtnAddImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                takePhotoWithPermission();
-            }
-        });
+        prepareFacilitiesData();
+
 
     }
 
-    private void takePhoto(){
+    private void takePhoto() {
         //show dialog for user to choose between camera or gallery
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Pilih Foto");
@@ -175,13 +191,13 @@ public class CreateNewInventory extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void pickImagesFromGallery(){
+    private void pickImagesFromGallery() {
         Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
         openGalleryIntent.setType("image/*");
         openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         openGalleryIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(Intent.createChooser(openGalleryIntent,"Select Picture"), RC_GALLERY);
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), RC_GALLERY);
     }
 
     private File createImageFile() throws IOException {
@@ -200,7 +216,7 @@ public class CreateNewInventory extends AppCompatActivity {
     }
 
 
-    private void takePhotoFromCamera(){
+    private void takePhotoFromCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -215,8 +231,8 @@ public class CreateNewInventory extends AppCompatActivity {
             if (fileImages.get(fileImages.size() - 1) != null) {
                 uriImages.add(FileProvider.getUriForFile(CreateNewInventory.this,
                         BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() -1)));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() -1));
+                        fileImages.get(fileImages.size() - 1)));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
                 startActivityForResult(takePictureIntent, RC_CAMERA);
             }
         }
@@ -234,9 +250,8 @@ public class CreateNewInventory extends AppCompatActivity {
         }
     }
 
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
         @SuppressWarnings("deprecation")
         Cursor cursor = managedQuery(uri, projection, null,
                 null, null);
@@ -255,8 +270,6 @@ public class CreateNewInventory extends AppCompatActivity {
 
     public void prepareFacilitiesData() {
 
-
-
         Call<JsonObject> response = mInventoryAPIService.getAllFacilities();
 
         response.enqueue(new Callback<JsonObject>() {
@@ -271,10 +284,6 @@ public class CreateNewInventory extends AppCompatActivity {
                             final JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Inventory invent = new Inventory();
 
-
-
-
-
                             checkFacilities = new CheckBox(CreateNewInventory.this);
                             checkFacilities.setText(Data.get("name").getAsString());
                             checkFacilities.setTextSize(12);
@@ -283,13 +292,10 @@ public class CreateNewInventory extends AppCompatActivity {
                             layoutFacilities.addView(checkFacilities);
 
                             new CountDownTimer(1000, 1000) {
-
                                 public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
                                 }
 
                                 public void onFinish() {
-
                                     progressDialog.dismiss();
                                 }
                             }.start();
@@ -297,14 +303,14 @@ public class CreateNewInventory extends AppCompatActivity {
                             checkFacilities.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if (isChecked == true){
+                                    if (isChecked == true) {
                                         int getChecked = buttonView.getId();
 
                                         final JsonObject DataChecked = jsonArray.get(getChecked).getAsJsonObject();
 
                                         Log.i("checkbox", DataChecked.get("_id").getAsString());
-                                        mListFacilitiesChecked.add( DataChecked.get("_id").getAsString());
-                                    }else{
+                                        mListFacilitiesChecked.add(DataChecked.get("_id").getAsString());
+                                    } else {
                                         int getChecked = buttonView.getId();
 
                                         final JsonObject DataChecked = jsonArray.get(getChecked).getAsJsonObject();
@@ -315,14 +321,6 @@ public class CreateNewInventory extends AppCompatActivity {
                                 }
                             });
 
-                            mBtnAddInvent.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    uploadImagesToServer();
-
-
-                                }
-                            });
                         }
                         Toast.makeText(CreateNewInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
                                 Toast.LENGTH_LONG).show();
@@ -347,7 +345,7 @@ public class CreateNewInventory extends AppCompatActivity {
 
     }
 
-    public void uploadImagesToServer(){
+    public void uploadImagesToServer() {
 
         progressDialog = new ProgressDialog(CreateNewInventory.this);
         progressDialog.setMessage("Menyimpan Data");
@@ -357,58 +355,40 @@ public class CreateNewInventory extends AppCompatActivity {
         final String inventoryDescription = mEtInventDeskripsi.getText().toString().trim();
         final String inventoryStock = mEtInventStock.getText().toString().trim();
         final String inventorySpace = mEtInventSpace.getText().toString().trim();
-        String inventoryPrice = mEtAddPrice.getText().toString().trim();
+        final String inventoryPrice = mEtAddPrice.getText().toString().trim();
 
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i=0; i < fileImages.size(); i++){
+        for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
             RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos",file.getName(),uploadBody);
+            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
         }
         Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.isSuccessful()){
-                    Locale localeID = new Locale("in", "ID");
-                    NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
-                    String inventoryPrice = mEtAddPrice.getText().toString().trim();
-
-
-
-
-
-
+                if (response.isSuccessful()) {
                     try {
-                        String unformated = null ;
-
-
-                        unformated = inventoryPrice.replaceAll("[Rp,]", "");
-
-                        Log.d("uang", unformated);
 
                         JSONArray images = new JSONArray(response.body().string());
                         String idAsset = getIntent().getStringExtra("idAsset");
-                        JSONObject object0 = new JSONObject();
-                        object0.put("asset", idAsset);
-                        object0.put("name", inventoryName);
-                        object0.put("description", inventoryDescription);
-                        object0.put("space", inventorySpace);
-                        object0.put("price", unformated);
-                        object0.put("stock", inventoryStock);
-
+                        JSONObject objectData = new JSONObject();
+                        objectData.put("asset", idAsset);
+                        objectData.put("name", inventoryName);
+                        objectData.put("description", inventoryDescription);
+                        objectData.put("space", inventorySpace);
+                        objectData.put("price", RupiahCurrency.unformatRupiah(inventoryPrice));
+                        objectData.put("stock", inventoryStock);
 
                         JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
+                        objectData.put("facilities", jsonArrayChecked);
 
-                        object0.put("facilities",jsonArrayChecked);
-
-                        JSONObject object = new JSONObject();
-                        object.put("data", object0 );
-                        object.put("images",images);
-
-                        saveInventoryToServer(object);
+                        JSONObject baseObject = new JSONObject();
+                        baseObject.put("data", objectData);
+                        baseObject.put("images", images);
+                        saveInventoryToServer(baseObject);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -425,20 +405,18 @@ public class CreateNewInventory extends AppCompatActivity {
 
     }
 
-    public void saveInventoryToServer(JSONObject jsonParams){
-
+    public void saveInventoryToServer(JSONObject jsonParams) {
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 (jsonParams).toString());
 
         Log.d("testJson", body.toString());
-
         Call<ResponseBody> addInventoryRequest = mInventoryAPIService.createInventoryCategory(body);
 
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
@@ -457,8 +435,8 @@ public class CreateNewInventory extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode ==  RC_GALLERY && resultCode == Activity.RESULT_OK){
-            if(data.getData()!=null){
+        if (requestCode == RC_GALLERY && resultCode == Activity.RESULT_OK) {
+            if (data.getData() != null) {
 
                 Uri imageUri = data.getData();
                 uriImages.add(imageUri);
@@ -482,7 +460,7 @@ public class CreateNewInventory extends AppCompatActivity {
             mPreviewAdapter.notifyDataSetChanged();
 
             Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
-        } else if (requestCode == RC_CAMERA && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == RC_CAMERA && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
     }
@@ -491,7 +469,7 @@ public class CreateNewInventory extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == 13){
+        if (requestCode == 13) {
             takePhotoFromCamera();
         }
 
@@ -499,4 +477,50 @@ public class CreateNewInventory extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onValidationSucceeded() {
+
+
+        if (mListFacilitiesChecked.size() == 0) {
+            Toast.makeText(this, "Pilih Fasilitas terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (uriImages.size() == 0) {
+            Toast.makeText(this, "Isi Foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Sedang Membuat Inventory", Toast.LENGTH_SHORT).show();
+        uploadImagesToServer();
+
+
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+            // Display error messages ;)
+            if (view instanceof EditText) {
+                ((EditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_add_new_inventory:
+                validator.validate();
+                break;
+            case R.id.select_image_inventory:
+                takePhotoWithPermission();
+                break;
+            default:
+                break;
+        }
+
+    }
 }
