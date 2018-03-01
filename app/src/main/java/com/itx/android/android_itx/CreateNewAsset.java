@@ -227,9 +227,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                Toast.makeText(CreateNewAsset.this, "isi images: " + uriImages.size(), Toast.LENGTH_SHORT).show();
                 uriImages.remove(position);
-                Toast.makeText(CreateNewAsset.this, "isi images skrg: " + uriImages.size(), Toast.LENGTH_SHORT).show();
+                mPreviewAdapter.notifyDataSetChanged();
             }
         });
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
@@ -610,7 +609,9 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             // TODO HERE TOO
         } else if (requestCode == LOCATION_REQUEST) {
-            mMap.setMyLocationEnabled(true);
+            if(mMap != null){
+                mMap.setMyLocationEnabled(true);
+            }
         }
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
