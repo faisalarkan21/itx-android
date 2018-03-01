@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -77,6 +78,9 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     Validator validator;
 
+    @BindView(R.id.fab_add_foto)
+    FloatingActionButton mFabAddPhoto;
+
     @BindView(R.id.iv_add_user)
     ImageView mIvPhoto;
 
@@ -138,7 +142,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         validator.setValidationListener(this);
 
         mBtnAddUser.setOnClickListener(this);
-        mIvPhoto.setOnClickListener(this);
+        mFabAddPhoto.setOnClickListener(this);
 
         setAutoComplete();
     }
@@ -413,7 +417,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             case R.id.btn_add_new_user:
                 validator.validate();
                 break;
-            case R.id.iv_add_user:
+            case R.id.fab_add_foto:
                 takePhotoWithPermission();
                 break;
             default:
