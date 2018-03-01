@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Entity.Users;
@@ -163,7 +164,13 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         mAcProvince.setText(jsonObject.get("address").getAsJsonObject().get("province").getAsString());
                         mAcCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
                         mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
+                        String images  = jsonObject.get("photo").getAsJsonObject().get("thumbnail").getAsString();
 
+                        if (images != null){
+                            Glide.with(UpdateUser.this)
+                                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                                    .into(mIvPhoto);
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();

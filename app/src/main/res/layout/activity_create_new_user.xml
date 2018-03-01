@@ -27,7 +27,7 @@
                 android:id="@+id/iv_add_user"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/colorPrimaryDark" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
