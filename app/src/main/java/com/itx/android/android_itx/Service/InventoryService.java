@@ -16,7 +16,7 @@ import retrofit2.http.Path;
  * Created by faisal on 2/22/18.
  */
 
-public interface ListInventoryService {
+public interface InventoryService {
 
     @GET("/api/asset/inventory-categories/{id}")
     Call<JsonObject> getUserInventory(@Path("id") String postfix);

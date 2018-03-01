@@ -64,6 +64,10 @@
             android:parentActivityName=".ListAssets"/>
         <activity android:label="New Inventory" android:name=".CreateNewInventory"
             android:parentActivityName=".ListInventory"></activity>
+
+        <activity android:label="Update User" android:name=".UpdateUser"
+            android:parentActivityName=".ListUsers"></activity>
+
     </application>
 
 </manifest>

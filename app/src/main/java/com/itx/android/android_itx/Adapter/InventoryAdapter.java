@@ -13,10 +13,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.itx.android.android_itx.Entity.Inventory;
-import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
-import com.itx.android.android_itx.Service.ListInventoryService;
-import com.itx.android.android_itx.Service.ListUsersService;
+import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.itx.android.android_itx.ViewHolder.InventoryViewHolder;
@@ -39,7 +37,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
     private Context mContext;
 
     private SessionManager session;
-    ListInventoryService mListInventAPIService;
+    InventoryService mListInventAPIService;
     ProgressDialog progressDialog;
 
 

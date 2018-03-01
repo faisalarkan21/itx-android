@@ -7,7 +7,6 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.location.Address;
@@ -17,8 +16,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,11 +42,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -57,22 +52,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Service.APIService;
-import com.itx.android.android_itx.Service.ListAssetService;
+import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -93,11 +85,9 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import pub.devrel.easypermissions.PermissionRequest;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.POST;
 
 public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
 
@@ -113,7 +103,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     ArrayList<File> fileImages = new ArrayList<>();
     ArrayList<String> categories = new ArrayList<>();
 
-    private ListAssetService mListAssetService;
+    private AssetService mAssetService;
     private String categoryIdSelected;
     private APIService mApiSevice;
 
@@ -222,7 +212,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
-        mListAssetService = ApiUtils.getListAssetsService(new SessionManager(this).getToken());
+        mAssetService = ApiUtils.getListAssetsService(new SessionManager(this).getToken());
 
         mRvPreviewImageAsset.setLayoutManager(new GridLayoutManager(this, 2));
         mRvPreviewImageAsset.addItemDecoration(new RecyclerView.ItemDecoration() {
@@ -356,7 +346,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     private void prepareAssetCategories() {
 //        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
-        Call<JsonObject> categoriesRequest = mListAssetService.getAssetCategories();
+        Call<JsonObject> categoriesRequest = mAssetService.getAssetCategories();
         categoriesRequest.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -565,7 +555,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
                     RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
-                    Call<ResponseBody> res = mListAssetService.createAsset(requestBody);
+                    Call<ResponseBody> res = mAssetService.createAsset(requestBody);
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

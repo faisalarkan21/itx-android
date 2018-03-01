@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,7 @@ import com.bumptech.glide.Glide;
 import com.itx.android.android_itx.Entity.Assets;
 import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
-import com.itx.android.android_itx.Service.ListAssetService;
-import com.itx.android.android_itx.Service.ListUsersService;
+import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
@@ -37,7 +35,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     private Context mContext;
     private List<Assets> mListAssets;
-    ListAssetService mListAssetsAPIService;
+    AssetService mListAssetsAPIService;
     private SessionManager session;
     ProgressDialog progressDialog;
 

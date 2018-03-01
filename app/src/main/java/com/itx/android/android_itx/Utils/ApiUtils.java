@@ -2,9 +2,9 @@ package com.itx.android.android_itx.Utils;
 
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
-import com.itx.android.android_itx.Service.ListAssetService;
-import com.itx.android.android_itx.Service.ListInventoryService;
-import com.itx.android.android_itx.Service.ListUsersService;
+import com.itx.android.android_itx.Service.AssetService;
+import com.itx.android.android_itx.Service.InventoryService;
+import com.itx.android.android_itx.Service.UsersService;
 
 /**
  * Created by faisal on 2/21/18.
@@ -23,19 +23,19 @@ public class ApiUtils {
         return RetrofitClient.getClientLogin(BASE_URL).create(AuthService.class);
     }
 
-    public static ListUsersService getListUsersService(String token) {
+    public static UsersService getListUsersService(String token) {
 
-        return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListUsersService.class);
+        return RetrofitClient.getClientPrivate(BASE_URL, token).create(UsersService.class);
     }
 
-    public static ListAssetService getListAssetsService(String token) {
+    public static AssetService getListAssetsService(String token) {
 
-        return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListAssetService.class);
+        return RetrofitClient.getClientPrivate(BASE_URL, token).create(AssetService.class);
     }
 
-    public static ListInventoryService getListInventoryService(String token) {
+    public static InventoryService getListInventoryService(String token) {
 
-        return RetrofitClient.getClientPrivate(BASE_URL, token).create(ListInventoryService.class);
+        return RetrofitClient.getClientPrivate(BASE_URL, token).create(InventoryService.class);
     }
 
     public static APIService getAPIService(String token){

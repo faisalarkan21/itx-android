@@ -14,10 +14,13 @@ import retrofit2.http.Path;
  * Created by faisal on 2/22/18.
  */
 
-public interface ListUsersService {
+public interface UsersService {
 
     @GET("/api/users")
     Call<JsonObject> getAUsers();
+
+    @GET("/api/user/{id}")
+    Call<JsonObject> getUser(@Path("id") String postfix);
 
     @POST("/api/user/create")
     Call<ResponseBody> createUser(@Body RequestBody params);

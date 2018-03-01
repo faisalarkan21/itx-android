@@ -29,17 +29,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
 import com.itx.android.android_itx.Entity.Inventory;
-import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.APIService;
-import com.itx.android.android_itx.Service.ListInventoryService;
-import com.itx.android.android_itx.Service.ListUsersService;
+import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.NumberTextWatcher;
 import com.itx.android.android_itx.Utils.RupiahCurrency;
@@ -47,22 +42,16 @@ import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -90,7 +79,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     private List<String> mListFacilitiesChecked = new ArrayList<>();
 
     SessionManager session;
-    ListInventoryService mInventoryAPIService;
+    InventoryService mInventoryAPIService;
     ProgressDialog progressDialog;
     Validator validator;
 

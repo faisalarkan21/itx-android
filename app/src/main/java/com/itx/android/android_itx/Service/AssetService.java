@@ -15,7 +15,7 @@ import retrofit2.http.Path;
  * Created by faisal on 2/22/18.
  */
 
-public interface ListAssetService {
+public interface AssetService {
 
 
     @GET("/api/user/assets/{id}")
