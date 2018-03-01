@@ -155,7 +155,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
                 Log.d("inidia", Integer.toString(position));
                 Log.d("ini stringnya", user.getIdUser());
-
                 Intent listAsset = new Intent(mContext, ListAssets.class);
                 listAsset.putExtra("id", user.getIdUser());
                 listAsset.putExtra("name", user.getFullName());

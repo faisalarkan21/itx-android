@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="15dp"
-                android:text="Pilih Letak Lokasi" />
+                android:text="Tap Pada Map Untuk Pilih Letak Lokasi" />
 
             <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
