@@ -22,10 +22,12 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
 
     private ArrayList<Uri> imageUriList;
     private Context mContext;
+    private previewInterface mClickHandler;
 
-    public PreviewAdapter(ArrayList<Uri> uris, Context activity){
+    public PreviewAdapter(ArrayList<Uri> uris, Context activity, previewInterface handler){
         imageUriList = uris;
         mContext = activity;
+        mClickHandler = handler;
     }
 
     @Override
@@ -37,13 +39,26 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(PreviewViewHolder holder, int position) {
+    public void onBindViewHolder(final PreviewViewHolder holder, int position) {
         Uri currentUri = imageUriList.get(position);
         holder.mIvPreview.setImageURI(currentUri);
+        holder.mFabDeletePreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = holder.getAdapterPosition();
+                imageUriList.remove(pos);
+                notifyDataSetChanged();
+                mClickHandler.deleteCurrentPreviewImage(pos);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return imageUriList.size();
+    }
+
+    public interface previewInterface {
+        void deleteCurrentPreviewImage(int position);
     }
 }

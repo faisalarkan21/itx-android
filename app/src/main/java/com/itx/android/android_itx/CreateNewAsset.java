@@ -234,7 +234,14 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                 outRect.top = space;
             }
         });
-        mPreviewAdapter = new PreviewAdapter(uriImages, this);
+        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+            @Override
+            public void deleteCurrentPreviewImage(int position) {
+                Toast.makeText(CreateNewAsset.this, "isi images: " + uriImages.size(), Toast.LENGTH_SHORT).show();
+                uriImages.remove(position);
+                Toast.makeText(CreateNewAsset.this, "isi images skrg: " + uriImages.size(), Toast.LENGTH_SHORT).show();
+            }
+        });
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
 
         prepareAssetCategories();

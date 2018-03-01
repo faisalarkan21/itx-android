@@ -146,7 +146,12 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
         mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this, 2));
-        mPreviewAdapter = new PreviewAdapter(uriImages, this);
+        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+            @Override
+            public void deleteCurrentPreviewImage(int position) {
+                uriImages.remove(position);
+            }
+        });
         mRvPreviewImageInvent.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
