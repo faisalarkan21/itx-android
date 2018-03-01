@@ -12,14 +12,16 @@ import com.itx.android.android_itx.R;
  */
 
 public class UsersViewHolder extends RecyclerView.ViewHolder {
-    public TextView userName, assets;
-    public ImageView imageUsers, btnImgDelete;
+    public TextView userName, assets ;
+    public ImageView imageUsers, iv_users_options;
     public UsersViewHolder(View itemView) {
         super(itemView);
         userName = (TextView) itemView.findViewById(R.id.userName);
         assets = (TextView) itemView.findViewById(R.id.assets);
+        iv_users_options = (ImageView) itemView.findViewById(R.id.iv_users_options);
         imageUsers = (ImageView) itemView.findViewById(R.id.list_image_users);
-        btnImgDelete = (ImageView) itemView.findViewById(R.id.iv_delete);
+
+
 
 
 

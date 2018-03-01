@@ -31,12 +31,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.InventoryAdapter;
 import com.itx.android.android_itx.Entity.Inventory;
-import com.itx.android.android_itx.Service.ListAssetService;
-import com.itx.android.android_itx.Service.ListInventoryService;
+import com.itx.android.android_itx.Service.AssetService;
+import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +87,7 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
 
     @BindView(R.id.pb_asset_details) ProgressBar mPbAssetImages;
 
-    ListInventoryService mInventoryAPIService;
+    InventoryService mInventoryAPIService;
     SessionManager session;
     private TextView[] dots;
     private int currentPage = 0;
@@ -119,8 +117,8 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
         mRecyclerView.setHasFixedSize(true);
 
-        ListAssetService listAssetService = ApiUtils.getListAssetsService(session.getToken());
-        Call<JsonObject> imagesResponse = listAssetService.getAssetImages(idAsset);
+        AssetService assetService = ApiUtils.getListAssetsService(session.getToken());
+        Call<JsonObject> imagesResponse = assetService.getAssetImages(idAsset);
         imagesResponse.enqueue(this);
 
         RecyclerView.LayoutManager layoutManager =

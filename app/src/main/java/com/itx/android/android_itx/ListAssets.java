@@ -1,9 +1,6 @@
 package com.itx.android.android_itx;
 
-import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,23 +18,17 @@ import com.bumptech.glide.Glide;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
-import com.itx.android.android_itx.Entity.Address;
 import com.itx.android.android_itx.Entity.Assets;
-import com.itx.android.android_itx.Entity.Users;
-import com.itx.android.android_itx.Service.ListAssetService;
+import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -71,7 +61,7 @@ public class ListAssets extends AppCompatActivity {
 
     private AssetsAdapter mAdapter;
     String idUser,userAdress,userName,phone,images,role ;
-    ListAssetService mAssetAPIService;
+    AssetService mAssetAPIService;
     SessionManager session;
 
     @Override
