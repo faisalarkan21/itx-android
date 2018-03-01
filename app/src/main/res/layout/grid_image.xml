@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="150dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="150dp"
     android:layout_height="150dp"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -16,7 +18,7 @@
         android:id="@+id/fab_delete_preview"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:backgroundTint="@color/colorAccent"
+        app:backgroundTint="@color/colorAccent"
         android:src="@drawable/ic_clear"
         android:layout_margin="8dp"
         android:layout_width="48dp"
