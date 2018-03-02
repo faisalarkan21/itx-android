@@ -41,7 +41,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
     private SessionManager session;
     UsersService mListUsersAPIService;
     ProgressDialog progressDialog;
-    private PopupMenu popupMenu;
 
 
     public UsersAdapter(List<Users> userList, Context activity) {

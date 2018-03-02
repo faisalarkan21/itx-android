@@ -21,11 +21,17 @@ public interface AssetService {
     @GET("/api/user/assets/{id}")
     Call<JsonObject> getUserAssets(@Path("id") String postfix);
 
+    @GET("/api/asset/{id}")
+    Call<JsonObject> getUserAsset(@Path("id") String postfix);
+
     @GET("/api/asset/{id}/images")
     Call<JsonObject> getAssetImages(@Path("id") String id);
 
     @POST("/api/asset/create")
     Call<ResponseBody> createAsset(@Body RequestBody params);
+
+    @POST("/api/asset/update/{id}")
+    Call<ResponseBody> updateAsset(@Path("id") String postfix, @Body RequestBody params);
 
     @GET("/api/asset-categories")
     Call<JsonObject> getAssetCategories();

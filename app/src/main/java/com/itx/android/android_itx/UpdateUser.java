@@ -137,7 +137,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
 
 
-
     /**
      * Prepares sample data to provide data set to adapter
      */

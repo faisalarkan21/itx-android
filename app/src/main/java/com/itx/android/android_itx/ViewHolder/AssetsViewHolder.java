@@ -14,7 +14,7 @@ import com.itx.android.android_itx.R;
 
 public class AssetsViewHolder extends RecyclerView.ViewHolder {
     public TextView mTvAssetName, mTvAssetCategory;
-    public ImageView mIvGambarAsset, btnImgDelete;
+    public ImageView mIvGambarAsset, iv_assets_options;
     public RatingBar mRatingBar;
 
     public AssetsViewHolder(View itemView) {
@@ -24,7 +24,7 @@ public class AssetsViewHolder extends RecyclerView.ViewHolder {
         mTvAssetCategory = (TextView) itemView.findViewById(R.id.tv_asset_category);
         mRatingBar = (RatingBar) itemView.findViewById(R.id.rating_bar_assets);
         mIvGambarAsset = (ImageView) itemView.findViewById(R.id.iv_asset_images);
-        btnImgDelete = (ImageView) itemView.findViewById(R.id.iv_delete);
+        iv_assets_options = (ImageView) itemView.findViewById(R.id.iv_assets_options);
 
 
     }

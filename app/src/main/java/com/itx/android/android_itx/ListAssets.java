@@ -129,6 +129,8 @@ public class ListAssets extends AppCompatActivity {
         mUserRole.setText(role);
         mUserAddress.setText(userAdress);
         mUserTelp.setText(phone);
+
+
         if (images != null){
             Glide.with(ListAssets.this)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)

@@ -68,6 +68,9 @@
         <activity android:label="Update User" android:name=".UpdateUser"
             android:parentActivityName=".ListUsers"></activity>
 
+        <activity android:label="Update Asset" android:name=".UpdateAsset"
+            android:parentActivityName=".ListAssets"></activity>
+
     </application>
 
 </manifest>
