@@ -46,8 +46,6 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
             @Override
             public void onClick(View view) {
                 int pos = holder.getAdapterPosition();
-                imageUriList.remove(pos);
-                notifyDataSetChanged();
                 mClickHandler.deleteCurrentPreviewImage(pos);
             }
         });

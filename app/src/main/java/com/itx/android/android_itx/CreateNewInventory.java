@@ -139,6 +139,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 uriImages.remove(position);
+                mPreviewAdapter.notifyDataSetChanged();
             }
         });
         mRvPreviewImageInvent.addItemDecoration(new RecyclerView.ItemDecoration() {

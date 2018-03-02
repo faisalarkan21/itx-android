@@ -1,9 +1,17 @@
 package com.itx.android.android_itx;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,6 +42,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -42,6 +56,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -69,6 +85,9 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     Validator validator;
     String idUser;
 
+
+    @BindView(R.id.fab_add_foto)
+    FloatingActionButton mFabAddPhoto;
 
     @BindView(R.id.iv_add_user)
     ImageView mIvPhoto;
@@ -130,6 +149,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
         mBtnAddUser.setOnClickListener(this);
         mIvPhoto.setOnClickListener(this);
+        mFabAddPhoto.setOnClickListener(this);
 
         setAutoComplete();
         prepareUserData();
@@ -206,21 +226,21 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         final String phone = mEtAssetPhone.getText().toString().trim();
 
         Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
-//        //Upload Photo first then on callback save the new User
-//        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
-//        MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
-//        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
-//
-//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                Log.d(TAG, response.body().toString());
-//                if (response.isSuccessful()) {
+//        Upload Photo first then on callback save the new User
+        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
+        MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
+        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
+
+        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG, response.body().toString());
+                if (response.isSuccessful()) {
                     try {
-//                        JSONArray responseJson = new JSONArray(response.body().string());
-//                        JSONObject images = responseJson.getJSONObject(0);
-//                        String urlFoto = images.getString("thumbnail");
-//                        Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+                        JSONArray responseJson = new JSONArray(response.body().string());
+                        JSONObject images = responseJson.getJSONObject(0);
+                        String urlFoto = images.getString("thumbnail");
+                        Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
 
 
                         JSONObject object0 = new JSONObject();
@@ -240,22 +260,22 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         JSONObject object = new JSONObject();
                         object.put("data", object0);
                         object.put("location", location);
-//                        object.put("images", images);
+                        object.put("images", images);
 
                         saveUserToServer(object);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Toast.makeText(UpdateUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(UpdateUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     public void setAutoComplete() {
@@ -303,6 +323,67 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         });
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
+    private void takePhotoFromCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                filePhoto = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (filePhoto != null) {
+                photoURI = FileProvider.getUriForFile(UpdateUser.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        filePhoto);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    @AfterPermissionGranted(13)
+    private void takePhotoWithPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromCamera();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
+                    13, perms);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        }
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -320,6 +401,24 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                InputStream ims = new FileInputStream(file);
+                mIvPhoto.setImageBitmap(BitmapFactory.decodeStream(ims));
+            } catch (FileNotFoundException e) {
+                return;
+            }
+        } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
+            photoURI = data.getData();
+            //filePhoto = new File(getPath(photoURI));
+            mIvPhoto.setImageURI(photoURI);
+        }
+    }
+
+    @Override
     public void afterTextChanged(Editable s) {
 
     }
@@ -330,8 +429,8 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             case R.id.btn_add_new_user:
                 validator.validate();
                 break;
-            case R.id.iv_add_user:
-//                takePhotoWithPermission();
+            case R.id.fab_add_foto:
+                takePhotoWithPermission();
                 break;
             default:
                 break;
