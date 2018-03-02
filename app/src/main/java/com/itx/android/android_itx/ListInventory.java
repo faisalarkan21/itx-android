@@ -198,7 +198,7 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
                     .into(mImagesAssets);
         }
 
-        Call<JsonObject> response = mInventoryAPIService.getUserInventory(idAsset);
+        Call<JsonObject> response = mInventoryAPIService.getUserInventories(idAsset);
 
         response.enqueue(new Callback<JsonObject>() {
             @Override

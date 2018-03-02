@@ -63,14 +63,16 @@
         <activity android:label="New Asset" android:name=".CreateNewAsset"
             android:parentActivityName=".ListAssets"/>
         <activity android:label="New Inventory" android:name=".CreateNewInventory"
-            android:parentActivityName=".ListInventory"></activity>
+            android:parentActivityName=".ListInventory"/>
 
         <activity android:label="Update User" android:name=".UpdateUser"
-            android:parentActivityName=".ListUsers"></activity>
+            android:parentActivityName=".ListUsers"/>
 
         <activity android:label="Update Asset" android:name=".UpdateAsset"
-            android:parentActivityName=".ListAssets"></activity>
+            android:parentActivityName=".ListAssets"/>
 
+        <activity android:label="Update Inventory" android:name=".UpdateInventory"
+            android:parentActivityName=".ListInventory"/>
     </application>
 
 </manifest>

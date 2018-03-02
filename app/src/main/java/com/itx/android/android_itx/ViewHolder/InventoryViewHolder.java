@@ -15,7 +15,7 @@ import com.itx.android.android_itx.R;
 public class InventoryViewHolder extends RecyclerView.ViewHolder  {
 
     public TextView inventoryName, inventoryStock, inventorySpace, inventoryPrice, inventoryFacilities;
-    public ImageView inventoryImage, btnImgDelete;
+    public ImageView inventoryImage, btnImgDelete, ivInventoptions;
 
     public InventoryViewHolder(View itemView) {
         super(itemView);
@@ -25,7 +25,7 @@ public class InventoryViewHolder extends RecyclerView.ViewHolder  {
         inventorySpace = (TextView) itemView.findViewById(R.id.tv_inventory_space);
         inventoryPrice = (TextView) itemView.findViewById(R.id.tv_inventory_price);
         inventoryImage = (ImageView) itemView.findViewById(R.id.iv_asset_inventory);
-        btnImgDelete = (ImageView) itemView.findViewById(R.id.iv_delete);
+        ivInventoptions = (ImageView) itemView.findViewById(R.id.iv_invent_options);
 
     }
 

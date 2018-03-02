@@ -336,8 +336,6 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                         Toast.LENGTH_LONG).show();
             }
         });
-
-
     }
 
     public void uploadImagesToServer() {
