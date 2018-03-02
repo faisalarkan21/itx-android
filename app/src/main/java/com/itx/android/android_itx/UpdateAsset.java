@@ -9,7 +9,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -65,7 +68,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -226,9 +232,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                Toast.makeText(UpdateAsset.this, "isi images: " + uriImages.size(), Toast.LENGTH_SHORT).show();
                 uriImages.remove(position);
-                Toast.makeText(UpdateAsset.this, "isi images skrg: " + uriImages.size(), Toast.LENGTH_SHORT).show();
             }
         });
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
@@ -318,7 +322,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
 
     private void prepareAssetCategories() {
-//        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
         Call<JsonObject> categoriesRequest = mAssetService.getAssetCategories();
         categoriesRequest.enqueue(new Callback<JsonObject>() {
             @Override
@@ -378,12 +381,14 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         mAcAssetCity.setText(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
                         mAcAssetCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
                         mAcAssetProvince.setText(jsonObject.get("address").getAsJsonObject().get("province").getAsString());
+                        JsonArray images = jsonObject.get("images").getAsJsonArray();
 
                         mRbAsset.setRating(jsonObject.get("rating").getAsFloat());
                         String assetCategory = jsonObject.get("assetCategory").getAsJsonObject().get("name").getAsString();
 
 
                         int selectionPosition = spAdapter.getPosition(assetCategory);
+                        categoryIdSelected = categories.get(selectionPosition);
                         mSpCategories.setSelection(selectionPosition);
 
                         JsonArray AssetCoordinates = jsonObject.get("address").getAsJsonObject().get("coordinates").getAsJsonArray();
@@ -425,65 +430,74 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
-//        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-//        for (int i = 0; i < fileImages.size(); i++) {
-//            File file = fileImages.get(i);
-//            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-//            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-//        }
+        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+        for (int i = 0; i < fileImages.size(); i++) {
+            File file = fileImages.get(i);
+            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
+            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+        }
 //        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
 //        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
 //            @Override
 //            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-        try {
+                try {
+
+                    List<Double> mListCoordinates = new ArrayList<>();
+                    mListCoordinates.add(assetLocation.latitude);
+                    mListCoordinates.add(assetLocation.longitude);
+
+
 //                    final JSONArray images = new JSONArray(response.body().string());
-            JSONObject data = new JSONObject();
-            data.put("assetCategory", categoryIdSelected);
-            data.put("name", name);
-            data.put("brand", brand);
-            data.put("npwp", npwp);
-            data.put("phone", phone);
-            data.put("user", idUser);
-            data.put("rating", rating);
+                    JSONObject data = new JSONObject();
+                    data.put("assetCategory", categoryIdSelected);
+                    data.put("name", name);
+                    data.put("brand", brand);
+                    data.put("npwp", npwp);
+                    data.put("phone", phone);
+                    data.put("user", idUser);
+                    data.put("rating", rating);
 
 
-            JSONObject location = new JSONObject();
-            location.put("address", address);
-            location.put("province", province);
-            location.put("city", city);
-            location.put("postalCode", postal);
-            location.put("country", country);
+                    JSONObject location = new JSONObject();
+                    location.put("address", address);
+                    location.put("province", province);
+                    location.put("city", city);
+                    location.put("postalCode", postal);
+                    location.put("country", country);
 
-            JSONObject request = new JSONObject();
-            request.put("data", data);
-            request.put("location", location);
+                    JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
+                    location.put("coordinates", jsonArrayCoordinates);
+
+                    JSONObject request = new JSONObject();
+                    request.put("data", data);
+                    request.put("location", location);
 //                    request.put("images", images);
 
-            RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
-            Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
-            res.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-
-
-                        Intent listAsset = new Intent(UpdateAsset.this, ListUsers.class);
-                        startActivity(listAsset);
-                        finish();
+                    Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
+                    res.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
 
 
-                    }
+                                Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
+                                startActivity(listAsset);
+                                finish();
+
+
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 //            }
 
 //            @Override
@@ -501,6 +515,55 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
             mAssetMarker.setPosition(assetLocation);
             mEtAssetAddress.setText(mAddress);
+        }
+    }
+
+    private void takePhotoFromCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                fileImages.add(createImageFile());
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (fileImages.get(fileImages.size() - 1) != null) {
+                uriImages.add(FileProvider.getUriForFile(UpdateAsset.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        fileImages.get(fileImages.size() - 1)));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        return image;
+    }
+
+    @AfterPermissionGranted(13)
+    private void takePhotoWithPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromCamera();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
+                    13, perms);
         }
     }
 
@@ -562,11 +625,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 13) {
-//            takePhotoFromCamera();
+            takePhotoFromCamera();
         } else if (requestCode == 12) {
             getCurrentLocation();
-
-            // TODO HERE TOO
         } else if (requestCode == LOCATION_REQUEST) {
             mMap.setMyLocationEnabled(true);
         }
@@ -603,7 +664,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 validator.validate();
                 break;
             case R.id.select_image:
-//                takePhotoWithPermission();
+                takePhotoWithPermission();
                 break;
             default:
                 break;
@@ -616,10 +677,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         mMap = googleMap;
         mMap.setIndoorEnabled(true);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
 
-
-        // TODO HERE where the shit began..... dim
 
         if (EasyPermissions.hasPermissions(this, locationPerm)) {
             mMap.setMyLocationEnabled(true);
@@ -634,6 +692,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         mAssetMarkerOptions.title("Lokasi Asset");
         mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
         mAssetMarker.showInfoWindow();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -649,47 +708,20 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         });
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-
             @Override
             public void onMapClick(LatLng point) {
-                // TODO Auto-generated method stub
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(point));
-
-                Geocoder gcd = new Geocoder(UpdateAsset.this, Locale.getDefault());
-                try {
-
-                    List<Address> address = gcd.getFromLocation(assetLocation.latitude, assetLocation.longitude, 1);
-                    if (address.size() > 0) {
-                        System.out.println(address.get(0).getLocality());
-                    } else {
-                        // do your stuff
-                        Toast.makeText(UpdateAsset.this, address.toString(), Toast.LENGTH_LONG).show();
-                    }
-
-
-                    assetLocation = point;
-                    getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
-                    updateMapUI();
-                    Toast.makeText(UpdateAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
-
-
-                } catch (Exception e) {
-                    Toast.makeText(UpdateAsset.this, e.getMessage(), Toast.LENGTH_LONG);
-                }
-
-
+                Log.d("new loc click", point.toString());
+                assetLocation = point;
+                Log.d("new loc asset", assetLocation.toString());
+                getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });
-
-        getCurrentLocationWithPermission();
-
 
     }
 
     @Override
     public void onValidationSucceeded() {
-//
+
 //        if (mRbAsset.getRating() == 0) {
 //            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
 //            return;

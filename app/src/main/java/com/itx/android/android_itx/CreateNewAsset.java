@@ -107,7 +107,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     ArrayList<String> categories = new ArrayList<>();
 
 
-
     private AssetService mAssetService;
     private String categoryIdSelected;
     private APIService mApiSevice;
@@ -710,33 +709,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             @Override
             public void onMapClick(LatLng point) {
-                // TODO Auto-generated method stub
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(point));
-
-                Geocoder gcd = new Geocoder(CreateNewAsset.this, Locale.getDefault());
-                try {
-
-                    List<Address> address = gcd.getFromLocation(assetLocation.latitude, assetLocation.longitude, 1);
-                    if (address.size() > 0) {
-                        System.out.println(address.get(0).getLocality());
-                    } else {
-                        // do your stuff
-                        Toast.makeText(CreateNewAsset.this, address.toString(), Toast.LENGTH_LONG).show();
-                    }
-
-
-                    assetLocation = point;
-                    getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
-                    updateMapUI();
-                    Toast.makeText(CreateNewAsset.this, "new Location :" + assetLocation, Toast.LENGTH_SHORT).show();
-
-
-                } catch (Exception e) {
-                    Toast.makeText(CreateNewAsset.this, e.getMessage(), Toast.LENGTH_LONG);
-                }
-
-
+                assetLocation = point;
+                getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });
 
