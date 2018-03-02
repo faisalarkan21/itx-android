@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Rect;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,12 +47,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
-import com.itx.android.android_itx.Entity.Assets;
+import com.itx.android.android_itx.Entity.Image;
+import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -73,7 +72,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,7 +96,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
     //URI List for the images that will be on the server
-    ArrayList<Uri> uriImages = new ArrayList<>();
+    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
     ArrayList<String> categories = new ArrayList<>();
 
@@ -229,10 +227,20 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 outRect.top = space;
             }
         });
-        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+        mPreviewAdapter = new PreviewAdapter(imagePreviews, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                uriImages.remove(position);
+                ImageHolder currentImage = imagePreviews.get(position);
+                for (int i = 0; i < fileImages.size(); i++){
+                    String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
+                    String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                        fileImages.remove(i);
+                    }
+                }
+                imagePreviews.remove(position);
+                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
+                mPreviewAdapter.notifyDataSetChanged();
             }
         });
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
@@ -382,6 +390,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         mAcAssetCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
                         mAcAssetProvince.setText(jsonObject.get("address").getAsJsonObject().get("province").getAsString());
                         JsonArray images = jsonObject.get("images").getAsJsonArray();
+                        for(int i = 0; i < images.size(); i++){
+                            Gson gson = new Gson();
+                            Image image = gson.fromJson(images.get(i), Image.class);
+                            imagePreviews.add(new ImageHolder(image,null));
+                        }
 
                         mRbAsset.setRating(jsonObject.get("rating").getAsFloat());
                         String assetCategory = jsonObject.get("assetCategory").getAsJsonObject().get("name").getAsString();
@@ -430,81 +443,167 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
-        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i = 0; i < fileImages.size(); i++) {
-            File file = fileImages.get(i);
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-        }
-//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
+        if (fileImages.size() < 1){
+            try {
 
-                    List<Double> mListCoordinates = new ArrayList<>();
-                    mListCoordinates.add(assetLocation.latitude);
-                    mListCoordinates.add(assetLocation.longitude);
+                List<Double> mListCoordinates = new ArrayList<>();
+                mListCoordinates.add(assetLocation.latitude);
+                mListCoordinates.add(assetLocation.longitude);
 
 
-//                    final JSONArray images = new JSONArray(response.body().string());
-                    JSONObject data = new JSONObject();
-                    data.put("assetCategory", categoryIdSelected);
-                    data.put("name", name);
-                    data.put("brand", brand);
-                    data.put("npwp", npwp);
-                    data.put("phone", phone);
-                    data.put("user", idUser);
-                    data.put("rating", rating);
+                final JSONArray images = new JSONArray();
+                for (int i = 0; i < imagePreviews.size(); i++){
+                    ImageHolder img = imagePreviews.get(i);
+                    if(img.getmImage() != null){
+                        Gson gson = new Gson();
+                        String jsonImg = gson.toJson(img.getmImage());
+                        images.put(new JSONObject(jsonImg));
+                    }
+                }
+                JSONObject data = new JSONObject();
+                data.put("assetCategory", categoryIdSelected);
+                data.put("name", name);
+                data.put("brand", brand);
+                data.put("npwp", npwp);
+                data.put("phone", phone);
+                data.put("user", idUser);
+                data.put("rating", rating);
 
 
-                    JSONObject location = new JSONObject();
-                    location.put("address", address);
-                    location.put("province", province);
-                    location.put("city", city);
-                    location.put("postalCode", postal);
-                    location.put("country", country);
+                JSONObject location = new JSONObject();
+                location.put("address", address);
+                location.put("province", province);
+                location.put("city", city);
+                location.put("postalCode", postal);
+                location.put("country", country);
 
-                    JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
-                    location.put("coordinates", jsonArrayCoordinates);
+                JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
+                location.put("coordinates", jsonArrayCoordinates);
 
-                    JSONObject request = new JSONObject();
-                    request.put("data", data);
-                    request.put("location", location);
-//                    request.put("images", images);
+                JSONObject request = new JSONObject();
+                request.put("data", data);
+                request.put("location", location);
+                request.put("images", images);
 
-                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+                RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
-                    Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
-                    res.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.isSuccessful()) {
-
-
-                                Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
-                                startActivity(listAsset);
-                                finish();
+                Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
+                res.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
 
 
+                            Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
+                            startActivity(listAsset);
+                            finish();
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            //DONE: file belom ke handle jika ada penghapusan preview
+            MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+            for (int i = 0; i < fileImages.size(); i++) {
+                File file = fileImages.get(i);
+                for(int j = 0; j < imagePreviews.size(); j++){
+                    ImageHolder currImg = imagePreviews.get(j);
+                    String lastpath = Uri.fromFile(file).getLastPathSegment();
+                    if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                        parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+                    }
+                }
+            }
+            Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+
+                        List<Double> mListCoordinates = new ArrayList<>();
+                        mListCoordinates.add(assetLocation.latitude);
+                        mListCoordinates.add(assetLocation.longitude);
+
+
+                        final JSONArray images = new JSONArray(response.body().string());
+                        for (int i = 0; i < imagePreviews.size(); i++){
+                            ImageHolder img = imagePreviews.get(i);
+                            if(img.getmImage() != null){
+                                Gson gson = new Gson();
+                                String jsonImg = gson.toJson(img.getmImage());
+                                images.put(new JSONObject(jsonImg));
                             }
                         }
+                        JSONObject data = new JSONObject();
+                        data.put("assetCategory", categoryIdSelected);
+                        data.put("name", name);
+                        data.put("brand", brand);
+                        data.put("npwp", npwp);
+                        data.put("phone", phone);
+                        data.put("user", idUser);
+                        data.put("rating", rating);
 
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                        JSONObject location = new JSONObject();
+                        location.put("address", address);
+                        location.put("province", province);
+                        location.put("city", city);
+                        location.put("postalCode", postal);
+                        location.put("country", country);
+
+                        JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
+                        location.put("coordinates", jsonArrayCoordinates);
+
+                        JSONObject request = new JSONObject();
+                        request.put("data", data);
+                        request.put("location", location);
+                        request.put("images", images);
+
+                        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+
+                        Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
+                        res.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.isSuccessful()) {
+
+
+                                    Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
+                                    startActivity(listAsset);
+                                    finish();
+
+
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-//            }
 
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Toast.makeText(UpdateAsset.this, "Gagal upload foto : " + t.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(UpdateAsset.this, "Gagal upload foto : " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
 
 
     }
@@ -531,10 +630,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             }
             // Continue only if the File was successfully created
             if (fileImages.get(fileImages.size() - 1) != null) {
-                uriImages.add(FileProvider.getUriForFile(UpdateAsset.this,
+                Uri uri = FileProvider.getUriForFile(UpdateAsset.this,
                         BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() - 1)));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
+                        fileImages.get(fileImages.size() - 1));
+                imagePreviews.add(new ImageHolder(null, uri));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
@@ -722,13 +822,13 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onValidationSucceeded() {
 
-//        if (mRbAsset.getRating() == 0) {
-//            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
-//            return;
-//        } else if (uriImages.size() == 0) {
-//            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+        if (mRbAsset.getRating() == 0) {
+            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (imagePreviews.size() == 0) {
+            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Toast.makeText(this, "Sedang Membuat Asset", Toast.LENGTH_SHORT).show();
         updateAsset();
