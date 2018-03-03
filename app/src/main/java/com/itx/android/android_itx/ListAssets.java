@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
 import com.itx.android.android_itx.Entity.Assets;
+import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -116,8 +117,6 @@ public class ListAssets extends AppCompatActivity {
 
     private void prepareUserData() {
 
-
-
         idUser = getIntent().getStringExtra("id");
         userAdress = getIntent().getStringExtra("address");
         userName = getIntent().getStringExtra("name");
@@ -168,7 +167,6 @@ public class ListAssets extends AppCompatActivity {
                                 JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
                                 assets.setImages(DataImageAseets.get("thumbnail").getAsString());
                             }
-
 
                             assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());

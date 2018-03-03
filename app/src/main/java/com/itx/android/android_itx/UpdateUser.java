@@ -187,7 +187,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 chosenProvince = adapterView.getItemAtPosition(i).toString();
 
-                if (!adapterView.getItemAtPosition(i).toString().equals(initProvince)){
+                if (!adapterView.getItemAtPosition(i).toString().equals(initProvince)) {
                     setCitybyProvince(chosenProvince);
                 }
             }
@@ -200,7 +200,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    public void setCitybyProvince(String provinceName){
+    public void setCitybyProvince(String provinceName) {
 
         spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
                 completeUtils.getArrayCityJson(provinceName));
@@ -244,9 +244,9 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         mEtPostalCode.setText(jsonObject.get("address").getAsJsonObject().get("postalCode").getAsString());
                         mAcCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
                         mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
-                        String images  = jsonObject.get("photo").getAsJsonObject().get("thumbnail").getAsString();
+                        String images = jsonObject.get("photo").getAsJsonObject().get("thumbnail").getAsString();
 
-                        if (images != null){
+                        if (images != null) {
                             Glide.with(UpdateUser.this)
                                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                                     .into(mIvPhoto);
@@ -309,7 +309,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
-        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
+
 //        Upload Photo first then on callback save the new User
         RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
@@ -368,6 +368,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
         Call<ResponseBody> addUserRequest = mUserService.updateUser(idUser, body);
 
+
         new CountDownTimer(1000, 1000) {
             public void onTick(long millisUntilFinished) {
             }
@@ -377,10 +378,13 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             }
         }.start();
 
+
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+
+
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
                     startActivity(new Intent(UpdateUser.this, ListUsers.class));
@@ -495,6 +499,10 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         if (photoURI == null) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
+        } else if (mSpProvince.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Provinsi terlebih dahulu", Toast.LENGTH_SHORT).show();
+        } else if (mSpCity.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Kota terlebih dahulu", Toast.LENGTH_SHORT).show();
         }
         updateUser(session.getToken());
 

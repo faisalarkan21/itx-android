@@ -3,6 +3,7 @@ package com.itx.android.android_itx;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -88,7 +90,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
+public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener {
 
     private final static int GALLERY_RC = 299;
     private final static int LOCATION_SETTING_RC = 122;
@@ -117,10 +119,14 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     private LatLng assetLocation = new LatLng(-7.348868, 108.535240);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    ProgressDialog progressDialog;
 
+    String chosenCity, chosenProvince;
     private PreviewAdapter mPreviewAdapter;
 
     ArrayAdapter<String> spAdapter;
+    ArrayAdapter spAdapterCity;
+    ArrayAdapter spAdapterProvince;
 
     @BindView(R.id.rv_preview_img_new_asset)
     RecyclerView mRvPreviewImageAsset;
@@ -145,13 +151,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     @BindView(R.id.et_add_asset_address)
     EditText mEtAssetAddress;
 
-    @NotEmpty
-    @BindView(R.id.et_add_asset_province)
-    AutoCompleteTextView mAcAssetProvince;
+    @BindView(R.id.sp_add_asset_province)
+    Spinner mSpProvince;
 
-    @NotEmpty
-    @BindView(R.id.et_add_asset_city)
-    AutoCompleteTextView mAcAssetCity;
+    @BindView(R.id.sp_add_asset_city)
+    Spinner mSpCity;
 
     @NotEmpty
     @BindView(R.id.et_add_asset_postal)
@@ -202,6 +206,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         role = getIntent().getStringExtra("role");
 
 
+        mBtnAddImages.setOnClickListener(this);
+        mBtnAddAsset.setOnClickListener(this);
+
+
         // ask user to on the GPS when the activity is created
 
         if (EasyPermissions.hasPermissions(this, locationPerm)) {
@@ -228,10 +236,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
+                for (int i = 0; i < fileImages.size(); i++) {
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                    if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
@@ -243,7 +251,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
 
         prepareAssetCategories();
-        setAutoComplete();
+        setProvince();
     }
 
     private void askUserToTurnOnGPS() {
@@ -303,7 +311,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
-    public void setAutoComplete() {
+    public void setProvince() {
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
@@ -313,19 +321,51 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, country);
 
-        mAcAssetProvince.setAdapter(adapterProvince);
-        mAcAssetProvince.setThreshold(1);
-        mAcAssetCity.setThreshold(1);
-
-        mAcAssetCity.addTextChangedListener(this);
-
-
-        mBtnAddAsset.setOnClickListener(this);
-        mBtnAddImages.setOnClickListener(this);
-
         mAcAssetCountry.setAdapter(adapterCountry);
         mAcAssetCountry.setThreshold(1);
+
+        spAdapterProvince = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayProvicesJson());
+        mSpProvince.setAdapter(spAdapterProvince);
+
+        mSpProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenProvince = adapterView.getItemAtPosition(i).toString();
+
+                setCitybyProvince(chosenProvince);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
     }
+
+    public void setCitybyProvince(String provinceName) {
+
+
+        spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayCityJson(provinceName));
+        mSpCity.setAdapter(spAdapterCity);
+
+
+        mSpCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenCity = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+
+    }
+
 
     private void takePhoto() {
         //show dialog for user to choose between camera or gallery
@@ -524,13 +564,16 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     private void createAsset() {
 
+        progressDialog = new ProgressDialog(CreateNewAsset.this);
+        progressDialog.setMessage("Menyimpan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
         final String name = mEtAssetName.getText().toString().trim();
         final String brand = mEtAssetBrand.getText().toString().trim();
         final String npwp = mEtAssetNPWP.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
         final String address = mEtAssetAddress.getText().toString().trim();
-        final String province = mAcAssetProvince.getText().toString().trim();
-        final String city = mAcAssetCity.getText().toString().trim();
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
@@ -538,10 +581,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
-            for(int j = 0; j < imagePreviews.size(); j++){
+            for (int j = 0; j < imagePreviews.size(); j++) {
                 ImageHolder currImg = imagePreviews.get(j);
                 String lastpath = Uri.fromFile(file).getLastPathSegment();
-                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
                     RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
                     parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                 }
@@ -570,8 +613,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
                     JSONObject location = new JSONObject();
                     location.put("address", address);
-                    location.put("province", province);
-                    location.put("city", city);
+                    location.put("province", chosenProvince);
+                    location.put("city", chosenCity);
                     location.put("postalCode", postal);
                     location.put("country", country);
 
@@ -586,6 +629,16 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
                     Call<ResponseBody> res = mAssetService.createAsset(requestBody);
+
+                    new CountDownTimer(1000, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+                            progressDialog.dismiss();
+                        }
+                    }.start();
+
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -633,7 +686,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             // TODO HERE TOO
         } else if (requestCode == LOCATION_REQUEST) {
-            if(mMap != null){
+            if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
             }
         }
@@ -689,8 +742,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
 
 
-        // TODO HERE where the shit began..... dim
-
         if (EasyPermissions.hasPermissions(this, locationPerm)) {
             mMap.setMyLocationEnabled(true);
         } else {
@@ -739,9 +790,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         } else if (imagePreviews.size() == 0) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
+        } else if (mSpProvince.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Provinsi terlebih dahulu", Toast.LENGTH_SHORT).show();
+        } else if (mSpCity.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Kota terlebih dahulu", Toast.LENGTH_SHORT).show();
         }
 
-        Toast.makeText(this, "Sedang Membuat Asset", Toast.LENGTH_SHORT).show();
         createAsset();
 
     }
@@ -775,23 +829,5 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             default:
                 break;
         }
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (CreateNewAsset.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcAssetProvince.getText().toString()));
-        mAcAssetCity.setAdapter(adapterCity);
-        mAcAssetCity.setThreshold(1);
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
     }
 }

@@ -3,11 +3,13 @@ package com.itx.android.android_itx;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -72,6 +74,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     private SessionManager sessManager;
     private File filePhoto;
     private Uri photoURI;
+
+    ProgressDialog progressDialog;
 
 
     ArrayAdapter spAdapterCity;
@@ -190,13 +194,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     }
 
-    public void setCitybyProvince(String provinceName){
+    public void setCitybyProvince(String provinceName) {
 
 
         spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
                 completeUtils.getArrayCityJson(provinceName));
         mSpCity.setAdapter(spAdapterCity);
-
 
 
         mSpCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -231,6 +234,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     private void addNewUser(String token) {
+        progressDialog = new ProgressDialog(CreateNewUser.this);
+        progressDialog.setMessage("Menyimpan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
 
@@ -243,7 +251,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
-        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
         //Upload Photo first then on callback save the new User
         RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
@@ -378,10 +385,21 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         Call<ResponseBody> addUserRequest = mUserService.createUser(body);
 
+        new CountDownTimer(1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                progressDialog.dismiss();
+            }
+        }.start();
+
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+
+
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
                     startActivity(new Intent(CreateNewUser.this, ListUsers.class));
@@ -473,8 +491,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         if (photoURI == null) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
+        } else if (mSpProvince.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Provinsi terlebih dahulu", Toast.LENGTH_SHORT).show();
+        } else if (mSpCity.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Kota terlebih dahulu", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(this, "Sedang Membuat User", Toast.LENGTH_SHORT).show();
         addNewUser(sessManager.getToken());
     }
 

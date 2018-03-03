@@ -94,7 +94,6 @@ import retrofit2.Response;
 public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback,
         View.OnClickListener,
         Validator.ValidationListener,
-        TextWatcher,
         EasyPermissions.PermissionCallbacks {
 
     private final static int GALLERY_RC = 299;
@@ -120,6 +119,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     private LatLng assetLocation = new LatLng(-7.348868, 108.535240);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    ArrayAdapter spAdapterCity;
+    ArrayAdapter spAdapterProvince;
+    String chosenCity, chosenProvince;
 
     private PreviewAdapter mPreviewAdapter;
 
@@ -148,13 +150,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     @BindView(R.id.et_add_asset_address)
     EditText mEtAssetAddress;
 
-    @NotEmpty
-    @BindView(R.id.et_add_asset_province)
-    AutoCompleteTextView mAcAssetProvince;
+    @BindView(R.id.sp_add_asset_province)
+    Spinner mSpProvince;
 
-    @NotEmpty
-    @BindView(R.id.et_add_asset_city)
-    AutoCompleteTextView mAcAssetCity;
+    @BindView(R.id.sp_add_asset_city)
+    Spinner mSpCity;
 
     @NotEmpty
     @BindView(R.id.et_add_asset_postal)
@@ -214,6 +214,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        mBtnAddImages.setOnClickListener(this);
+        mBtnAddAsset.setOnClickListener(this);
+
 
         // ask user to on the GPS when the activity is created
         if (EasyPermissions.hasPermissions(this, locationPerm)) {
@@ -240,10 +243,10 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
+                for (int i = 0; i < fileImages.size(); i++) {
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                    if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
@@ -255,7 +258,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         mRvPreviewImageAsset.setAdapter(mPreviewAdapter);
 
         prepareAssetCategories();
-        setAutoComplete();
     }
 
     private void askUserToTurnOnGPS() {
@@ -313,7 +315,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void setAutoComplete() {
+
+    public void setProvince(final String initProvince) {
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
@@ -323,18 +326,51 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, country);
 
-        mAcAssetProvince.setAdapter(adapterProvince);
-        mAcAssetProvince.setThreshold(1);
-        mAcAssetCity.setThreshold(1);
-
-        mAcAssetCity.addTextChangedListener(this);
-
-
-        mBtnAddAsset.setOnClickListener(this);
-        mBtnAddImages.setOnClickListener(this);
-
         mAcAssetCountry.setAdapter(adapterCountry);
         mAcAssetCountry.setThreshold(1);
+
+        spAdapterProvince = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayProvicesJson());
+        mSpProvince.setAdapter(spAdapterProvince);
+
+        mSpProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenProvince = adapterView.getItemAtPosition(i).toString();
+
+                if (!adapterView.getItemAtPosition(i).toString().equals(initProvince)) {
+                    setCitybyProvince(chosenProvince);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+    }
+
+    public void setCitybyProvince(String provinceName) {
+
+
+        spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayCityJson(provinceName));
+        mSpCity.setAdapter(spAdapterCity);
+
+
+        mSpCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenCity = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+
     }
 
 
@@ -395,18 +431,29 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         mEtAssetNPWP.setText(jsonObject.get("npwp").getAsString());
                         mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
                         mEtAssetPostal.setText(jsonObject.get("address").getAsJsonObject().get("postalCode").getAsString());
-                        mAcAssetCity.setText(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
+
                         mAcAssetCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
-                        mAcAssetProvince.setText(jsonObject.get("address").getAsJsonObject().get("province").getAsString());
+
                         JsonArray images = jsonObject.get("images").getAsJsonArray();
-                        for(int i = 0; i < images.size(); i++){
+                        for (int i = 0; i < images.size(); i++) {
                             Gson gson = new Gson();
                             Image image = gson.fromJson(images.get(i), Image.class);
-                            imagePreviews.add(new ImageHolder(image,null));
+                            imagePreviews.add(new ImageHolder(image, null));
                         }
 
                         mRbAsset.setRating(jsonObject.get("rating").getAsFloat());
                         String assetCategory = jsonObject.get("assetCategory").getAsJsonObject().get("name").getAsString();
+
+
+                        String selectedValueProv = jsonObject.get("address").getAsJsonObject().get("province").getAsString();
+                        setProvince(selectedValueProv);
+
+                        int selectionPositionProv = spAdapterProvince.getPosition(selectedValueProv);
+                        mSpProvince.setSelection(selectionPositionProv);
+                        setCitybyProvince(selectedValueProv);
+
+                        int selectionPositionCity = spAdapterCity.getPosition(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
+                        mSpCity.setSelection(selectionPositionCity);
 
 
                         int selectionPosition = spAdapter.getPosition(assetCategory);
@@ -424,6 +471,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                             public void onTick(long millisUntilFinished) {
                                 // You don't need anything here
                             }
+
                             public void onFinish() {
                                 progressDialog.dismiss();
 
@@ -455,19 +503,22 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
     private void updateAsset() {
 
+        progressDialog = new ProgressDialog(UpdateAsset.this);
+        progressDialog.setMessage("Menyimpan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
         final String name = mEtAssetName.getText().toString().trim();
         final String brand = mEtAssetBrand.getText().toString().trim();
         final String npwp = mEtAssetNPWP.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
         final String address = mEtAssetAddress.getText().toString().trim();
-        final String province = mAcAssetProvince.getText().toString().trim();
-        final String city = mAcAssetCity.getText().toString().trim();
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
 
-        if (fileImages.size() < 1){
+        if (fileImages.size() < 1) {
             //INI JIKA USER TDK MENAMBAHKAN FOTO BARU DARI CAMERA/GALLERY
             try {
 
@@ -477,9 +528,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
 
                 final JSONArray images = new JSONArray();
-                for (int i = 0; i < imagePreviews.size(); i++){
+                for (int i = 0; i < imagePreviews.size(); i++) {
                     ImageHolder img = imagePreviews.get(i);
-                    if(img.getmImage() != null){
+                    if (img.getmImage() != null) {
                         Gson gson = new Gson();
                         String jsonImg = gson.toJson(img.getmImage());
                         images.put(new JSONObject(jsonImg));
@@ -497,8 +548,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
                 JSONObject location = new JSONObject();
                 location.put("address", address);
-                location.put("province", province);
-                location.put("city", city);
+                location.put("province", chosenProvince);
+                location.put("city", chosenCity);
                 location.put("postalCode", postal);
                 location.put("country", country);
 
@@ -513,18 +564,25 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
                 Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
+
+                new CountDownTimer(1000, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                    }
+
+                    public void onFinish() {
+                        progressDialog.dismiss();
+                    }
+                }.start();
+
+
                 res.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
 
-
                             Intent listUsers = new Intent(UpdateAsset.this, ListUsers.class);
                             startActivity(listUsers);
                             finish();
-
-
-
                         }
                     }
 
@@ -541,17 +599,18 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
             for (int i = 0; i < fileImages.size(); i++) {
                 File file = fileImages.get(i);
-                for(int j = 0; j < imagePreviews.size(); j++){
+                for (int j = 0; j < imagePreviews.size(); j++) {
                     ImageHolder currImg = imagePreviews.get(j);
                     String lastpath = Uri.fromFile(file).getLastPathSegment();
-                    if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                    if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
                         RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
                         parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                     }
                 }
             }
             Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+
+               uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
@@ -562,9 +621,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
 
                         final JSONArray images = new JSONArray(response.body().string());
-                        for (int i = 0; i < imagePreviews.size(); i++){
+                        for (int i = 0; i < imagePreviews.size(); i++) {
                             ImageHolder img = imagePreviews.get(i);
-                            if(img.getmImage() != null){
+                            if (img.getmImage() != null) {
                                 Gson gson = new Gson();
                                 String jsonImg = gson.toJson(img.getmImage());
                                 images.put(new JSONObject(jsonImg));
@@ -582,8 +641,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
                         JSONObject location = new JSONObject();
                         location.put("address", address);
-                        location.put("province", province);
-                        location.put("city", city);
+                        location.put("province", chosenProvince);
+                        location.put("city", chosenCity);
                         location.put("postalCode", postal);
                         location.put("country", country);
 
@@ -597,12 +656,23 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
                         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
+
                         Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
+
+                        new CountDownTimer(1000, 1000) {
+                            public void onTick(long millisUntilFinished) {
+                            }
+
+                            public void onFinish() {
+                                progressDialog.dismiss();
+                            }
+                        }.start();
+
+
                         res.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                 if (response.isSuccessful()) {
-
 
                                     Intent listAsset = new Intent(UpdateAsset.this, ListUsers.class);
                                     startActivity(listAsset);
@@ -628,10 +698,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
         }
-
-
-
-
     }
 
 
@@ -751,29 +817,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 
-
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (UpdateAsset.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcAssetProvince.getText().toString()));
-        mAcAssetCity.setAdapter(adapterCity);
-        mAcAssetCity.setThreshold(1);
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
     }
 
     @Override
@@ -833,7 +877,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("new loc click", point.toString());
                 assetLocation = point;
                 Log.d("new loc asset", assetLocation.toString());
-                Toast.makeText(UpdateAsset.this,assetLocation.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
                 getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });
@@ -849,9 +893,12 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         } else if (imagePreviews.size() == 0) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
+        } else if (mSpProvince.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Provinsi terlebih dahulu", Toast.LENGTH_SHORT).show();
+        } else if (mSpCity.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Kota terlebih dahulu", Toast.LENGTH_SHORT).show();
         }
 
-        Toast.makeText(this, "Sedang Membuat Asset", Toast.LENGTH_SHORT).show();
         updateAsset();
 
     }

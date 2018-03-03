@@ -150,17 +150,34 @@
                     android:layout_marginTop="8dp"
                     android:layout_weight="1">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/et_add_asset_province"
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Pilih Provinsi" />
+
+                    <Spinner
+                        android:id="@+id/sp_add_asset_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Province"
-                        android:ems="10"
-
-                       />
+                        android:inputType="text" />
 
 
                 </android.support.design.widget.TextInputLayout>
+
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
 
 
                 <android.support.design.widget.TextInputLayout
@@ -170,8 +187,16 @@
                     android:layout_marginTop="8dp"
                     android:layout_weight="1">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/et_add_asset_city"
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="Pilih Kota" />
+
+                    <Spinner
+                        android:id="@+id/sp_add_asset_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="City"
