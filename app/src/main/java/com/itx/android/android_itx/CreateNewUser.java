@@ -19,11 +19,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.itx.android.android_itx.Service.APIService;
@@ -60,7 +62,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, TextWatcher {
+public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
@@ -71,8 +73,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     private File filePhoto;
     private Uri photoURI;
 
+
+    ArrayAdapter spAdapterCity;
+    ArrayAdapter spAdapterProvince;
     UsersService mUserService;
     APIService mApiService;
+    String chosenCity, chosenProvince;
 
     String mCurrentPhotoPath;
 
@@ -105,17 +111,16 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     @BindView(R.id.et_add_user_address)
     EditText mEtAddress;
 
-    @NotEmpty
-    @BindView(R.id.et_add_user_city)
-    AutoCompleteTextView mAcCity;
+    @BindView(R.id.sp_add_user_city)
+    Spinner mSpCity;
 
     @NotEmpty
     @BindView(R.id.et_add_user_postal)
     EditText mEtPostalCode;
 
-    @NotEmpty
-    @BindView(R.id.et_add_user_province)
-    AutoCompleteTextView mAcProvince;
+
+    @BindView(R.id.sp_add_user_province)
+    Spinner mSpProvince;
 
     @NotEmpty
     @BindView(R.id.btn_add_new_user)
@@ -144,12 +149,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         mBtnAddUser.setOnClickListener(this);
         mFabAddPhoto.setOnClickListener(this);
 
-        setAutoComplete();
+
+        setProvince();
     }
 
 
-
-    public void setAutoComplete(){
+    public void setProvince() {
 
         ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
@@ -159,13 +164,52 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
                 (this, android.R.layout.select_dialog_item, country);
 
-        mAcProvince.setAdapter(adapterProvince);
-        mAcProvince.setThreshold(1);
+        spAdapterProvince = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayProvicesJson());
+        mSpProvince.setAdapter(spAdapterProvince);
 
-        mAcCity.addTextChangedListener(this);
+        mSpProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenProvince = adapterView.getItemAtPosition(i).toString();
+
+                setCitybyProvince(chosenProvince);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+
 
         mAcCountry.setAdapter(adapterCountry);
         mAcCountry.setThreshold(1);
+
+
+    }
+
+    public void setCitybyProvince(String provinceName){
+
+
+        spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayCityJson(provinceName));
+        mSpCity.setAdapter(spAdapterCity);
+
+
+
+        mSpCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenCity = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
 
     }
 
@@ -195,9 +239,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String email = mEtEmail.getText().toString().trim();
         final String noKTP = mEtNoKTP.getText().toString().trim();
         final String address = mEtAddress.getText().toString().trim();
-        final String city = mAcCity.getText().toString().trim();
         final String postal = mEtPostalCode.getText().toString().trim();
-        final String province = mAcProvince.getText().toString().trim();
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
@@ -228,8 +270,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
                         JSONObject location = new JSONObject();
                         location.put("address", address);
-                        location.put("province", province);
-                        location.put("city", city);
+                        location.put("province", chosenProvince);
+                        location.put("city", chosenCity);
                         location.put("postalCode", postal);
                         location.put("country", country);
 
@@ -450,26 +492,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
-
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (CreateNewUser.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcProvince.getText().toString()));
-        mAcCity.setAdapter(adapterCity);
-        mAcCity.setThreshold(1);
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
-    }
 }
