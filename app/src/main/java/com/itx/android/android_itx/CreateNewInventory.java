@@ -116,7 +116,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     @BindView(R.id.et_add_price)
     EditText mEtAddPrice;
 
-    CheckBox checkFacilities;
+    CheckBox [] checkFacilities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -273,18 +273,18 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 if (rawResponse.isSuccessful()) {
                     try {
                         final JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
-
+                        checkFacilities= new CheckBox[jsonArray.size()];
                         for (int i = 0; i < jsonArray.size(); i++) {
 
                             final JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Inventory invent = new Inventory();
 
-                            checkFacilities = new CheckBox(CreateNewInventory.this);
-                            checkFacilities.setText(Data.get("name").getAsString());
-                            checkFacilities.setTextSize(12);
-                            checkFacilities.setId(i);
-                            checkFacilities.setTextColor(Color.BLACK);
-                            layoutFacilities.addView(checkFacilities);
+                            checkFacilities[i] = new CheckBox(CreateNewInventory.this);
+                            checkFacilities[i].setText(Data.get("name").getAsString());
+                            checkFacilities[i].setTextSize(12);
+                            checkFacilities[i].setId(i);
+                            checkFacilities[i].setTextColor(Color.BLACK);
+                            layoutFacilities.addView(checkFacilities[i]);
 
                             new CountDownTimer(1000, 1000) {
                                 public void onTick(long millisUntilFinished) {
@@ -295,7 +295,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                                 }
                             }.start();
 
-                            checkFacilities.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            checkFacilities[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                     if (isChecked == true) {
@@ -305,6 +305,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
                                         Log.i("checkbox", DataChecked.get("_id").getAsString());
                                         mListFacilitiesChecked.add(DataChecked.get("_id").getAsString());
+                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
                                     } else {
                                         int getChecked = buttonView.getId();
 
@@ -312,6 +313,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
                                         Log.i("checkbox", DataChecked.get("_id").getAsString());
                                         mListFacilitiesChecked.remove(DataChecked.get("_id").getAsString());
+                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
                                     }
                                 }
                             });

@@ -27,6 +27,7 @@ import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.NumberTextWatcher;
 import com.itx.android.android_itx.Utils.RupiahCurrency;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,7 +65,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
     ArrayList<Uri> uriImages = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
 
-    String idUser, userAdress, userName, phone, imagesDetail, role;
+    String idAsset, userAdress, userName, phone, imagesDetail, role;
     private APIService mApiSevice;
     private PreviewAdapter mPreviewAdapter;
     private List<String> mListFacilitiesChecked = new ArrayList<>();
@@ -106,7 +108,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
     @BindView(R.id.et_add_price)
     EditText mEtAddPrice;
 
-    CheckBox checkFacilities;
+    CheckBox[] checkFacilities;
 
 
     @Override
@@ -122,6 +124,8 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
         session = new SessionManager(this);
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
+
+        mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
         mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this, 2));
         mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
@@ -164,29 +168,19 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                 if (rawResponse.isSuccessful()) {
                     try {
                         final JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
-
+                        checkFacilities = new CheckBox[jsonArray.size()];
                         for (int i = 0; i < jsonArray.size(); i++) {
 
                             final JsonObject Data = jsonArray.get(i).getAsJsonObject();
-                            Inventory invent = new Inventory();
 
-                            checkFacilities = new CheckBox(UpdateInventory.this);
-                            checkFacilities.setText(Data.get("name").getAsString());
-                            checkFacilities.setTextSize(12);
-                            checkFacilities.setId(i);
-                            checkFacilities.setTextColor(Color.BLACK);
-                            layoutFacilities.addView(checkFacilities);
+                            checkFacilities[i] = new CheckBox(UpdateInventory.this);
+                            checkFacilities[i].setText(Data.get("name").getAsString());
+                            checkFacilities[i].setTextSize(12);
+                            checkFacilities[i].setId(i);
+                            checkFacilities[i].setTextColor(Color.BLACK);
+                            layoutFacilities.addView(checkFacilities[i]);
 
-                            new CountDownTimer(1000, 1000) {
-                                public void onTick(long millisUntilFinished) {
-                                }
-
-                                public void onFinish() {
-                                    progressDialog.dismiss();
-                                }
-                            }.start();
-
-                            checkFacilities.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            checkFacilities[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                     if (isChecked == true) {
@@ -196,6 +190,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                                         Log.i("checkbox", DataChecked.get("_id").getAsString());
                                         mListFacilitiesChecked.add(DataChecked.get("_id").getAsString());
+                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
                                     } else {
                                         int getChecked = buttonView.getId();
 
@@ -203,9 +198,11 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                                         Log.i("checkbox", DataChecked.get("_id").getAsString());
                                         mListFacilitiesChecked.remove(DataChecked.get("_id").getAsString());
+                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
                                     }
                                 }
                             });
+
                         }
                         Toast.makeText(UpdateInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
                                 Toast.LENGTH_LONG).show();
@@ -228,38 +225,69 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         });
     }
 
-    public void prepareInventData (){
+    public void prepareInventData() {
 
-        idUser = getIntent().getStringExtra("id");
+        idAsset = getIntent().getStringExtra("id");
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
 
-//        Call<JsonObject> response = mInventoryAPIService.getUserInventory(idUser);
+        Call<JsonObject> response = mInventoryAPIService.getUserInventory(idAsset);
 
-//        response.enqueue(new Callback<JsonObject>() {
-//            @Override
-//            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
-//                if (rawResponse.isSuccessful()) {
-//                    try {
-//                        JsonObject jsonObject = rawResponse.body().get("data").getAsJsonObject();
-//
-//
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    Toast.makeText(UpdateInventory.this, "Gagal",
-//                            Toast.LENGTH_LONG).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<JsonObject> call, Throwable throwable) {
-//
-//                Toast.makeText(UpdateInventory.this, throwable.getMessage(),
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        });
+        response.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+                if (rawResponse.isSuccessful()) {
+                    try {
+                        JsonObject jsonObject = rawResponse.body().get("data").getAsJsonObject();
+                        mEtInventName.setText(jsonObject.get("name").getAsString());
+                        mEtInventDeskripsi.setText(jsonObject.get("description").getAsString());
+                        mEtInventSpace.setText(jsonObject.get("space").getAsString());
+                        mEtInventStock.setText(jsonObject.get("stock").getAsString());
+                        mEtAddPrice.setText(RupiahCurrency.toRupiahFormat(jsonObject.get("price").getAsDouble()));
+
+                        final JsonArray jsonArray = jsonObject.get("facilities").getAsJsonArray();
+
+
+                        for (int z = 0; z < jsonArray.size(); z++) {
+                            final JsonObject Data = jsonArray.get(z).getAsJsonObject();
+                            Log.d("KenaBerepa", Data.get("name").getAsString());
+
+                            for (int i = 0; i < checkFacilities.length; i++) {
+
+                                if (checkFacilities[i].getText().toString().equals(jsonArray.get(z).getAsJsonObject().get("name").getAsString())) {
+                                    checkFacilities[i].setChecked(true);
+
+                                }
+                            }
+                        }
+
+                        new CountDownTimer(1000, 1000) {
+                            public void onTick(long millisUntilFinished) {
+                            }
+
+                            public void onFinish() {
+                                progressDialog.dismiss();
+                            }
+                        }.start();
+
+
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(UpdateInventory.this, "Gagal",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+
+                Toast.makeText(UpdateInventory.this, throwable.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
 
 
     }
@@ -278,21 +306,21 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         final String inventoryPrice = mEtAddPrice.getText().toString().trim();
 
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
-
-        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i = 0; i < fileImages.size(); i++) {
-            File file = fileImages.get(i);
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-        }
-        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
+//
+//        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+//        for (int i = 0; i < fileImages.size(); i++) {
+//            File file = fileImages.get(i);
+//            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
+//            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+//        }
+//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
                     try {
 
-                        JSONArray images = new JSONArray(response.body().string());
+//                        JSONArray images = new JSONArray(response.body().string());
                         String idAsset = getIntent().getStringExtra("idAsset");
                         JSONObject objectData = new JSONObject();
                         objectData.put("asset", idAsset);
@@ -307,20 +335,20 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                         JSONObject baseObject = new JSONObject();
                         baseObject.put("data", objectData);
-                        baseObject.put("images", images);
+//                        baseObject.put("images", images);
                         updateInventoryToServer(baseObject);
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-            }
+//                }
+//            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//            }
+//        });
     }
 
 
@@ -330,7 +358,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                 (jsonParams).toString());
 
         Log.d("testJson", body.toString());
-        Call<ResponseBody> addInventoryRequest = mInventoryAPIService.createInventoryCategory(body);
+        Call<ResponseBody> addInventoryRequest = mInventoryAPIService.updateInventoryCategory(idAsset ,body);
 
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
             @Override

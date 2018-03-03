@@ -87,6 +87,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                                 Intent updateAsset = new Intent(mContext, UpdateAsset.class);
                                 updateAsset.putExtra("id", currentAsset.getId());
                                 mContext.startActivity(updateAsset);
+                                ((Activity) mContext).finish();
                                 break;
                             case R.id.menu_delete:
                                 deleteUser(currentAsset);

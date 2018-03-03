@@ -30,8 +30,8 @@ public interface InventoryService {
     @POST("/api/inventory-category/delete/{id}")
     Call<ResponseBody> deleteInventoryCategory (@Path("id") String params);
 
-//    @GET("/api/inventory-categories/{id}")
-//    Call<JsonObject> getUserInventory(@Path("id") String postfix);
+    @GET("/api/inventory-categories/{id}")
+    Call<JsonObject> getUserInventory(@Path("id") String postfix);
 
     @POST("/api/inventory-category/update/{id}")
     Call<ResponseBody> updateInventoryCategory (@Path("id") String postfix, @Body RequestBody params);

@@ -2,6 +2,7 @@ package com.itx.android.android_itx;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -85,6 +86,8 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     Validator validator;
     String idUser;
 
+    ProgressDialog progressDialog;
+
 
     @BindView(R.id.fab_add_foto)
     FloatingActionButton mFabAddPhoto;
@@ -151,6 +154,10 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         mIvPhoto.setOnClickListener(this);
         mFabAddPhoto.setOnClickListener(this);
 
+        progressDialog = new ProgressDialog(UpdateUser.this);
+        progressDialog.setMessage("Menyiapkan Data");
+        progressDialog.show();
+
         setAutoComplete();
         prepareUserData();
     }
@@ -190,6 +197,17 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                                     .into(mIvPhoto);
                         }
+
+                        new CountDownTimer(1000, 1000) {
+                            public void onTick(long millisUntilFinished) {
+                            }
+
+                            public void onFinish() {
+                                progressDialog.dismiss();
+                            }
+                        }.start();
+
+
 
                     } catch (Exception e) {
                         e.printStackTrace();

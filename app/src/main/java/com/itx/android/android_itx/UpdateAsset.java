@@ -1,6 +1,7 @@
 package com.itx.android.android_itx;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Rect;
@@ -9,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -176,6 +178,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     String idUser, userAdress, userName, phone, imagesDetail, role;
     AssetService mAssetAPIService;
     SessionManager session;
+    ProgressDialog progressDialog;
 
 
     private static final int CAMERA_REQUEST = 201;
@@ -192,6 +195,9 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         validator.setValidationListener(this);
 
         session = new SessionManager(this);
+        progressDialog = new ProgressDialog(UpdateAsset.this);
+        progressDialog.setMessage("Sedang Menyiapkan Data");
+        progressDialog.show();
 
         idUser = getIntent().getStringExtra("idUser");
         userAdress = getIntent().getStringExtra("address");
@@ -373,7 +379,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                     try {
                         JsonObject jsonObject = rawResponse.body().get("data").getAsJsonObject();
                         mEtAssetName.setText(jsonObject.get("name").getAsString());
-                        mEtAssetAddress.setText(jsonObject.get("address").getAsJsonObject().get("address").getAsString());
+
                         mEtAssetBrand.setText(jsonObject.get("brand").getAsString());
                         mEtAssetNPWP.setText(jsonObject.get("npwp").getAsString());
                         mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
@@ -390,10 +396,24 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         int selectionPosition = spAdapter.getPosition(assetCategory);
                         categoryIdSelected = categories.get(selectionPosition);
                         mSpCategories.setSelection(selectionPosition);
-
                         JsonArray AssetCoordinates = jsonObject.get("address").getAsJsonObject().get("coordinates").getAsJsonArray();
 
                         assetLocation = new LatLng(AssetCoordinates.get(0).getAsDouble(), AssetCoordinates.get(1).getAsDouble());
+
+                        getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
+                        updateMapUI();
+
+                        new CountDownTimer(1000, 1000) {
+
+                            public void onTick(long millisUntilFinished) {
+                                // You don't need anything here
+                            }
+                            public void onFinish() {
+                                progressDialog.dismiss();
+
+
+                            }
+                        }.start();
 
 
                     } catch (Exception e) {
@@ -446,6 +466,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                     mListCoordinates.add(assetLocation.latitude);
                     mListCoordinates.add(assetLocation.longitude);
 
+                    Log.d("checkcoordinates", mListCoordinates.toString());
 
 //                    final JSONArray images = new JSONArray(response.body().string());
                     JSONObject data = new JSONObject();
@@ -482,8 +503,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                             if (response.isSuccessful()) {
 
 
-                                Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
-                                startActivity(listAsset);
+                                Intent listUser = new Intent(UpdateAsset.this, ListUsers.class);
+                                startActivity(listUser);
                                 finish();
 
 
@@ -713,6 +734,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("new loc click", point.toString());
                 assetLocation = point;
                 Log.d("new loc asset", assetLocation.toString());
+                Toast.makeText(UpdateAsset.this,assetLocation.toString(), Toast.LENGTH_SHORT).show();
                 getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });
