@@ -66,7 +66,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
+public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
     private static final int RC_CAMERA = 1000;
     private static final int RC_GALLERY = 1001;
@@ -481,12 +481,12 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        }
+
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
+
 
 
     @Override
@@ -533,6 +533,18 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             default:
                 break;
         }
+
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
     }
 }

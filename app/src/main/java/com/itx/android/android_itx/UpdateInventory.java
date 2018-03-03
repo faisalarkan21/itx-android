@@ -1,5 +1,6 @@
 package com.itx.android.android_itx;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,6 +8,10 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,9 +25,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
+import com.itx.android.android_itx.Entity.Image;
 import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.Service.APIService;
@@ -39,8 +46,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,6 +59,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,10 +69,11 @@ import retrofit2.Response;
  * Created by faisal on 3/2/18.
  */
 
-public class UpdateInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
+public class UpdateInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
     private static final int RC_CAMERA = 1000;
     private static final int RC_GALLERY = 1001;
+    private static final int CAMERA_REQUEST = 201;
 
 
     ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
@@ -167,6 +180,56 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private void takePhotoFromCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                fileImages.add(createImageFile());
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (fileImages.get(fileImages.size() - 1) != null) {
+                Uri uri = FileProvider.getUriForFile(UpdateInventory.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        fileImages.get(fileImages.size() - 1));
+                imagePreviews.add(new ImageHolder(null, uri));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        return image;
+    }
+
+    @AfterPermissionGranted(13)
+    private void takePhotoWithPermission() {
+        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromCamera();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
+                    13, perms);
+        }
+    }
+
 
     public void prepareFacilitiesData() {
 
@@ -254,6 +317,13 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                         mEtInventStock.setText(jsonObject.get("stock").getAsString());
                         mEtAddPrice.setText(RupiahCurrency.toRupiahFormat(jsonObject.get("price").getAsDouble()));
 
+                        JsonArray images = jsonObject.get("images").getAsJsonArray();
+                        for(int i = 0; i < images.size(); i++){
+                            Gson gson = new Gson();
+                            Image image = gson.fromJson(images.get(i), Image.class);
+                            imagePreviews.add(new ImageHolder(image,null));
+                        }
+
                         final JsonArray jsonArray = jsonObject.get("facilities").getAsJsonArray();
 
 
@@ -317,50 +387,96 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
 
-//
-//        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-//        for (int i = 0; i < fileImages.size(); i++) {
-//            File file = fileImages.get(i);
-//            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-//            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-//        }
-//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (response.isSuccessful()) {
 
-                    try {
-
-//                        JSONArray images = new JSONArray(response.body().string());
-                        String idAsset = getIntent().getStringExtra("idAsset");
-                        JSONObject objectData = new JSONObject();
-                        objectData.put("asset", idAsset);
-                        objectData.put("name", inventoryName);
-                        objectData.put("description", inventoryDescription);
-                        objectData.put("space", inventorySpace);
-                        objectData.put("price", RupiahCurrency.unformatRupiah(inventoryPrice));
-                        objectData.put("stock", inventoryStock);
-
-                        JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
-                        objectData.put("facilities", jsonArrayChecked);
-
-                        JSONObject baseObject = new JSONObject();
-                        baseObject.put("data", objectData);
-//                        baseObject.put("images", images);
-                        updateInventoryToServer(baseObject);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        if(fileImages.size() < 1){
+            try {
+                final JSONArray images = new JSONArray();
+                for (int i = 0; i < imagePreviews.size(); i++){
+                    ImageHolder img = imagePreviews.get(i);
+                    if(img.getmImage() != null){
+                        Gson gson = new Gson();
+                        String jsonImg = gson.toJson(img.getmImage());
+                        images.put(new JSONObject(jsonImg));
                     }
-//                }
-//            }
+                }
+                String idAsset = getIntent().getStringExtra("idAsset");
+                JSONObject objectData = new JSONObject();
+                objectData.put("asset", idAsset);
+                objectData.put("name", inventoryName);
+                objectData.put("description", inventoryDescription);
+                objectData.put("space", inventorySpace);
+                objectData.put("price", RupiahCurrency.unformatRupiah(inventoryPrice));
+                objectData.put("stock", inventoryStock);
 
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//            }
-//        });
+                JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
+                objectData.put("facilities", jsonArrayChecked);
+
+                JSONObject baseObject = new JSONObject();
+                baseObject.put("data", objectData);
+                baseObject.put("images", images);
+                updateInventoryToServer(baseObject);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } else {
+            MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+            for (int i = 0; i < fileImages.size(); i++) {
+                File file = fileImages.get(i);
+                for(int j = 0; j < imagePreviews.size(); j++){
+                    ImageHolder currImg = imagePreviews.get(j);
+                    String lastpath = Uri.fromFile(file).getLastPathSegment();
+                    if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                        parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+                    }
+                }
+            }
+            Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+
+                        try {
+
+                            final JSONArray images = new JSONArray(response.body().string());
+                            for (int i = 0; i < imagePreviews.size(); i++){
+                                ImageHolder img = imagePreviews.get(i);
+                                if(img.getmImage() != null){
+                                    Gson gson = new Gson();
+                                    String jsonImg = gson.toJson(img.getmImage());
+                                    images.put(new JSONObject(jsonImg));
+                                }
+                            }
+                            String idAsset = getIntent().getStringExtra("idAsset");
+                            JSONObject objectData = new JSONObject();
+                            objectData.put("asset", idAsset);
+                            objectData.put("name", inventoryName);
+                            objectData.put("description", inventoryDescription);
+                            objectData.put("space", inventorySpace);
+                            objectData.put("price", RupiahCurrency.unformatRupiah(inventoryPrice));
+                            objectData.put("stock", inventoryStock);
+
+                            JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
+                            objectData.put("facilities", jsonArrayChecked);
+
+                            JSONObject baseObject = new JSONObject();
+                            baseObject.put("data", objectData);
+                            baseObject.put("images", images);
+                            updateInventoryToServer(baseObject);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        }
     }
 
 
@@ -391,6 +507,24 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -400,7 +534,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                 validator.validate();
                 break;
             case R.id.select_image_inventory:
-//                takePhotoWithPermission();
+                takePhotoWithPermission();
                 break;
             default:
                 break;
@@ -415,10 +549,10 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(this, "Pilih Fasilitas terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
-//        else if (uriImages.size() == 0) {
-//            Toast.makeText(this, "Isi Foto terlebih dahulu", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+        else if (imagePreviews.size() == 0) {
+            Toast.makeText(this, "Isi Foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Toast.makeText(this, "Sedang Membuat Inventory", Toast.LENGTH_SHORT).show();
         uploadImagesToServer();

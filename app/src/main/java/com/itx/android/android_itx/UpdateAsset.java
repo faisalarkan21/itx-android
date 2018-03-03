@@ -91,7 +91,11 @@ import retrofit2.Response;
  * Created by faisal on 3/1/18.
  */
 
-public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, TextWatcher {
+public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback,
+        View.OnClickListener,
+        Validator.ValidationListener,
+        TextWatcher,
+        EasyPermissions.PermissionCallbacks {
 
     private final static int GALLERY_RC = 299;
     private final static int LOCATION_SETTING_RC = 122;
@@ -172,7 +176,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
-    private AssetsAdapter mAdapter;
     String idUser, userAdress, userName, phone, imagesDetail, role;
     AssetService mAssetAPIService;
     SessionManager session;
@@ -465,6 +468,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
 
         if (fileImages.size() < 1){
+            //INI JIKA USER TDK MENAMBAHKAN FOTO BARU DARI CAMERA/GALLERY
             try {
 
                 List<Double> mListCoordinates = new ArrayList<>();
@@ -600,7 +604,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                                 if (response.isSuccessful()) {
 
 
-                                    Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
+                                    Intent listAsset = new Intent(UpdateAsset.this, ListUsers.class);
                                     startActivity(listAsset);
                                     finish();
 
@@ -746,13 +750,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        } else if (requestCode == 12) {
-            getCurrentLocation();
-        } else if (requestCode == LOCATION_REQUEST) {
-            mMap.setMyLocationEnabled(true);
-        }
+
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
@@ -871,6 +869,22 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        } else if (requestCode == 12) {
+            getCurrentLocation();
+        } else if (requestCode == LOCATION_REQUEST) {
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
     }
 }
