@@ -463,64 +463,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
 
-<<<<<<< HEAD
-        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i = 0; i < fileImages.size(); i++) {
-            File file = fileImages.get(i);
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-        }
-//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
 
-                    List<Double> mListCoordinates = new ArrayList<>();
-                    mListCoordinates.add(assetLocation.latitude);
-                    mListCoordinates.add(assetLocation.longitude);
-
-                    Log.d("checkcoordinates", mListCoordinates.toString());
-
-//                    final JSONArray images = new JSONArray(response.body().string());
-                    JSONObject data = new JSONObject();
-                    data.put("assetCategory", categoryIdSelected);
-                    data.put("name", name);
-                    data.put("brand", brand);
-                    data.put("npwp", npwp);
-                    data.put("phone", phone);
-                    data.put("user", idUser);
-                    data.put("rating", rating);
-
-
-                    JSONObject location = new JSONObject();
-                    location.put("address", address);
-                    location.put("province", province);
-                    location.put("city", city);
-                    location.put("postalCode", postal);
-                    location.put("country", country);
-
-                    JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
-                    location.put("coordinates", jsonArrayCoordinates);
-
-                    JSONObject request = new JSONObject();
-                    request.put("data", data);
-                    request.put("location", location);
-//                    request.put("images", images);
-
-                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-
-                    Call<ResponseBody> res = mAssetService.updateAsset(idUser, requestBody);
-                    res.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.isSuccessful()) {
-
-
-                                Intent listUser = new Intent(UpdateAsset.this, ListUsers.class);
-                                startActivity(listUser);
-                                finish();
-=======
         if (fileImages.size() < 1){
             try {
 
@@ -572,10 +515,10 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         if (response.isSuccessful()) {
 
 
-                            Intent listAsset = new Intent(UpdateAsset.this, ListAssets.class);
-                            startActivity(listAsset);
+                            Intent listUsers = new Intent(UpdateAsset.this, ListUsers.class);
+                            startActivity(listUsers);
                             finish();
->>>>>>> 51f95ba2e07b13ee855efab6414dd5762c45473f
+
 
 
                         }

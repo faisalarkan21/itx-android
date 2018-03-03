@@ -317,27 +317,22 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
 
-        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-        for (int i = 0; i < fileImages.size(); i++) {
-            File file = fileImages.get(i);
-            for(int j = 0; j < imagePreviews.size(); j++){
-                ImageHolder currImg = imagePreviews.get(j);
-                String lastpath = Uri.fromFile(file).getLastPathSegment();
-                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
-                    RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
-                    parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-                }
-            }
-        }
-        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
+//
+//        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+//        for (int i = 0; i < fileImages.size(); i++) {
+//            File file = fileImages.get(i);
+//            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
+//            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+//        }
+//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                if (response.isSuccessful()) {
 
                     try {
 
-                        JSONArray images = new JSONArray(response.body().string());
+//                        JSONArray images = new JSONArray(response.body().string());
                         String idAsset = getIntent().getStringExtra("idAsset");
                         JSONObject objectData = new JSONObject();
                         objectData.put("asset", idAsset);
@@ -352,20 +347,20 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                         JSONObject baseObject = new JSONObject();
                         baseObject.put("data", objectData);
-                        baseObject.put("images", images);
+//                        baseObject.put("images", images);
                         updateInventoryToServer(baseObject);
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-            }
+//                }
+//            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//            }
+//        });
     }
 
 
