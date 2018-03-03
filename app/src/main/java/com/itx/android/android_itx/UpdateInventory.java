@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
+import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.InventoryService;
@@ -62,7 +63,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
     private static final int RC_GALLERY = 1001;
 
 
-    ArrayList<Uri> uriImages = new ArrayList<>();
+    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
 
     String idAsset, userAdress, userName, phone, imagesDetail, role;
@@ -128,10 +129,19 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
         mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this, 2));
-        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+        mPreviewAdapter = new PreviewAdapter(imagePreviews, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                uriImages.remove(position);
+                ImageHolder currentImage = imagePreviews.get(position);
+                for (int i = 0; i < fileImages.size(); i++){
+                    String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
+                    String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                        fileImages.remove(i);
+                    }
+                }
+                imagePreviews.remove(position);
+                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -306,21 +316,28 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         final String inventoryPrice = mEtAddPrice.getText().toString().trim();
 
         Log.d("getAllChecked", mListFacilitiesChecked.toString());
-//
-//        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
-//        for (int i = 0; i < fileImages.size(); i++) {
-//            File file = fileImages.get(i);
-//            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-//            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
-//        }
-//        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-//        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (response.isSuccessful()) {
+
+        MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
+        for (int i = 0; i < fileImages.size(); i++) {
+            File file = fileImages.get(i);
+            for(int j = 0; j < imagePreviews.size(); j++){
+                ImageHolder currImg = imagePreviews.get(j);
+                String lastpath = Uri.fromFile(file).getLastPathSegment();
+                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                    RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                    parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+                }
+            }
+        }
+        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+
                     try {
 
-//                        JSONArray images = new JSONArray(response.body().string());
+                        JSONArray images = new JSONArray(response.body().string());
                         String idAsset = getIntent().getStringExtra("idAsset");
                         JSONObject objectData = new JSONObject();
                         objectData.put("asset", idAsset);
@@ -335,20 +352,20 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                         JSONObject baseObject = new JSONObject();
                         baseObject.put("data", objectData);
-//                        baseObject.put("images", images);
+                        baseObject.put("images", images);
                         updateInventoryToServer(baseObject);
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-//                }
-//            }
+                }
+            }
 
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//            }
-//        });
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 
 

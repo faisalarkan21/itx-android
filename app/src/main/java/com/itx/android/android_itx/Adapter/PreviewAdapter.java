@@ -1,15 +1,16 @@
 package com.itx.android.android_itx.Adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.R;
-import com.itx.android.android_itx.ViewHolder.InventoryViewHolder;
+import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.ViewHolder.PreviewViewHolder;
 
 import java.util.ArrayList;
@@ -20,12 +21,12 @@ import java.util.ArrayList;
 
 public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
 
-    private ArrayList<Uri> imageUriList;
+    private ArrayList<ImageHolder> imageList;
     private Context mContext;
     private previewInterface mClickHandler;
 
-    public PreviewAdapter(ArrayList<Uri> uris, Context activity, previewInterface handler){
-        imageUriList = uris;
+    public PreviewAdapter(ArrayList<ImageHolder> images, Context activity, previewInterface handler){
+        imageList = images;
         mContext = activity;
         mClickHandler = handler;
     }
@@ -40,8 +41,16 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
 
     @Override
     public void onBindViewHolder(final PreviewViewHolder holder, int position) {
-        Uri currentUri = imageUriList.get(position);
-        holder.mIvPreview.setImageURI(currentUri);
+        ImageHolder currentImage = imageList.get(position);
+        Uri currentUri = currentImage.getmUri();
+        if(currentUri != null){
+            holder.mIvPreview.setImageURI(currentUri);
+        } else {
+            Glide.with(mContext)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + currentImage.getmImage().getmMedium())
+                    .into(holder.mIvPreview);
+        }
+
         holder.mFabDeletePreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,7 +62,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
 
     @Override
     public int getItemCount() {
-        return imageUriList.size();
+        return imageList.size();
     }
 
     public interface previewInterface {

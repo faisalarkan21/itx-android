@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
+import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.InventoryService;
@@ -71,7 +72,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     private static final int RC_GALLERY = 1001;
 
 
-    ArrayList<Uri> uriImages = new ArrayList<>();
+    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
 
     private APIService mApiSevice;
@@ -135,10 +136,19 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         mEtAddPrice.addTextChangedListener(new NumberTextWatcher(mEtAddPrice, "##,###"));
 
         mRvPreviewImageInvent.setLayoutManager(new GridLayoutManager(this, 2));
-        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+        mPreviewAdapter = new PreviewAdapter(imagePreviews, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                uriImages.remove(position);
+                ImageHolder currentImage = imagePreviews.get(position);
+                for (int i = 0; i < fileImages.size(); i++){
+                    String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
+                    String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                        fileImages.remove(i);
+                    }
+                }
+                imagePreviews.remove(position);
+                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -224,10 +234,11 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             }
             // Continue only if the File was successfully created
             if (fileImages.get(fileImages.size() - 1) != null) {
-                uriImages.add(FileProvider.getUriForFile(CreateNewInventory.this,
+                Uri uri = FileProvider.getUriForFile(CreateNewInventory.this,
                         BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() - 1)));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
+                        fileImages.get(fileImages.size() - 1));
+                imagePreviews.add(new ImageHolder(null, uri));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
                 startActivityForResult(takePictureIntent, RC_CAMERA);
             }
         }
@@ -357,8 +368,14 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+            for(int j = 0; j < imagePreviews.size(); j++){
+                ImageHolder currImg = imagePreviews.get(j);
+                String lastpath = Uri.fromFile(file).getLastPathSegment();
+                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                    RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                    parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+                }
+            }
         }
         Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
@@ -434,7 +451,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             if (data.getData() != null) {
 
                 Uri imageUri = data.getData();
-                uriImages.add(imageUri);
+                imagePreviews.add(new ImageHolder(null, imageUri));
                 fileImages.add(new File(imageUri.getEncodedPath()));
 
             } else {
@@ -445,7 +462,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
                         ClipData.Item item = mClipData.getItemAt(i);
                         Uri uri = item.getUri();
-                        uriImages.add(uri);
+                        imagePreviews.add(new ImageHolder(null, uri));
                         fileImages.add(new File(getPath(uri)));
 
                     }
@@ -479,7 +496,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         if (mListFacilitiesChecked.size() == 0) {
             Toast.makeText(this, "Pilih Fasilitas terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
-        } else if (uriImages.size() == 0) {
+        } else if (imagePreviews.size() == 0) {
             Toast.makeText(this, "Isi Foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }

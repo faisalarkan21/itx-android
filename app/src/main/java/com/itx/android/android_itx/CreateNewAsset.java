@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Rect;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
@@ -57,6 +55,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
+import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -72,13 +71,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -102,7 +98,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
     //URI List for the images that will be on the server
-    ArrayList<Uri> uriImages = new ArrayList<>();
+    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
     ArrayList<File> fileImages = new ArrayList<>();
     ArrayList<String> categories = new ArrayList<>();
 
@@ -228,10 +224,19 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                 outRect.top = space;
             }
         });
-        mPreviewAdapter = new PreviewAdapter(uriImages, this, new PreviewAdapter.previewInterface() {
+        mPreviewAdapter = new PreviewAdapter(imagePreviews, this, new PreviewAdapter.previewInterface() {
             @Override
             public void deleteCurrentPreviewImage(int position) {
-                uriImages.remove(position);
+                ImageHolder currentImage = imagePreviews.get(position);
+                for (int i = 0; i < fileImages.size(); i++){
+                    String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
+                    String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                        fileImages.remove(i);
+                    }
+                }
+                imagePreviews.remove(position);
+                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -418,10 +423,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             }
             // Continue only if the File was successfully created
             if (fileImages.get(fileImages.size() - 1) != null) {
-                uriImages.add(FileProvider.getUriForFile(CreateNewAsset.this,
+                Uri uri = FileProvider.getUriForFile(CreateNewAsset.this,
                         BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() - 1)));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImages.get(uriImages.size() - 1));
+                        fileImages.get(fileImages.size() - 1));
+                imagePreviews.add(new ImageHolder(null, uri));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
@@ -532,8 +538,15 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(uriImages.get(i))), file);
-            parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+            for(int j = 0; j < imagePreviews.size(); j++){
+                ImageHolder currImg = imagePreviews.get(j);
+                String lastpath = Uri.fromFile(file).getLastPathSegment();
+                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                    RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                    parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
+                }
+            }
+
         }
         Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
         uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
@@ -635,7 +648,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             if (data.getData() != null) {
 
                 Uri imageUri = data.getData();
-                uriImages.add(imageUri);
+                imagePreviews.add(new ImageHolder(null, imageUri));
                 fileImages.add(new File(imageUri.getEncodedPath()));
 
 
@@ -647,7 +660,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
                         ClipData.Item item = mClipData.getItemAt(i);
                         Uri uri = item.getUri();
-                        uriImages.add(uri);
+                        imagePreviews.add(new ImageHolder(null, uri));
                         fileImages.add(new File(getPath(uri)));
 
                     }
@@ -723,7 +736,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         if (mRbAsset.getRating() == 0) {
             Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
-        } else if (uriImages.size() == 0) {
+        } else if (imagePreviews.size() == 0) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
