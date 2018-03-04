@@ -147,6 +147,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
                 for (int i = 0; i < fileImages.size(); i++){
+                    if(currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
                     if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
