@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -253,7 +255,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String phone = mEtAssetPhone.getText().toString().trim();
 
         //Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
+        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), filePhoto);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
         Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 
@@ -355,25 +357,25 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             ambil foto dari gallery lalu hasilnya akan ada di onActivityResult
         */
 
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
-        openGalleryIntent.setType("image/*");
-        openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        openGalleryIntent.setType("image/jpeg");
         startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_REQUEST);
     }
 
     public String getPath(Uri uri) {
-        String result;
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = uri.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            Log.d("Cursor index : ", " index : " + idx);
-            result = cursor.getString(0);
-            cursor.close();
-        }
-        return result;
+        String[] proj = { MediaStore.Images.Media.DATA };
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        int column_index =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
     }
 
     public void saveUserToServer(JSONObject jsonParams) {
@@ -458,7 +460,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             }
         } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             photoURI = data.getData();
-            Log.d("URI", photoURI.toString() + " ini");
             try {
                 filePhoto = new File(getPath(photoURI));
             } catch (Exception e){
@@ -472,8 +473,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add_new_user:
-//                validator.validate();
-                addNewUser(sessManager.getToken());
+                validator.validate();
                 break;
             case R.id.fab_add_foto:
                 takePhoto();

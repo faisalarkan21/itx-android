@@ -1,8 +1,13 @@
 package com.itx.android.android_itx;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -12,6 +17,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -147,16 +153,19 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
-                    if(currentImage.getmUri() == null) continue;
+                for (int i = 0; i < fileImages.size(); i++) {
+                    if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                    Log.d("filename : " , fileName);
+                    Log.d("Uriname : ", currentUriName);
+                    if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
+
+                Log.d("SIZE ","The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
                 imagePreviews.remove(position);
-                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -204,6 +213,52 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }
+    }
+
+    private void takePhoto() {
+        //show dialog for user to choose between camera or gallery
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Pilih Foto");
+        alertBuilder.setMessage("Ambil foto dari ?");
+        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                takePhotoWithPermission();
+            }
+        });
+        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                pickImagesFromGallery();
+            }
+        });
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
+    }
+
+    private void pickImagesFromGallery() {
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        openGalleryIntent.setType("image/jpeg");
+        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), RC_GALLERY);
+    }
+
+    public String getPath(Uri uri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        int column_index =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
     }
 
     private File createImageFile() throws IOException {
@@ -432,7 +487,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                     ImageHolder currImg = imagePreviews.get(j);
                     String lastpath = Uri.fromFile(file).getLastPathSegment();
                     if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
-                        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
                         parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                     }
                 }
@@ -516,6 +571,39 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_GALLERY && resultCode == Activity.RESULT_OK) {
+            if (data.getClipData() != null) {
+                ClipData mClipData = data.getClipData();
+                for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                    ClipData.Item item = mClipData.getItemAt(i);
+                    Uri uri = item.getUri();
+                    File file = new File(getPath(uri));
+                    imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                    fileImages.add(file);
+
+                }
+            } else {
+                Uri imageUri = data.getData();
+                File file = new File(getPath(imageUri));
+                imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                fileImages.add(file);
+            }
+
+
+            mPreviewAdapter.notifyDataSetChanged();
+
+            Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
+        } else if (requestCode == RC_CAMERA && resultCode == Activity.RESULT_OK) {
+            mPreviewAdapter.notifyDataSetChanged();
+        }
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -543,7 +631,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                 validator.validate();
                 break;
             case R.id.select_image_inventory:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;

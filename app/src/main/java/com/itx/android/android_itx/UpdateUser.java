@@ -2,8 +2,11 @@ package com.itx.android.android_itx;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -402,6 +406,56 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
     }
 
+    private void takePhoto() {
+        //show dialog for user to choose between camera or gallery
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Pilih Foto");
+        alertBuilder.setMessage("Ambil foto dari ?");
+        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                takePhotoWithPermission();
+            }
+        });
+        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                takePhotoFromGallery();
+            }
+        });
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
+    }
+
+    private void takePhotoFromGallery() {
+        /*
+            ambil foto dari gallery lalu hasilnya akan ada di onActivityResult
+        */
+
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        openGalleryIntent.setType("image/*");
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_REQUEST);
+    }
+
+    public String getPath(Uri uri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        int column_index =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        Log.d("THEPATH", "path : " + path);
+        cursor.close();
+        return path;
+    }
+
     public void saveUserToServer(JSONObject jsonParams) {
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
@@ -504,7 +558,11 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             }
         } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             photoURI = data.getData();
-            //filePhoto = new File(getPath(photoURI));
+            try {
+                filePhoto = new File(getPath(photoURI));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             mIvPhoto.setImageURI(photoURI);
         }
     }
@@ -517,7 +575,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                 validator.validate();
                 break;
             case R.id.fab_add_foto:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;

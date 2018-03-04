@@ -1,9 +1,14 @@
 package com.itx.android.android_itx;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.database.Cursor;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
@@ -13,6 +18,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -244,12 +250,15 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                     if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    Log.d("filename : " , fileName);
+                    Log.d("Uriname : ", currentUriName);
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
+
+                Log.d("SIZE ","The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
                 imagePreviews.remove(position);
-                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -585,9 +594,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 File file = fileImages.get(i);
                 for (int j = 0; j < imagePreviews.size(); j++) {
                     ImageHolder currImg = imagePreviews.get(j);
+                    Uri imageUri = currImg.getmUri();
                     String lastpath = Uri.fromFile(file).getLastPathSegment();
-                    if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
-                        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                    if (imageUri != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
+                        //TODO: SHOULD SUPPORT DIFFERENT TYPE OF IMAGE
+                        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
                         parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                     }
                 }
@@ -704,6 +715,23 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    public String getPath(Uri uri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        int column_index =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        Log.d("THEPATH", "path : " + path);
+        cursor.close();
+        return path;
+    }
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -729,6 +757,36 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
                     13, perms);
         }
+    }
+
+    private void takePhoto() {
+        //show dialog for user to choose between camera or gallery
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Pilih Foto");
+        alertBuilder.setMessage("Ambil foto dari ?");
+        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                takePhotoWithPermission();
+            }
+        });
+        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                pickImagesFromGallery();
+            }
+        });
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
+    }
+
+    private void pickImagesFromGallery() {
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        openGalleryIntent.setType("image/jpeg");
+        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_RC);
     }
 
     private void getCurrentLocation() {
@@ -800,7 +858,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 validator.validate();
                 break;
             case R.id.select_image:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;
@@ -873,6 +931,43 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         updateAsset();
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY_RC && resultCode == Activity.RESULT_OK) {
+            if (data.getClipData() != null) {
+                ClipData mClipData = data.getClipData();
+                for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                    ClipData.Item item = mClipData.getItemAt(i);
+                    Uri uri = item.getUri();
+                    File file = new File(getPath(uri));
+                    imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                    fileImages.add(file);
+
+                }
+
+
+            } else {
+                Uri imageUri = data.getData();
+                File file = new File(getPath(imageUri));
+                imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                fileImages.add(file);
+            }
+
+
+            mPreviewAdapter.notifyDataSetChanged();
+
+        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            mPreviewAdapter.notifyDataSetChanged();
+        } else if (requestCode == LOCATION_SETTING_RC && resultCode == RESULT_OK) {
+            LocationSettingsStates settingsStates = LocationSettingsStates.fromIntent(data);
+            if (settingsStates.isNetworkLocationUsable() && settingsStates.isGpsUsable() && settingsStates.isLocationUsable()) {
+                return;
+            }
+        }
     }
 
     @Override

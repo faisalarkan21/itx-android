@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -141,14 +142,18 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
                 for (int i = 0; i < fileImages.size(); i++) {
+                    if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
+                    Log.d("filename : " , fileName);
+                    Log.d("Uriname : ", currentUriName);
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
+
+                Log.d("SIZE ","The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
                 imagePreviews.remove(position);
-                Log.d("DATA IMAGE", "uri ada : " + imagePreviews.size() + " and files :" + fileImages.size());
                 mPreviewAdapter.notifyDataSetChanged();
             }
         });
@@ -199,11 +204,9 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     }
 
     private void pickImagesFromGallery() {
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
-        openGalleryIntent.setType("image/*");
+        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        openGalleryIntent.setType("image/jpeg");
         openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        openGalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        openGalleryIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), RC_GALLERY);
     }
 
@@ -259,21 +262,19 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     }
 
     public String getPath(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        @SuppressWarnings("deprecation")
-        Cursor cursor = managedQuery(uri, projection, null,
-                null, null);
-        if (cursor == null)
-            return null;
-        int column_index = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        if (cursor.moveToFirst()) {
-            String s = cursor.getString(column_index);
-            // cursor.close();
-            return s;
-        }
-        // cursor.close();
-        return null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        int column_index =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
     }
 
     public void prepareFacilitiesData() {
@@ -370,7 +371,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 ImageHolder currImg = imagePreviews.get(j);
                 String lastpath = Uri.fromFile(file).getLastPathSegment();
                 if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
-                    RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
+                    RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
                     parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                 }
             }
@@ -420,7 +421,6 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 (jsonParams).toString());
 
-        Log.d("testJson", body.toString());
         Call<ResponseBody> addInventoryRequest = mInventoryAPIService.createInventoryCategory(body);
 
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
@@ -447,26 +447,24 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_GALLERY && resultCode == Activity.RESULT_OK) {
-            if (data.getData() != null) {
+            if (data.getClipData() != null) {
+                ClipData mClipData = data.getClipData();
+                for (int i = 0; i < mClipData.getItemCount(); i++) {
 
-                Uri imageUri = data.getData();
-                imagePreviews.add(new ImageHolder(null, imageUri));
-                fileImages.add(new File(imageUri.getEncodedPath()));
+                    ClipData.Item item = mClipData.getItemAt(i);
+                    Uri uri = item.getUri();
+                    File file = new File(getPath(uri));
+                    imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                    fileImages.add(file);
 
-            } else {
-                if (data.getClipData() != null) {
-                    ClipData mClipData = data.getClipData();
-                    Log.d("TEST!23", mClipData.getItemCount() + " jumlah");
-                    for (int i = 0; i < mClipData.getItemCount(); i++) {
-
-                        ClipData.Item item = mClipData.getItemAt(i);
-                        Uri uri = item.getUri();
-                        imagePreviews.add(new ImageHolder(null, uri));
-                        fileImages.add(new File(getPath(uri)));
-
-                    }
                 }
+            } else {
+                Uri imageUri = data.getData();
+                File file = new File(getPath(imageUri));
+                imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
+                fileImages.add(file);
             }
+
 
             mPreviewAdapter.notifyDataSetChanged();
 
@@ -524,7 +522,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 validator.validate();
                 break;
             case R.id.select_image_inventory:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;
