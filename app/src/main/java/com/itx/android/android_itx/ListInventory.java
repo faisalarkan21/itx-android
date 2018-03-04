@@ -160,10 +160,6 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                     .into(mImagesAssets);
         }
-
-        prepareUserData();
-
-
     }
 
     private void showLoading() {
@@ -199,7 +195,7 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     private void prepareUserData() {
 
         showLoading();
-        if (mListInventory.size() > 1){
+        if (mListInventory.size() >= 1){
             mListInventory.clear();
             mAdapter.notifyDataSetChanged();
         }

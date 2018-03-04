@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -250,7 +251,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         JsonObject image = jsonObject.get("photo").getAsJsonObject();
 
                         Gson gson = new Gson();
-                        imageFromServer = gson.fromJson(image,Image.class);
+                        imageFromServer = gson.fromJson(image, Image.class);
 
                         if (image != null) {
                             Glide.with(UpdateUser.this)
@@ -268,14 +269,14 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         int selectionPositionCity = spAdapterCity.getPosition(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
                         mSpCity.setSelection(selectionPositionCity);
 
-                        new CountDownTimer(1000, 1000) {
-                            public void onTick(long millisUntilFinished) {
-                            }
-
-                            public void onFinish() {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
                                 progressDialog.dismiss();
                             }
-                        }.start();
+                        }, 3800);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -315,7 +316,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
-        if(photoURI != null){
+        if (photoURI != null) {
 
 //        Upload Photo first then on callback save the new User
             RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
@@ -412,9 +413,9 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                progressDialog.dismiss();
-                if (response.isSuccessful()) {
 
+                if (response.isSuccessful()) {
+                    progressDialog.dismiss();
 
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity

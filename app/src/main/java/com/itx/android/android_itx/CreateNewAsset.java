@@ -630,14 +630,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
                     Call<ResponseBody> res = mAssetService.createAsset(requestBody);
 
-                    new CountDownTimer(1000, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                        }
 
-                        public void onFinish() {
-                            progressDialog.dismiss();
-                        }
-                    }.start();
+                    progressDialog.dismiss();
 
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override

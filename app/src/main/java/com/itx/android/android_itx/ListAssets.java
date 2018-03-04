@@ -105,7 +105,7 @@ public class ListAssets extends AppCompatActivity {
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                     .into(mIvUserImages);
         }
-        prepareUserData();
+
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,13 +135,12 @@ public class ListAssets extends AppCompatActivity {
     private void prepareUserData() {
 
         showLoading();
-        if(mListAsset.size() > 1){
+        if(mListAsset.size() >= 1){
             mListAsset.clear();
             mAdapter.notifyDataSetChanged();
         }
 
-
-        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
+        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());
 
         Call<JsonObject> response = mAssetAPIService.getUserAssets(idUser);
 

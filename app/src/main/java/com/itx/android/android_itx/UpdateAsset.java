@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
@@ -197,6 +198,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         session = new SessionManager(this);
         progressDialog = new ProgressDialog(UpdateAsset.this);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Sedang Menyiapkan Data");
         progressDialog.show();
 
@@ -462,19 +464,14 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
                         updateMapUI();
 
-                        new CountDownTimer(1000, 1000) {
-
-                            public void onTick(long millisUntilFinished) {
-                                // You don't need anything here
-                            }
-
-                            public void onFinish() {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
                                 progressDialog.dismiss();
-
-
                             }
-                        }.start();
-
+                        }, 3800);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -650,8 +647,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         res.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                progressDialog.dismiss();
                                 if (response.isSuccessful()) {
+                                    progressDialog.dismiss();
                                     finish();
                                 }
                             }

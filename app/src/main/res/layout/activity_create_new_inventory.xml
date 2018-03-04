@@ -130,9 +130,10 @@
                     android:id="@+id/et_add_price"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
                     android:hint="Harga"
 
-                    android:inputType="numberDecimal" />
+                 />
 
 
             </android.support.design.widget.TextInputLayout>

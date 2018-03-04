@@ -385,20 +385,15 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         Call<ResponseBody> addUserRequest = mUserService.createUser(body);
 
-        new CountDownTimer(1000, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
 
-            public void onFinish() {
-                progressDialog.dismiss();
-            }
-        }.start();
+
 
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
 
+                    progressDialog.dismiss();
 
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity

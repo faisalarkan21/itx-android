@@ -99,8 +99,6 @@ public class ListUsers extends AppCompatActivity {
 
         recyclerView.setAdapter(uAdapter);
 
-        prepareUserData();
-
     }
 
     private void showLoading(){
@@ -119,7 +117,7 @@ public class ListUsers extends AppCompatActivity {
     private void prepareUserData() {
 
         showLoading();
-        if (userList.size() > 1){
+        if (userList.size() >= 1){
             userList.clear();
             uAdapter.notifyDataSetChanged();
         }
