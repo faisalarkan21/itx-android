@@ -629,13 +629,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
                     Call<ResponseBody> res = mAssetService.createAsset(requestBody);
-
-
-                    progressDialog.dismiss();
-
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            progressDialog.dismiss();
                             if (response.isSuccessful()) {
                                 finish();
                             }
@@ -643,7 +640,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(CreateNewAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                            Toast.makeText(CreateNewAsset.this, "Gagal Membuat asset", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (Exception e) {

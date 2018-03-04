@@ -265,7 +265,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         JSONArray responseJson = new JSONArray(response.body().string());
                         JSONObject images = responseJson.getJSONObject(0);
                         String urlFoto = images.getString("thumbnail");
-                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
 
 
                         JSONObject object0 = new JSONObject();
@@ -391,10 +391,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
-
-                    progressDialog.dismiss();
-
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    startActivity(new Intent(CreateNewUser.this, ListUsers.class));
@@ -404,7 +402,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewUser.this, "Gagal Membuat User", Toast.LENGTH_SHORT).show();
             }
         });
     }

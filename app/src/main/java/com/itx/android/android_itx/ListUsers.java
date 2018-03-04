@@ -49,7 +49,7 @@ public class ListUsers extends AppCompatActivity {
     GoogleApiClient mGoogleApiClient;
     GoogleMap mMap;
 
-    private LatLng mPosMarker = new LatLng(-6.3660756,106.8346144);
+    private LatLng mPosMarker = new LatLng(-6.3660756, 106.8346144);
 
     private MarkerOptions markerOptions;
     private Marker marker;
@@ -64,7 +64,6 @@ public class ListUsers extends AppCompatActivity {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-
 
 
     @Override
@@ -83,10 +82,9 @@ public class ListUsers extends AppCompatActivity {
             }
         });
 
-        uAdapter = new UsersAdapter(userList,this);
+        uAdapter = new UsersAdapter(userList, this);
 
         recyclerView.setHasFixedSize(true);
-
 
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -101,12 +99,12 @@ public class ListUsers extends AppCompatActivity {
 
     }
 
-    private void showLoading(){
+    private void showLoading() {
         mPbListUser.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
     }
 
-    private void hideLoading(){
+    private void hideLoading() {
         mPbListUser.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
     }
@@ -117,7 +115,7 @@ public class ListUsers extends AppCompatActivity {
     private void prepareUserData() {
 
         showLoading();
-        if (userList.size() >= 1){
+        if (userList.size() >= 1) {
             userList.clear();
             uAdapter.notifyDataSetChanged();
         }
@@ -132,7 +130,17 @@ public class ListUsers extends AppCompatActivity {
                     try {
                         JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
 
-                        for (int i=0; i < jsonArray.size() ; i++ ){
+                        if (jsonArray.size() == 0) {
+                            hideLoading();
+                            Toast.makeText(ListUsers.this, "Tidak ada data.",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Pengguna",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+
+                        for (int i = 0; i < jsonArray.size(); i++) {
 
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Log.d("TEST", Data.toString());
@@ -143,15 +151,15 @@ public class ListUsers extends AppCompatActivity {
 
                             user.setAssets(Data.get("totalAssets").getAsString());
 
-                            if(Data.get("phone") != null){
+                            if (Data.get("phone") != null) {
                                 user.setPhone(Data.get("phone").getAsString());
                             }
 
-                            if(Data.get("address").getAsJsonObject().get("address") != null){
+                            if (Data.get("address").getAsJsonObject().get("address") != null) {
                                 user.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
                             }
 
-                            if(Data.get("photo") != null){
+                            if (Data.get("photo") != null) {
                                 user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
                             }
 
@@ -162,14 +170,13 @@ public class ListUsers extends AppCompatActivity {
                         }
 
                         uAdapter.notifyDataSetChanged();
-                        Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
-                                Toast.LENGTH_LONG).show();
+
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(ListUsers.this, "Gagal",
+                    Toast.makeText(ListUsers.this, "Gagal Mengambil Data",
                             Toast.LENGTH_LONG).show();
                 }
 
@@ -195,13 +202,13 @@ public class ListUsers extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.actionbar_menu,menu);
+        menuInflater.inflate(R.menu.actionbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_logout:
                 session.removeToken();
                 startActivity(new Intent(ListUsers.this, Login.class));

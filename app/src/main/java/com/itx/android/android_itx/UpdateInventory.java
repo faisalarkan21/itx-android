@@ -497,8 +497,8 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    Intent i = new Intent(UpdateInventory.this, ListInventory.class);
@@ -511,6 +511,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressDialog.dismiss();
+                Toast.makeText(UpdateInventory.this, "Gagal Membuat Inventory", Toast.LENGTH_SHORT).show();
             }
         });
     }

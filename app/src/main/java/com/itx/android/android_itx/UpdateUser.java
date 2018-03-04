@@ -332,7 +332,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                             JSONArray responseJson = new JSONArray(response.body().string());
                             JSONObject images = responseJson.getJSONObject(0);
 
-                            Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
 
                             JSONObject object0 = new JSONObject();
                             object0.put("firstName", firstName);
@@ -413,10 +413,8 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    progressDialog.dismiss();
-
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    startActivity(new Intent(UpdateUser.this, ListUsers.class));
@@ -427,6 +425,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressDialog.dismiss();
+                Toast.makeText(UpdateUser.this, "Gagal Membuat User", Toast.LENGTH_SHORT).show();
             }
         });
     }

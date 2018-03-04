@@ -426,8 +426,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    startActivity(new Intent(CreateNewInventory.this, ListUsers.class));
@@ -437,7 +437,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewInventory.this, "Gagal Membuat Inventory", Toast.LENGTH_SHORT).show();
             }
         });
     }

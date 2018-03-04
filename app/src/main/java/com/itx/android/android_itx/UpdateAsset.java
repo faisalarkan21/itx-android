@@ -647,8 +647,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         res.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                progressDialog.dismiss();
                                 if (response.isSuccessful()) {
-                                    progressDialog.dismiss();
                                     finish();
                                 }
                             }
@@ -656,7 +656,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                             @Override
                             public void onFailure(Call<ResponseBody> call, Throwable t) {
                                 progressDialog.dismiss();
-                                Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UpdateAsset.this, "Gagal Membuat asset", Toast.LENGTH_SHORT).show();
                             }
                         });
                     } catch (Exception e) {
@@ -849,7 +849,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("new loc click", point.toString());
                 assetLocation = point;
                 Log.d("new loc asset", assetLocation.toString());
-                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
                 getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });
