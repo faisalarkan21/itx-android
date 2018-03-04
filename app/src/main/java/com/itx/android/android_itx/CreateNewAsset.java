@@ -643,15 +643,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                             if (response.isSuccessful()) {
-                                Intent i = new Intent(CreateNewAsset.this, ListAssets.class);
-                                i.putExtra("id", idUser);
-                                i.putExtra("idUser", idUser);
-                                i.putExtra("name", userName);
-                                i.putExtra("address", userAdress);
-                                i.putExtra("phone", phone);
-                                i.putExtra("photo", imagesDetail);
-                                i.putExtra("role", role);
-//                                startActivity(i);
                                 finish();
                             }
                         }

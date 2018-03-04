@@ -201,11 +201,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         progressDialog.show();
 
         idUser = getIntent().getStringExtra("idUser");
-        userAdress = getIntent().getStringExtra("address");
-        userName = getIntent().getStringExtra("name");
-        phone = getIntent().getStringExtra("phone");
-        imagesDetail = getIntent().getStringExtra("photo");
-        role = getIntent().getStringExtra("role");
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -243,8 +238,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
-                    if(currentImage.getmUri() == null) continue;
+                for (int i = 0; i < fileImages.size(); i++) {
+                    if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
@@ -602,7 +597,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             }
             Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
 
-               uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
@@ -658,8 +653,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                                 progressDialog.dismiss();
                                 if (response.isSuccessful()) {
                                     finish();
-
-
                                 }
                             }
 
