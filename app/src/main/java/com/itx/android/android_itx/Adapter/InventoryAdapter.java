@@ -81,7 +81,8 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
 
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
-        holder.inventoryPrice.setText("@ " + RupiahCurrency.toRupiahFormat(invent.getPrice()));
+        holder.inventoryPrice.setText("@ " + RupiahCurrency.toRupiahFormat(invent.getPrice()) + ",00");
+
 
         holder.ivInventoptions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +114,6 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
     }
 
 
-
     public void deleteUser(Inventory invent) {
 
         session = new SessionManager(mContext);
@@ -137,24 +137,15 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
                     @Override
                     public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
                         if (rawResponse.isSuccessful()) {
+                            progressDialog.dismiss();
 
-                            new CountDownTimer(800, 800) {
+                            Toast.makeText(mContext, "Berhasil Mengapus",
+                                    Toast.LENGTH_LONG).show();
 
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
+                            ((Activity) mContext).finish();
+                            mContext.startActivity(((Activity) mContext).getIntent());
+                            progressDialog.dismiss();
 
-                                public void onFinish() {
-                                    progressDialog.dismiss();
-
-                                    Toast.makeText(mContext, "Berhasil Mengapus",
-                                            Toast.LENGTH_LONG).show();
-
-                                    ((Activity) mContext).finish();
-                                    mContext.startActivity(((Activity) mContext).getIntent());
-                                    progressDialog.dismiss();
-                                }
-                            }.start();
                         } else {
                             Toast.makeText(mContext, "Gagal",
                                     Toast.LENGTH_LONG).show();

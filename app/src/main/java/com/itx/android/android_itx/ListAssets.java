@@ -100,13 +100,12 @@ public class ListAssets extends AppCompatActivity {
         mUserAddress.setText(userAdress);
         mUserTelp.setText(phone);
 
-
         if (images != null){
             Glide.with(ListAssets.this)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                     .into(mIvUserImages);
         }
-        prepareUserData();
+
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,13 +135,12 @@ public class ListAssets extends AppCompatActivity {
     private void prepareUserData() {
 
         showLoading();
-        if(mListAsset.size() > 1){
+        if(mListAsset.size() >= 1){
             mListAsset.clear();
             mAdapter.notifyDataSetChanged();
         }
 
-
-        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
+        mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());
 
         Call<JsonObject> response = mAssetAPIService.getUserAssets(idUser);
 
@@ -158,6 +156,10 @@ public class ListAssets extends AppCompatActivity {
                             hideLoading();
                             Toast.makeText(ListAssets.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
+                        }else{
+
+                            Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
+                                    Toast.LENGTH_SHORT).show();
                         }
 
                         for (int i = 0; i < jsonArray.size(); i++) {
@@ -185,13 +187,12 @@ public class ListAssets extends AppCompatActivity {
                         }
 
                         mAdapter.notifyDataSetChanged();
-                        Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
-                                Toast.LENGTH_LONG).show();
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(ListAssets.this, "Gagal",
+                    Toast.makeText(ListAssets.this, "Gagal Mengambil Data",
                             Toast.LENGTH_LONG).show();
                 }
                 hideLoading();

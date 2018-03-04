@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
@@ -172,6 +173,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         mRvPreviewImageInvent.setAdapter(mPreviewAdapter);
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
         progressDialog = new ProgressDialog(UpdateInventory.this);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Menyiapkan Data");
         progressDialog.show();
 
@@ -316,7 +318,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                         mEtInventDeskripsi.setText(jsonObject.get("description").getAsString());
                         mEtInventSpace.setText(jsonObject.get("space").getAsString());
                         mEtInventStock.setText(jsonObject.get("stock").getAsString());
-                        mEtAddPrice.setText(RupiahCurrency.toRupiahFormat(jsonObject.get("price").getAsDouble()));
+                        mEtAddPrice.setText(jsonObject.get("price").getAsString());
 
                         JsonArray images = jsonObject.get("images").getAsJsonArray();
                         for(int i = 0; i < images.size(); i++){
@@ -327,31 +329,30 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
                         final JsonArray jsonArray = jsonObject.get("facilities").getAsJsonArray();
 
+                        if (checkFacilities != null) {
+                            for (int z = 0; z < jsonArray.size(); z++) {
+                                final JsonObject Data = jsonArray.get(z).getAsJsonObject();
+                                Log.d("KenaBerepa", Data.get("name").getAsString());
 
-                        for (int z = 0; z < jsonArray.size(); z++) {
-                            final JsonObject Data = jsonArray.get(z).getAsJsonObject();
-                            Log.d("KenaBerepa", Data.get("name").getAsString());
+                                for (int i = 0; i < checkFacilities.length; i++) {
 
-                            for (int i = 0; i < checkFacilities.length; i++) {
+                                    if (checkFacilities[i].getText().toString().equals(jsonArray.get(z).getAsJsonObject().get("name").getAsString())) {
+                                        checkFacilities[i].setChecked(true);
 
-                                if (checkFacilities[i].getText().toString().equals(jsonArray.get(z).getAsJsonObject().get("name").getAsString())) {
-                                    checkFacilities[i].setChecked(true);
-
+                                    }
                                 }
                             }
                         }
 
-                        new CountDownTimer(1000, 1000) {
-                            public void onTick(long millisUntilFinished) {
-                            }
 
-                            public void onFinish() {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
                                 progressDialog.dismiss();
                             }
-                        }.start();
-
-
-
+                        }, 3800);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -371,6 +372,9 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         });
 
 
+
+
+
     }
 
 
@@ -378,6 +382,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
         progressDialog = new ProgressDialog(UpdateInventory.this);
         progressDialog.setMessage("Menyimpan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
         final String inventoryName = mEtInventName.getText().toString().trim();
@@ -494,7 +499,6 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 progressDialog.dismiss();
                 if (response.isSuccessful()) {
-
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    Intent i = new Intent(UpdateInventory.this, ListInventory.class);
@@ -507,6 +511,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressDialog.dismiss();
+                Toast.makeText(UpdateInventory.this, "Gagal Membuat Inventory", Toast.LENGTH_SHORT).show();
             }
         });
     }

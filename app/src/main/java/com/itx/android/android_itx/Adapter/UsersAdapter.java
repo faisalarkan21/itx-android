@@ -108,8 +108,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
                 listAsset.putExtra("phone", user.getPhone());
                 listAsset.putExtra("photo", user.getPhoto());
                 listAsset.putExtra("role", user.getRole());
-
                 mContext.startActivity(listAsset);
+
+
 
 
             }
@@ -140,24 +141,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
                     @Override
                     public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
                         if (rawResponse.isSuccessful()) {
+                            progressDialog.dismiss();
 
-                            new CountDownTimer(800, 800) {
+                            Toast.makeText(mContext, "Berhasil Mengapus",
+                                    Toast.LENGTH_LONG).show();
 
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
+                            ((Activity) mContext).finish();
+                            mContext.startActivity(((Activity) mContext).getIntent());
+                            progressDialog.dismiss();
 
-                                public void onFinish() {
-                                    progressDialog.dismiss();
-
-                                    Toast.makeText(mContext, "Berhasil Mengapus",
-                                            Toast.LENGTH_LONG).show();
-
-                                    ((Activity) mContext).finish();
-                                    mContext.startActivity(((Activity) mContext).getIntent());
-                                    progressDialog.dismiss();
-                                }
-                            }.start();
                         } else {
                             Toast.makeText(mContext, "Gagal",
                                     Toast.LENGTH_LONG).show();

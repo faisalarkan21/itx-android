@@ -629,36 +629,19 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                     RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
 
                     Call<ResponseBody> res = mAssetService.createAsset(requestBody);
-
-                    new CountDownTimer(1000, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        public void onFinish() {
-                            progressDialog.dismiss();
-                        }
-                    }.start();
-
                     res.enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            progressDialog.dismiss();
                             if (response.isSuccessful()) {
-                                Intent i = new Intent(CreateNewAsset.this, ListAssets.class);
-                                i.putExtra("id", idUser);
-                                i.putExtra("idUser", idUser);
-                                i.putExtra("name", userName);
-                                i.putExtra("address", userAdress);
-                                i.putExtra("phone", phone);
-                                i.putExtra("photo", imagesDetail);
-                                i.putExtra("role", role);
-//                                startActivity(i);
                                 finish();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(CreateNewAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                            Toast.makeText(CreateNewAsset.this, "Gagal Membuat asset", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (Exception e) {

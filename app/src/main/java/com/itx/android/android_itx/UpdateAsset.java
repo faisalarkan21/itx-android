@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
@@ -197,15 +198,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         session = new SessionManager(this);
         progressDialog = new ProgressDialog(UpdateAsset.this);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Sedang Menyiapkan Data");
         progressDialog.show();
 
         idUser = getIntent().getStringExtra("idUser");
-        userAdress = getIntent().getStringExtra("address");
-        userName = getIntent().getStringExtra("name");
-        phone = getIntent().getStringExtra("phone");
-        imagesDetail = getIntent().getStringExtra("photo");
-        role = getIntent().getStringExtra("role");
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -243,8 +240,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
-                    if(currentImage.getmUri() == null) continue;
+                for (int i = 0; i < fileImages.size(); i++) {
+                    if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
@@ -467,19 +464,14 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
                         updateMapUI();
 
-                        new CountDownTimer(1000, 1000) {
-
-                            public void onTick(long millisUntilFinished) {
-                                // You don't need anything here
-                            }
-
-                            public void onFinish() {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
                                 progressDialog.dismiss();
-
-
                             }
-                        }.start();
-
+                        }, 3800);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -602,7 +594,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             }
             Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
 
-               uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
@@ -658,15 +650,13 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                                 progressDialog.dismiss();
                                 if (response.isSuccessful()) {
                                     finish();
-
-
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<ResponseBody> call, Throwable t) {
                                 progressDialog.dismiss();
-                                Toast.makeText(UpdateAsset.this, "Gagal buat asset", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UpdateAsset.this, "Gagal Membuat asset", Toast.LENGTH_SHORT).show();
                             }
                         });
                     } catch (Exception e) {
@@ -859,7 +849,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("new loc click", point.toString());
                 assetLocation = point;
                 Log.d("new loc asset", assetLocation.toString());
-                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
                 getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
             }
         });

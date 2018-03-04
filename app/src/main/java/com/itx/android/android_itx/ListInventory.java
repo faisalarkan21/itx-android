@@ -160,10 +160,6 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                     .into(mImagesAssets);
         }
-
-        prepareUserData();
-
-
     }
 
     private void showLoading() {
@@ -199,11 +195,10 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     private void prepareUserData() {
 
         showLoading();
-        if (mListInventory.size() > 1){
+        if (mListInventory.size() >= 1) {
             mListInventory.clear();
             mAdapter.notifyDataSetChanged();
         }
-
 
 
         Call<JsonObject> response = mInventoryAPIService.getUserInventories(idAsset);
@@ -224,6 +219,9 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
                             hideLoading();
                             Toast.makeText(ListInventory.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
+                                    Toast.LENGTH_SHORT).show();
                         }
 
                         for (int i = 0; i < jsonArray.size(); i++) {
@@ -259,13 +257,12 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
 
                         mAdapter.notifyDataSetChanged();
 
-                        Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
-                                Toast.LENGTH_LONG).show();
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(ListInventory.this, "Gagal",
+                    Toast.makeText(ListInventory.this, "Gagal Mengambil Data",
                             Toast.LENGTH_LONG).show();
                 }
             }

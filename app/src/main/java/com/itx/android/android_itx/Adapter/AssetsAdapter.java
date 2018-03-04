@@ -63,7 +63,6 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     @Override
     public void onBindViewHolder(final AssetsViewHolder holder, int position) {
         final Assets currentAsset = mListAssets.get(position);
-        final Users user = new Users();
         holder.mTvAssetName.setText(currentAsset.getName());
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(Math.round(currentAsset.getRating()));
@@ -87,12 +86,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                             case R.id.menu_edit:
                                 Intent updateAsset = new Intent(mContext, UpdateAsset.class);
                                 updateAsset.putExtra("id", currentAsset.getId());
-                                updateAsset.putExtra("idUser", user.getIdUser());
-                                updateAsset.putExtra("name", user.getFullName());
-                                updateAsset.putExtra("role", user.getRole());
-
                                 mContext.startActivity(updateAsset);
-                                ((Activity) mContext).finish();
                                 break;
                             case R.id.menu_delete:
                                 deleteUser(currentAsset);
@@ -104,7 +98,6 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                 popup.show();
             }
         });
-
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +117,6 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
             }
         });
     }
-
 
 
     public void deleteUser(Assets asset) {
@@ -149,24 +141,15 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                     @Override
                     public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
                         if (rawResponse.isSuccessful()) {
+                            progressDialog.dismiss();
 
-                            new CountDownTimer(800, 800) {
+                            Toast.makeText(mContext, "Berhasil Mengapus",
+                                    Toast.LENGTH_LONG).show();
 
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
+                            ((Activity) mContext).finish();
+                            mContext.startActivity(((Activity) mContext).getIntent());
+                            progressDialog.dismiss();
 
-                                public void onFinish() {
-                                    progressDialog.dismiss();
-
-                                    Toast.makeText(mContext, "Berhasil Mengapus",
-                                            Toast.LENGTH_LONG).show();
-
-                                    ((Activity) mContext).finish();
-                                    mContext.startActivity(((Activity) mContext).getIntent());
-                                    progressDialog.dismiss();
-                                }
-                            }.start();
                         } else {
                             Toast.makeText(mContext, "Gagal",
                                     Toast.LENGTH_LONG).show();

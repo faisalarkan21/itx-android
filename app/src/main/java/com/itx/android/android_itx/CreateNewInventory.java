@@ -117,7 +117,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     @BindView(R.id.et_add_price)
     EditText mEtAddPrice;
 
-    CheckBox [] checkFacilities;
+    CheckBox[] checkFacilities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,10 +140,10 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             @Override
             public void deleteCurrentPreviewImage(int position) {
                 ImageHolder currentImage = imagePreviews.get(position);
-                for (int i = 0; i < fileImages.size(); i++){
+                for (int i = 0; i < fileImages.size(); i++) {
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    if(currentImage.getmUri() != null && fileName.equals(currentUriName)){
+                    if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
@@ -164,7 +164,9 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
         mRvPreviewImageInvent.setAdapter(mPreviewAdapter);
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
+
         progressDialog = new ProgressDialog(CreateNewInventory.this);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Menyiapkan Data");
         progressDialog.show();
 
@@ -284,7 +286,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 if (rawResponse.isSuccessful()) {
                     try {
                         final JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
-                        checkFacilities= new CheckBox[jsonArray.size()];
+                        checkFacilities = new CheckBox[jsonArray.size()];
                         for (int i = 0; i < jsonArray.size(); i++) {
 
                             final JsonObject Data = jsonArray.get(i).getAsJsonObject();
@@ -297,14 +299,9 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                             checkFacilities[i].setTextColor(Color.BLACK);
                             layoutFacilities.addView(checkFacilities[i]);
 
-                            new CountDownTimer(1000, 1000) {
-                                public void onTick(long millisUntilFinished) {
-                                }
 
-                                public void onFinish() {
-                                    progressDialog.dismiss();
-                                }
-                            }.start();
+                            progressDialog.dismiss();
+
 
                             checkFacilities[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
@@ -354,6 +351,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     public void uploadImagesToServer() {
 
         progressDialog = new ProgressDialog(CreateNewInventory.this);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Menyimpan Data");
         progressDialog.show();
 
@@ -368,10 +366,10 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
             File file = fileImages.get(i);
-            for(int j = 0; j < imagePreviews.size(); j++){
+            for (int j = 0; j < imagePreviews.size(); j++) {
                 ImageHolder currImg = imagePreviews.get(j);
                 String lastpath = Uri.fromFile(file).getLastPathSegment();
-                if(currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)){
+                if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
                     RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(currImg.getmUri())), file);
                     parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                 }
@@ -428,8 +426,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         addInventoryRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
-                    progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
 //                    startActivity(new Intent(CreateNewInventory.this, ListUsers.class));
@@ -439,7 +437,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewInventory.this, "Gagal Membuat Inventory", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -482,11 +481,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 
-
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
-
-
 
 
     @Override
