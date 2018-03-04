@@ -90,7 +90,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener {
+public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
     private final static int GALLERY_RC = 299;
     private final static int LOCATION_SETTING_RC = 122;
@@ -679,6 +679,13 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         if (requestCode == 13) {
             takePhotoFromCamera();
         } else if (requestCode == 12) {
@@ -690,8 +697,11 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                 mMap.setMyLocationEnabled(true);
             }
         }
+    }
 
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+
     }
 
     @Override
@@ -717,6 +727,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                         fileImages.add(new File(getPath(uri)));
 
                     }
+
+                    Log.d("TOTAL", "Uri : " + imagePreviews.size() + " files: " + fileImages.size());
                 }
             }
 
@@ -824,10 +836,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                 validator.validate();
                 break;
             case R.id.select_image:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;
         }
     }
+
+
 }

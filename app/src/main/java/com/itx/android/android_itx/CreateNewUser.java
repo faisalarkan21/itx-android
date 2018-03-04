@@ -48,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -361,21 +362,18 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     public String getPath(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        @SuppressWarnings("deprecation")
-        Cursor cursor = managedQuery(uri, projection, null,
-                null, null);
-        if (cursor == null)
-            return null;
-        int column_index = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        if (cursor.moveToFirst()) {
-            String s = cursor.getString(column_index);
-            // cursor.close();
-            return s;
+        String result;
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = uri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            Log.d("Cursor index : ", " index : " + idx);
+            result = cursor.getString(0);
+            cursor.close();
         }
-        // cursor.close();
-        return null;
+        return result;
     }
 
     public void saveUserToServer(JSONObject jsonParams) {
@@ -466,7 +464,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             }
         } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             photoURI = data.getData();
-            filePhoto = new File(getPath(photoURI));
+            Log.d("URI", photoURI.toString() + " ini");
+            try {
+                filePhoto = new File(getPath(photoURI));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             mIvPhoto.setImageURI(photoURI);
         }
     }
@@ -475,10 +478,11 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add_new_user:
-                validator.validate();
+//                validator.validate();
+                addNewUser(sessManager.getToken());
                 break;
             case R.id.fab_add_foto:
-                takePhotoWithPermission();
+                takePhoto();
                 break;
             default:
                 break;
