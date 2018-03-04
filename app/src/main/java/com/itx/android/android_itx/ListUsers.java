@@ -87,7 +87,7 @@ public class ListUsers extends AppCompatActivity {
 
         recyclerView.setHasFixedSize(true);
 
-        showLoading();
+
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
@@ -118,12 +118,18 @@ public class ListUsers extends AppCompatActivity {
      */
     private void prepareUserData() {
 
+        showLoading();
+        if (userList.size() > 1){
+            userList.clear();
+            uAdapter.notifyDataSetChanged();
+        }
         mListUsersAPIService = ApiUtils.getListUsersService(session.getToken());
         Call<JsonObject> response = mListUsersAPIService.getAUsers();
 
         response.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+                hideLoading();
                 if (rawResponse.isSuccessful()) {
                     try {
                         JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
@@ -154,20 +160,10 @@ public class ListUsers extends AppCompatActivity {
 
                             userList.add(user);
 
-                            new CountDownTimer(1000, 1000) {
-
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
-
-                                public void onFinish() {
-                                    uAdapter.notifyDataSetChanged();
-                                    hideLoading();
-                                }
-                            }.start();
-
 
                         }
+
+                        uAdapter.notifyDataSetChanged();
                         Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
                                 Toast.LENGTH_LONG).show();
 
@@ -183,13 +179,19 @@ public class ListUsers extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable throwable) {
-
+                hideLoading();
                 Toast.makeText(ListUsers.this, throwable.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        prepareUserData();
     }
 
     @Override

@@ -59,19 +59,25 @@
             android:name=".ListInventory"
             android:label="List Inventory" />
         <activity android:label="New User" android:name=".CreateNewUser"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListUsers"/>
         <activity android:label="New Asset" android:name=".CreateNewAsset"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListAssets"/>
         <activity android:label="New Inventory" android:name=".CreateNewInventory"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListInventory"/>
 
         <activity android:label="Update User" android:name=".UpdateUser"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListUsers"/>
 
         <activity android:label="Update Asset" android:name=".UpdateAsset"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListAssets"/>
 
         <activity android:label="Update Inventory" android:name=".UpdateInventory"
+            android:launchMode="singleTop"
             android:parentActivityName=".ListInventory"/>
     </application>
 

@@ -63,6 +63,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     @Override
     public void onBindViewHolder(final AssetsViewHolder holder, int position) {
         final Assets currentAsset = mListAssets.get(position);
+        final Users user = new Users();
         holder.mTvAssetName.setText(currentAsset.getName());
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(Math.round(currentAsset.getRating()));
@@ -86,6 +87,10 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                             case R.id.menu_edit:
                                 Intent updateAsset = new Intent(mContext, UpdateAsset.class);
                                 updateAsset.putExtra("id", currentAsset.getId());
+                                updateAsset.putExtra("idUser", user.getIdUser());
+                                updateAsset.putExtra("name", user.getFullName());
+                                updateAsset.putExtra("role", user.getRole());
+
                                 mContext.startActivity(updateAsset);
                                 ((Activity) mContext).finish();
                                 break;

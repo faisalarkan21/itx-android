@@ -18,16 +18,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Entity.Image;
 import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
@@ -67,7 +71,7 @@ import retrofit2.Response;
  * Created by faisal on 3/1/18.
  */
 
-public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, TextWatcher {
+public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
@@ -77,11 +81,16 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     private SessionManager session;
     private File filePhoto;
     private Uri photoURI;
+    private Image imageFromServer;
 
     UsersService mUserService;
     APIService mApiService;
 
     String mCurrentPhotoPath;
+
+    ArrayAdapter spAdapterCity;
+    ArrayAdapter spAdapterProvince;
+    String chosenCity, chosenProvince;
 
     Validator validator;
     String idUser;
@@ -116,17 +125,15 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     @BindView(R.id.et_add_user_address)
     EditText mEtAddress;
 
-    @NotEmpty
-    @BindView(R.id.et_add_user_city)
-    AutoCompleteTextView mAcCity;
+    @BindView(R.id.sp_add_user_city)
+    Spinner mSpCity;
 
     @NotEmpty
     @BindView(R.id.et_add_user_postal)
     EditText mEtPostalCode;
 
-    @NotEmpty
-    @BindView(R.id.et_add_user_province)
-    AutoCompleteTextView mAcProvince;
+    @BindView(R.id.sp_add_user_province)
+    Spinner mSpProvince;
 
     @NotEmpty
     @BindView(R.id.btn_add_new_user)
@@ -156,13 +163,65 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
         progressDialog = new ProgressDialog(UpdateUser.this);
         progressDialog.setMessage("Menyiapkan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
-        setAutoComplete();
         prepareUserData();
+
     }
 
 
+    public void setProvince(final String initProvince) {
+
+        String country[] = {"Indonesia"};
+
+        ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, country);
+
+        mAcCountry.setAdapter(adapterCountry);
+        mAcCountry.setThreshold(1);
+
+        spAdapterProvince = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayProvicesJson());
+        mSpProvince.setAdapter(spAdapterProvince);
+
+        mSpProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenProvince = adapterView.getItemAtPosition(i).toString();
+
+                if (!adapterView.getItemAtPosition(i).toString().equals(initProvince)) {
+                    setCitybyProvince(chosenProvince);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+    }
+
+
+    public void setCitybyProvince(String provinceName) {
+
+        spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                completeUtils.getArrayCityJson(provinceName));
+        mSpCity.setAdapter(spAdapterCity);
+
+        mSpCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                chosenCity = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                chosenCity = null;
+            }
+        });
+
+    }
 
     /**
      * Prepares sample data to provide data set to adapter
@@ -185,18 +244,29 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                         mEtNoKTP.setText(jsonObject.get("ktp").getAsString());
                         mEtEmail.setText(jsonObject.get("email").getAsString());
                         mEtAddress.setText(jsonObject.get("address").getAsJsonObject().get("address").getAsString());
-                        mAcCity.setText(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
                         mEtPostalCode.setText(jsonObject.get("address").getAsJsonObject().get("postalCode").getAsString());
-                        mAcProvince.setText(jsonObject.get("address").getAsJsonObject().get("province").getAsString());
                         mAcCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
                         mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
-                        String images  = jsonObject.get("photo").getAsJsonObject().get("thumbnail").getAsString();
+                        JsonObject image = jsonObject.get("photo").getAsJsonObject();
 
-                        if (images != null){
+                        Gson gson = new Gson();
+                        imageFromServer = gson.fromJson(image,Image.class);
+
+                        if (image != null) {
                             Glide.with(UpdateUser.this)
-                                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                                    .load(ApiUtils.BASE_URL_USERS_IMAGE + imageFromServer.getmThumbnail())
                                     .into(mIvPhoto);
                         }
+
+                        String selectedValueProv = jsonObject.get("address").getAsJsonObject().get("province").getAsString();
+                        setProvince(selectedValueProv);
+
+                        int selectionPositionProv = spAdapterProvince.getPosition(selectedValueProv);
+                        mSpProvince.setSelection(selectionPositionProv);
+                        setCitybyProvince(selectedValueProv);
+
+                        int selectionPositionCity = spAdapterCity.getPosition(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
+                        mSpCity.setSelection(selectionPositionCity);
 
                         new CountDownTimer(1000, 1000) {
                             public void onTick(long millisUntilFinished) {
@@ -207,8 +277,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                             }
                         }.start();
 
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -216,7 +284,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                     Toast.makeText(UpdateUser.this, "Gagal",
                             Toast.LENGTH_LONG).show();
                 }
-
             }
 
             @Override
@@ -229,6 +296,13 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     }
 
     private void updateUser(String token) {
+
+        progressDialog = new ProgressDialog(UpdateUser.this);
+        progressDialog.setMessage("Menyimpan Data");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
 
@@ -237,82 +311,93 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         final String email = mEtEmail.getText().toString().trim();
         final String noKTP = mEtNoKTP.getText().toString().trim();
         final String address = mEtAddress.getText().toString().trim();
-        final String city = mAcCity.getText().toString().trim();
         final String postal = mEtPostalCode.getText().toString().trim();
-        final String province = mAcProvince.getText().toString().trim();
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
-        Toast.makeText(this, "Sedang membuat User", Toast.LENGTH_SHORT).show();
+        if(photoURI != null){
+
 //        Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
-        MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
-        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
+            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
+            MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
+            Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d(TAG, response.body().toString());
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray responseJson = new JSONArray(response.body().string());
-                        JSONObject images = responseJson.getJSONObject(0);
-                        String urlFoto = images.getString("thumbnail");
-                        Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG, response.body().toString());
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONArray responseJson = new JSONArray(response.body().string());
+                            JSONObject images = responseJson.getJSONObject(0);
 
+                            Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
 
-                        JSONObject object0 = new JSONObject();
-                        object0.put("firstName", firstName);
-                        object0.put("lastName", lastName);
-                        object0.put("ktp", noKTP);
-                        object0.put("email", email);
-                        object0.put("phone", phone);
+                            JSONObject object0 = new JSONObject();
+                            object0.put("firstName", firstName);
+                            object0.put("lastName", lastName);
+                            object0.put("ktp", noKTP);
+                            object0.put("email", email);
+                            object0.put("phone", phone);
 
-                        JSONObject location = new JSONObject();
-                        location.put("address", address);
-                        location.put("province", province);
-                        location.put("city", city);
-                        location.put("postalCode", postal);
-                        location.put("country", country);
+                            JSONObject location = new JSONObject();
+                            location.put("address", address);
+                            location.put("province", chosenProvince);
+                            location.put("city", chosenCity);
+                            location.put("postalCode", postal);
+                            location.put("country", country);
 
-                        JSONObject object = new JSONObject();
-                        object.put("data", object0);
-                        object.put("location", location);
-                        object.put("images", images);
+                            JSONObject object = new JSONObject();
+                            object.put("data", object0);
+                            object.put("location", location);
+                            object.put("images", images);
 
-                        saveUserToServer(object);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                            saveUserToServer(object);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(UpdateUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
+            });
+        } else {
+            try {
+
+                Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
+
+                Gson gson = new Gson();
+
+                String image = gson.toJson(imageFromServer);
+                JSONObject object0 = new JSONObject();
+                object0.put("firstName", firstName);
+                object0.put("lastName", lastName);
+                object0.put("ktp", noKTP);
+                object0.put("email", email);
+                object0.put("phone", phone);
+
+                JSONObject location = new JSONObject();
+                location.put("address", address);
+                location.put("province", chosenProvince);
+                location.put("city", chosenCity);
+                location.put("postalCode", postal);
+                location.put("country", country);
+
+                JSONObject object = new JSONObject();
+                object.put("data", object0);
+                object.put("location", location);
+                object.put("images", new JSONObject(image));
+
+                saveUserToServer(object);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(UpdateUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
-
-    public void setAutoComplete() {
-
-        ArrayAdapter<String> adapterProvince = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, completeUtils.getArrayProvicesJson());
-
-        String country[] = {"Indonesia"};
-
-        ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, country);
-
-        mAcProvince.setAdapter(adapterProvince);
-        mAcProvince.setThreshold(1);
-
-        mAcCity.addTextChangedListener(this);
-
-        mAcCountry.setAdapter(adapterCountry);
-        mAcCountry.setThreshold(1);
+        }
 
     }
 
@@ -323,20 +408,24 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
         Call<ResponseBody> addUserRequest = mUserService.updateUser(idUser, body);
 
+
         addUserRequest.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progressDialog.dismiss();
                 if (response.isSuccessful()) {
+
+
                     Log.d(TAG, response.body().toString());
                     //success then send back the user to the list user and destroy this activity
-                    startActivity(new Intent(UpdateUser.this, ListUsers.class));
+//                    startActivity(new Intent(UpdateUser.this, ListUsers.class));
                     finish();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                progressDialog.dismiss();
             }
         });
     }
@@ -402,22 +491,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<String>
-                (UpdateUser.this, android.R.layout.select_dialog_item, completeUtils.getArrayCityJson(mAcProvince.getText().toString()));
-        mAcCity.setAdapter(adapterCity);
-        mAcCity.setThreshold(1);
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -436,10 +509,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         }
     }
 
-    @Override
-    public void afterTextChanged(Editable s) {
-
-    }
 
     @Override
     public void onClick(View v) {
@@ -458,11 +527,14 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onValidationSucceeded() {
 
-//        if (photoURI == null) {
-//            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-        Toast.makeText(this, "Sedang Membuat User", Toast.LENGTH_SHORT).show();
+        if (photoURI == null && imageFromServer == null) {
+            Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (mSpProvince.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Provinsi terlebih dahulu", Toast.LENGTH_SHORT).show();
+        } else if (mSpCity.getSelectedItem() == null) {
+            Toast.makeText(this, "Pilih Kota terlebih dahulu", Toast.LENGTH_SHORT).show();
+        }
         updateUser(session.getToken());
 
     }

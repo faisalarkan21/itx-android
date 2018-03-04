@@ -432,7 +432,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                     progressDialog.dismiss();
                     Log.d("Post", response.body().toString());
                     //success then send back the user to the list user and destroy this activity
-                    startActivity(new Intent(CreateNewInventory.this, ListUsers.class));
+//                    startActivity(new Intent(CreateNewInventory.this, ListUsers.class));
                     finish();
                 }
             }

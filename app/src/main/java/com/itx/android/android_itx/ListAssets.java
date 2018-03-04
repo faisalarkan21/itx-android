@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
 import com.itx.android.android_itx.Entity.Assets;
+import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -87,6 +88,24 @@ public class ListAssets extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         mRecyclerView.setAdapter(mAdapter);
+        idUser = getIntent().getStringExtra("id");
+        userAdress = getIntent().getStringExtra("address");
+        userName = getIntent().getStringExtra("name");
+        phone = getIntent().getStringExtra("phone");
+        images = getIntent().getStringExtra("photo");
+        role = getIntent().getStringExtra("role");
+
+        mUserName.setText(userName);
+        mUserRole.setText(role);
+        mUserAddress.setText(userAdress);
+        mUserTelp.setText(phone);
+
+
+        if (images != null){
+            Glide.with(ListAssets.this)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
+                    .into(mIvUserImages);
+        }
         prepareUserData();
         mBtnAddAsset.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,26 +135,12 @@ public class ListAssets extends AppCompatActivity {
 
     private void prepareUserData() {
 
-
-
-        idUser = getIntent().getStringExtra("id");
-        userAdress = getIntent().getStringExtra("address");
-        userName = getIntent().getStringExtra("name");
-        phone = getIntent().getStringExtra("phone");
-        images = getIntent().getStringExtra("photo");
-        role = getIntent().getStringExtra("role");
-
-        mUserName.setText(userName);
-        mUserRole.setText(role);
-        mUserAddress.setText(userAdress);
-        mUserTelp.setText(phone);
-
-
-        if (images != null){
-            Glide.with(ListAssets.this)
-                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
-                    .into(mIvUserImages);
+        showLoading();
+        if(mListAsset.size() > 1){
+            mListAsset.clear();
+            mAdapter.notifyDataSetChanged();
         }
+
 
         mAssetAPIService = ApiUtils.getListAssetsService(session.getToken());/**/
 
@@ -169,7 +174,6 @@ public class ListAssets extends AppCompatActivity {
                                 assets.setImages(DataImageAseets.get("thumbnail").getAsString());
                             }
 
-
                             assets.setPhone(Data.get("phone").getAsString());
                             assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             if (Data.get("rating") != null) {
@@ -181,7 +185,6 @@ public class ListAssets extends AppCompatActivity {
                         }
 
                         mAdapter.notifyDataSetChanged();
-                        hideLoading();
                         Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
                                 Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
@@ -191,11 +194,12 @@ public class ListAssets extends AppCompatActivity {
                     Toast.makeText(ListAssets.this, "Gagal",
                             Toast.LENGTH_LONG).show();
                 }
+                hideLoading();
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable throwable) {
-
+                hideLoading();
                 Toast.makeText(ListAssets.this, throwable.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
@@ -203,4 +207,9 @@ public class ListAssets extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        prepareUserData();
+    }
 }

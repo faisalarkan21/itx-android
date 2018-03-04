@@ -85,7 +85,8 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     @BindView(R.id.layoutDots_asset_details)
     LinearLayout mLlDotsAssetImages;
 
-    @BindView(R.id.pb_asset_details) ProgressBar mPbAssetImages;
+    @BindView(R.id.pb_asset_details)
+    ProgressBar mPbAssetImages;
 
     InventoryService mInventoryAPIService;
     SessionManager session;
@@ -93,7 +94,6 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     private int currentPage = 0;
 
     private String idAsset;
-
 
 
     private InventoryAdapter mAdapter;
@@ -141,43 +141,6 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
             }
         });
 
-        prepareUserData();
-
-
-    }
-
-    private void showLoading(){
-        mPbListInvent.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.INVISIBLE);
-    }
-
-    private void hideLoading(){
-        mPbListInvent.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private void addBottomDots(int currentPage){
-        dots = new TextView[mAssetImages.size()];
-
-        int colosActive = ContextCompat.getColor(this, R.color.dot_active);
-        int colorInactive = ContextCompat.getColor(this, R.color.dot_inactive);
-
-        mLlDotsAssetImages.removeAllViews();
-        for(int i = 0;i < dots.length;i++){
-            dots[i] = new TextView(this);
-            dots[i].setText(Html.fromHtml("&#8226;"));
-            dots[i].setTextSize(35);
-            dots[i].setTextColor(colorInactive);
-            mLlDotsAssetImages.addView(dots[i]);
-        }
-
-        if(dots.length > 0){
-            dots[currentPage].setTextColor(colosActive);
-        }
-    }
-
-    private void prepareUserData() {
-
         String idAsset = getIntent().getStringExtra("idAsset");
         String assetAdress = getIntent().getStringExtra("address");
         String assetName = getIntent().getStringExtra("assetName");
@@ -192,17 +155,63 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         mAssetPhone.setText(phone);
         mAssetRating.setRating(rating);
 
-        if (images != null){
+        if (images != null) {
             Glide.with(ListInventory.this)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
                     .into(mImagesAssets);
         }
+
+        prepareUserData();
+
+
+    }
+
+    private void showLoading() {
+        mPbListInvent.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideLoading() {
+        mPbListInvent.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void addBottomDots(int currentPage) {
+        dots = new TextView[mAssetImages.size()];
+
+        int colosActive = ContextCompat.getColor(this, R.color.dot_active);
+        int colorInactive = ContextCompat.getColor(this, R.color.dot_inactive);
+
+        mLlDotsAssetImages.removeAllViews();
+        for (int i = 0; i < dots.length; i++) {
+            dots[i] = new TextView(this);
+            dots[i].setText(Html.fromHtml("&#8226;"));
+            dots[i].setTextSize(35);
+            dots[i].setTextColor(colorInactive);
+            mLlDotsAssetImages.addView(dots[i]);
+        }
+
+        if (dots.length > 0) {
+            dots[currentPage].setTextColor(colosActive);
+        }
+    }
+
+    private void prepareUserData() {
+
+        showLoading();
+        if (mListInventory.size() > 1){
+            mListInventory.clear();
+            mAdapter.notifyDataSetChanged();
+        }
+
+
 
         Call<JsonObject> response = mInventoryAPIService.getUserInventories(idAsset);
 
         response.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+                hideLoading();
                 if (rawResponse.isSuccessful()) {
                     try {
 
@@ -246,18 +255,9 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
 
                             mListInventory.add(invent);
 
-                            new CountDownTimer(1000, 1000) {
-
-                                public void onTick(long millisUntilFinished) {
-                                    // You don't need anything here
-                                }
-
-                                public void onFinish() {
-                                    mAdapter.notifyDataSetChanged();
-                                    hideLoading();
-                                }
-                            }.start();
                         }
+
+                        mAdapter.notifyDataSetChanged();
 
                         Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
                                 Toast.LENGTH_LONG).show();
@@ -272,7 +272,7 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable throwable) {
-
+                hideLoading();
                 Toast.makeText(ListInventory.this, throwable.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
@@ -297,24 +297,30 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        prepareUserData();
+    }
+
+    @Override
     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
         mPbAssetImages.setVisibility(View.INVISIBLE);
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             JsonArray imagesResponse = response.body().getAsJsonArray("images");
-            for(int i=0; i< imagesResponse.size(); i++){
+            for (int i = 0; i < imagesResponse.size(); i++) {
                 JsonObject image = imagesResponse.get(i).getAsJsonObject();
                 mAssetImages.add(image.get("medium").getAsString());
             }
-            if(mAssetImages.size() != 0){
+            if (mAssetImages.size() != 0) {
                 addBottomDots(0);
                 mVpAssetImages.addOnPageChangeListener(Listener);
-                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages,this));
+                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages, this));
                 final Handler handler = new Handler();
 
                 final Runnable update = new Runnable() {
                     public void run() {
 
-                        if (currentPage == mAssetImages.size() ) {
+                        if (currentPage == mAssetImages.size()) {
                             currentPage = 0;
                         }
                         mVpAssetImages.setCurrentItem(currentPage++, true);
@@ -333,16 +339,16 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         } else {
             mAssetImages.add("http://baak.gunadarma.ac.id/public/images/ugcoba24.jpg");
             mAssetImages.add("http://mherman.org/assets/img/blog/on-demand-environments/on-demand-envs.png");
-            if(mAssetImages.size() != 0){
+            if (mAssetImages.size() != 0) {
                 addBottomDots(0);
                 mVpAssetImages.addOnPageChangeListener(Listener);
-                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages,this));
+                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages, this));
                 final Handler handler = new Handler();
 
                 final Runnable update = new Runnable() {
                     public void run() {
 
-                        if (currentPage == mAssetImages.size() ) {
+                        if (currentPage == mAssetImages.size()) {
                             currentPage = 0;
                         }
                         mVpAssetImages.setCurrentItem(currentPage++, true);
@@ -372,14 +378,14 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         List<String> images;
         Context mContext;
 
-        public ImageSlider(List<String> img, Context context){
+        public ImageSlider(List<String> img, Context context) {
             images = img;
             mContext = context;
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View rootView = LayoutInflater.from(mContext).inflate(R.layout.layout_images_slider,null);
+            View rootView = LayoutInflater.from(mContext).inflate(R.layout.layout_images_slider, null);
             ImageView mImageView = (ImageView) rootView.findViewById(R.id.iv_bg_banner);
             Glide.with(mContext)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + images.get(position))

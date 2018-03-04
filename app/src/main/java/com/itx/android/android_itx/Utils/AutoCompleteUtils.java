@@ -19,7 +19,7 @@ public class AutoCompleteUtils {
     private Context mContext;
 
 
-    public AutoCompleteUtils(Context mContext){
+    public AutoCompleteUtils(Context mContext) {
         this.mContext = mContext;
 
     }
@@ -27,7 +27,7 @@ public class AutoCompleteUtils {
     public String loadJSONFromAssetProvince() {
         String json = null;
         try {
-            InputStream is = mContext.getResources().openRawResource(R.raw.states_provinces);
+            InputStream is = mContext.getResources().openRawResource(R.raw.provinces);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -43,7 +43,7 @@ public class AutoCompleteUtils {
     public String loadJSONFromAssetCity() {
         String json = null;
         try {
-            InputStream is = mContext.getResources().openRawResource(R.raw.places);
+            InputStream is = mContext.getResources().openRawResource(R.raw.cities);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -56,34 +56,49 @@ public class AutoCompleteUtils {
         return json;
     }
 
-    public ArrayList<String> getArrayProvicesJson(){
+    public ArrayList<String> getArrayProvicesJson() {
 
         ArrayList<String> arrListProvince = new ArrayList<String>();
         String dataJsonProvince = loadJSONFromAssetProvince();
-        JsonArray gsonProvince = new JsonParser().parse(dataJsonProvince).getAsJsonObject().get("features").getAsJsonArray();
+        JsonArray gsonProvince = new JsonParser().parse(dataJsonProvince).getAsJsonArray();
 
         for (int i = 0; i < gsonProvince.size(); i++) {
-            String nameProvice = gsonProvince.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("name").getAsString();
+            String nameProvice = gsonProvince.get(i).getAsJsonObject().get("province_name").getAsString();
             arrListProvince.add(nameProvice);
         }
         return arrListProvince;
     }
 
-    public ArrayList<String> getArrayCityJson(String byProvince){
+    public ArrayList<String> getArrayCityJson(String byProvinceName) {
         ArrayList<String> arrListCity = new ArrayList<String>();
 
-        String dataJsonCity = loadJSONFromAssetCity();
-        JsonArray gsonCity = new JsonParser().parse(dataJsonCity).getAsJsonObject().get("features").getAsJsonArray();
+        String byProvinceId = null;
+
+        if (byProvinceName != null) {
+
+            String dataJsonCity = loadJSONFromAssetCity();
+            JsonArray gsonCity = new JsonParser().parse(dataJsonCity).getAsJsonArray();
+
+            String dataJsonProvince = loadJSONFromAssetProvince();
+            JsonArray gsonProvince = new JsonParser().parse(dataJsonProvince).getAsJsonArray();
+
+            for (int i = 0; i < gsonProvince.size(); i++) {
+
+                if (gsonProvince.get(i).getAsJsonObject().get("province_name").getAsString().equals(byProvinceName)) {
+
+                    byProvinceId = gsonProvince.get(i).getAsJsonObject().get("province_id").getAsString();
+                }
+            }
 
 
-        if (!byProvince.isEmpty()) {
             for (int i = 0; i < gsonCity.size(); i++) {
-                ;
-                if (gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("ADM1NAME").getAsString().equals(byProvince)) {
-                    String nameCity = gsonCity.get(i).getAsJsonObject().get("properties").getAsJsonObject().get("NAME").getAsString();
+
+                if (gsonCity.get(i).getAsJsonObject().get("province_id").getAsString().equals(byProvinceId)) {
+                    String nameCity = gsonCity.get(i).getAsJsonObject().get("city_name").getAsString();
                     arrListCity.add(nameCity);
                 }
             }
+
 
         }
         return arrListCity;
