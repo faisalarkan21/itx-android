@@ -340,8 +340,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                             });
 
                         }
-                        Toast.makeText(CreateNewInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(CreateNewInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+//                                Toast.LENGTH_LONG).show();
 
                     } catch (Exception e) {
                         e.printStackTrace();

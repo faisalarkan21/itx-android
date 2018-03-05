@@ -347,8 +347,8 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
                             });
 
                         }
-                        Toast.makeText(UpdateInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
-                                Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UpdateInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
+//                                Toast.LENGTH_LONG).show();
 
                     } catch (Exception e) {
                         e.printStackTrace();
