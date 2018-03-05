@@ -231,7 +231,7 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                pickImagesFromGallery();
+                takeImageGalleryWithPermission();
             }
         });
         AlertDialog alertDialog = alertBuilder.create();
@@ -285,6 +285,18 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
                     13, perms);
+        }
+    }
+
+    @AfterPermissionGranted(14)
+    private void takeImageGalleryWithPermission() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            pickImagesFromGallery();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
+                    14, perms);
         }
     }
 
@@ -615,6 +627,8 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         if (requestCode == 13) {
             takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            pickImagesFromGallery();
         }
     }
 

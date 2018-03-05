@@ -76,7 +76,7 @@ import retrofit2.Response;
  * Created by faisal on 3/1/18.
  */
 
-public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
+public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener , EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
@@ -422,7 +422,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                takePhotoFromGallery();
+                takeImageGalleryWithPermission();
             }
         });
         AlertDialog alertDialog = alertBuilder.create();
@@ -534,13 +534,28 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    @AfterPermissionGranted(14)
+    private void takeImageGalleryWithPermission() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromGallery();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
+                    14, perms);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 13) {
             takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            takePhotoFromGallery();
         }
+
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
@@ -611,6 +626,22 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            takePhotoFromGallery();
+        }
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
     }
 }

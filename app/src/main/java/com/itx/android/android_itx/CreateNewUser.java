@@ -67,7 +67,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
+public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
@@ -323,7 +323,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                takePhotoFromGallery();
+                takeImageGalleryWithPermission();
             }
         });
         AlertDialog alertDialog = alertBuilder.create();
@@ -363,7 +363,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     }
 
     public String getPath(Uri uri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
+        String[] proj = {MediaStore.Images.Media.DATA};
 
         CursorLoader cursorLoader = new CursorLoader(
                 this,
@@ -384,8 +384,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                 (jsonParams).toString());
 
         Call<ResponseBody> addUserRequest = mUserService.createUser(body);
-
-
 
 
         addUserRequest.enqueue(new Callback<ResponseBody>() {
@@ -420,13 +418,21 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @AfterPermissionGranted(14)
+    private void takeImageGalleryWithPermission() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            takePhotoFromGallery();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
+                    14, perms);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        }
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
@@ -462,7 +468,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             photoURI = data.getData();
             try {
                 filePhoto = new File(getPath(photoURI));
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             mIvPhoto.setImageURI(photoURI);
@@ -513,4 +519,19 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+        if (requestCode == 13) {
+            takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            takePhotoFromGallery();
+        }
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+
+    }
 }

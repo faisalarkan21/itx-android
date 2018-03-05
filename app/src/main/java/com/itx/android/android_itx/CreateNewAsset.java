@@ -388,7 +388,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                pickImagesFromGallery();
+                takeImageGalleryWithPermission();
             }
         });
         AlertDialog alertDialog = alertBuilder.create();
@@ -547,6 +547,18 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
+    @AfterPermissionGranted(14)
+    private void takeImageGalleryWithPermission() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            pickImagesFromGallery();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
+                    14, perms);
+        }
+    }
+
     public String getPath(Uri uri) {
         String[] proj = { MediaStore.Images.Media.DATA };
 
@@ -671,12 +683,13 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        } else if (requestCode == 12) {
-            getCurrentLocation();
 
-            // TODO HERE TOO
+        if (requestCode == 12) {
+            getCurrentLocation();
+        } else if (requestCode == 13) {
+            takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            pickImagesFromGallery();
         } else if (requestCode == LOCATION_REQUEST) {
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);

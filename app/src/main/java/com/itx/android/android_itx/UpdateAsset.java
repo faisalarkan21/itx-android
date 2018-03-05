@@ -250,14 +250,14 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                     if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    Log.d("filename : " , fileName);
+                    Log.d("filename : ", fileName);
                     Log.d("Uriname : ", currentUriName);
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
 
-                Log.d("SIZE ","The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
+                Log.d("SIZE ", "The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
                 imagePreviews.remove(position);
                 mPreviewAdapter.notifyDataSetChanged();
             }
@@ -716,7 +716,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public String getPath(Uri uri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
+        String[] proj = {MediaStore.Images.Media.DATA};
 
         CursorLoader cursorLoader = new CursorLoader(
                 this,
@@ -775,11 +775,23 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                pickImagesFromGallery();
+                takeImageGalleryWithPermission();
             }
         });
         AlertDialog alertDialog = alertBuilder.create();
         alertDialog.show();
+    }
+
+    @AfterPermissionGranted(14)
+    private void takeImageGalleryWithPermission() {
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            pickImagesFromGallery();
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
+                    14, perms);
+        }
     }
 
     private void pickImagesFromGallery() {
@@ -845,7 +857,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
@@ -990,6 +1001,8 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         if (requestCode == 13) {
             takePhotoFromCamera();
+        } else if (requestCode == 14) {
+            pickImagesFromGallery();
         } else if (requestCode == 12) {
             getCurrentLocation();
         } else if (requestCode == LOCATION_REQUEST) {
