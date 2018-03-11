@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.itx.android.android_itx.Adapter.WelcomeSliderAdapter;
 import com.itx.android.android_itx.Utils.PrefManager;
+import com.itx.android.android_itx.Utils.SessionManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,9 +82,15 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
     }
 
     private void launchHomeScreen() {
-        prefManager.setFirstTimeLaunch(false);
-        startActivity(new Intent(WelcomeActivity.this, DashboardUtama.class));
-        finish();
+        prefManager.setFirstTimeLaunch(true);
+        SessionManager sessionManager = new SessionManager(WelcomeActivity.this);
+        if (sessionManager.getToken().length() > 0) {
+            startActivity(new Intent(WelcomeActivity.this, ListUsers.class));
+            finish();
+        } else {
+            startActivity(new Intent(WelcomeActivity.this, Login.class));
+            finish();
+        }
     }
 
     private void addBottomDots(int currentPage) {

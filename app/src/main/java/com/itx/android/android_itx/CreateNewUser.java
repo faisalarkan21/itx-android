@@ -57,6 +57,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -254,8 +255,17 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
+
+        File compressedImageFile = null;
+
+        try {
+            compressedImageFile = new Compressor(this).compressToFile(filePhoto);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //Upload Photo first then on callback save the new User
-        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), filePhoto);
+        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), compressedImageFile);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
         Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 

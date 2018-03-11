@@ -84,6 +84,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -520,7 +521,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         final int rating = Math.round(mRbAsset.getRating());
 
 
-        //TODO: DISINI ANEH, FINISHNYA KOK MALAH KE LIST USER, YG INVENT BISA
+
         if (fileImages.size() < 1) {
             //INI JIKA USER TDK MENAMBAHKAN FOTO BARU DARI CAMERA/GALLERY
             try {
@@ -597,8 +598,15 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                     Uri imageUri = currImg.getmUri();
                     String lastpath = Uri.fromFile(file).getLastPathSegment();
                     if (imageUri != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
-                        //TODO: SHOULD SUPPORT DIFFERENT TYPE OF IMAGE
-                        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+
+                        File compressedImageFile = null;
+                        try {
+                            compressedImageFile = new Compressor(this).compressToFile(file);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), compressedImageFile);
                         parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                     }
                 }

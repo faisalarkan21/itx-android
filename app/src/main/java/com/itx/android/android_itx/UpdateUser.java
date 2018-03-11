@@ -62,6 +62,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -322,8 +323,16 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
         if (photoURI != null) {
 
+            File compressedImageFile = null;
+
+            try {
+                compressedImageFile = new Compressor(this).compressToFile(filePhoto);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 //        Upload Photo first then on callback save the new User
-            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), filePhoto);
+            RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), compressedImageFile);
             MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
             Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 
@@ -549,12 +558,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        } else if (requestCode == 14) {
-            takePhotoFromGallery();
-        }
 
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);

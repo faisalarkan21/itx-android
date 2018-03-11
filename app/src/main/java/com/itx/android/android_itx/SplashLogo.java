@@ -54,8 +54,13 @@ public class SplashLogo extends AppCompatActivity {
                 } finally {
                     // TODO on design which is belong to hengky
                     // for testing purpose let the welcome slider always on
-                    if (prefManager.isFirstTimeLaunch()) isHasToken();
-                    else isFirstTimeInstall();
+                    prefManager.setFirstTimeLaunch(true);
+
+                    if (prefManager.isFirstTimeLaunch()) {
+                        sliderFirstTimeInstall();
+                    } else {
+                        isHasToken();
+                    }
                 }
             }
         };
@@ -63,12 +68,14 @@ public class SplashLogo extends AppCompatActivity {
 
     }
 
-    private void isFirstTimeInstall() {
+    private void sliderFirstTimeInstall() {
         startActivity(new Intent(SplashLogo.this, WelcomeActivity.class));
         finish();
     }
 
-    private void isHasToken() {
+    public void isHasToken() {
+
+        prefManager.setFirstTimeLaunch(true);
         SessionManager sessionManager = new SessionManager(SplashLogo.this);
         if (sessionManager.getToken().length() > 0) {
             startActivity(new Intent(SplashLogo.this, ListUsers.class));
@@ -77,6 +84,7 @@ public class SplashLogo extends AppCompatActivity {
             startActivity(new Intent(SplashLogo.this, Login.class));
             finish();
         }
+
     }
 
 

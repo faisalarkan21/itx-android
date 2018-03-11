@@ -57,6 +57,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -383,7 +384,15 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 ImageHolder currImg = imagePreviews.get(j);
                 String lastpath = Uri.fromFile(file).getLastPathSegment();
                 if (currImg.getmUri() != null && currImg.getmUri().getLastPathSegment().equals(lastpath)) {
-                    RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+
+                    File compressedImageFile = null;
+                    try {
+                        compressedImageFile = new Compressor(this).compressToFile(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), compressedImageFile);
                     parts[i] = MultipartBody.Part.createFormData("photos", file.getName(), uploadBody);
                 }
             }
