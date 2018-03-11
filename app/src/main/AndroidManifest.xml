@@ -3,11 +3,19 @@
     package="com.itx.android.android_itx">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:required="true"  />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +24,6 @@
         android:roundIcon="@drawable/seller"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -28,7 +35,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity android:name=".SplashLogo">
@@ -43,42 +50,50 @@
             android:name=".DashboardUtama"
             android:label="Dahsboard Utama" />
         <activity
-            android:launchMode="singleTop"
             android:name=".ListUsers"
-            android:label="List Pengguna" >
-
-        </activity>
+            android:label="List Pengguna"
+            android:launchMode="singleTop"></activity>
         <activity
-            android:parentActivityName=".ListUsers"
             android:name=".ListAssets"
             android:label="List Assets"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:parentActivityName=".ListUsers" />
         <activity
-            android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets"
             android:name=".ListInventory"
-            android:label="List Inventory" />
-        <activity android:label="New User" android:name=".CreateNewUser"
+            android:label="List Inventory"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListUsers"/>
-        <activity android:label="New Asset" android:name=".CreateNewAsset"
+            android:parentActivityName=".ListAssets" />
+        <activity
+            android:name=".CreateNewUser"
+            android:label="New User"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets"/>
-        <activity android:label="New Inventory" android:name=".CreateNewInventory"
+            android:parentActivityName=".ListUsers" />
+        <activity
+            android:name=".CreateNewAsset"
+            android:label="New Asset"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListInventory"/>
-
-        <activity android:label="Update User" android:name=".UpdateUser"
+            android:parentActivityName=".ListAssets" />
+        <activity
+            android:name=".CreateNewInventory"
+            android:label="New Inventory"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListUsers"/>
-
-        <activity android:label="Update Asset" android:name=".UpdateAsset"
+            android:parentActivityName=".ListInventory" />
+        <activity
+            android:name=".UpdateUser"
+            android:label="Update User"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets"/>
-
-        <activity android:label="Update Inventory" android:name=".UpdateInventory"
+            android:parentActivityName=".ListUsers" />
+        <activity
+            android:name=".UpdateAsset"
+            android:label="Update Asset"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListInventory"/>
+            android:parentActivityName=".ListAssets" />
+        <activity
+            android:name=".UpdateInventory"
+            android:label="Update Inventory"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ListInventory" />
+        <activity android:name=".WelcomeActivity"></activity>
     </application>
 
 </manifest>

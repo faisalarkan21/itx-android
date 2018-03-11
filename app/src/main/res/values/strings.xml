@@ -6,4 +6,25 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="geocode_key">AIzaSyDU6YAkP2kWc-KYVlpHso33-SLaOz2rtns</string>
+
+
+
+    <!-- Welcome Slider Text -->
+
+    <string name="slide_1_title">SELLER</string>
+    <string name="slide_1_desc">ITX menyediakan fasilitas digital untuk memasarkan inventory produk pariwisata</string>
+
+    <string name="slide_2_title">BUYER</string>
+    <string name="slide_2_desc">Akses inventory jasa pariwisata Indonesia yang lebih luas dan e-commerce ready</string>
+
+    <string name="slide_3_title">DESTINASI</string>
+    <string name="slide_3_desc">Anda dapat mempromosikan potensi pariwisata dan mendistribusikannya</string>
+
+
+
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
+    <string name="play_again">Play Again</string>
+
+
+
 </resources>
