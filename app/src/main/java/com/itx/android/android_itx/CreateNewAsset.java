@@ -63,6 +63,7 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
+import com.itx.android.android_itx.Utils.ImageUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -94,7 +95,10 @@ import retrofit2.Response;
 
 public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
-    private final static int GALLERY_RC = 299;
+    private static final int CAMERA_REQUEST = 1000;
+    private static final int RC_PERMS_CAMERA = 13;
+    private static final int RC_PERMS_GALLERY = 14;
+    private static final int GALLERY_REQUEST = 1001;
     private final static int LOCATION_SETTING_RC = 122;
 
     String idUser, userAdress, userName, phone, role, imagesDetail;
@@ -102,8 +106,8 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
     //URI List for the images that will be on the server
-    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
-    ArrayList<File> fileImages = new ArrayList<>();
+    public static ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
+    public static ArrayList<File> fileImages = new ArrayList<>();
     ArrayList<String> categories = new ArrayList<>();
 
 
@@ -180,7 +184,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     Button mBtnAddImages;
 
 
-    private static final int CAMERA_REQUEST = 201;
     private static final int LOCATION_REQUEST = 201;
 
 
@@ -373,36 +376,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
-    private void takePhoto() {
-        //show dialog for user to choose between camera or gallery
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setTitle("Pilih Foto");
-        alertBuilder.setMessage("Ambil foto dari ?");
-        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takePhotoWithPermission();
-            }
-        });
-        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takeImageGalleryWithPermission();
-            }
-        });
-        AlertDialog alertDialog = alertBuilder.create();
-        alertDialog.show();
-    }
-
-    private void pickImagesFromGallery() {
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        openGalleryIntent.setType("image/jpeg");
-        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_RC);
-    }
-
     private void prepareAssetCategories() {
 //        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
         Call<JsonObject> categoriesRequest = mAssetService.getAssetCategories();
@@ -438,44 +411,6 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        return image;
-    }
-
-
-    private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                fileImages.add(createImageFile());
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                return;
-            }
-            // Continue only if the File was successfully created
-            if (fileImages.get(fileImages.size() - 1) != null) {
-                Uri uri = FileProvider.getUriForFile(CreateNewAsset.this,
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() - 1));
-                imagePreviews.add(new ImageHolder(null, uri));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
-                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
-            }
-        }
-    }
 
     private void getCurrentLocation() {
 
@@ -536,46 +471,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
-    @AfterPermissionGranted(13)
-    private void takePhotoWithPermission() {
-        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            takePhotoFromCamera();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
-                    13, perms);
-        }
-    }
 
-    @AfterPermissionGranted(14)
-    private void takeImageGalleryWithPermission() {
-        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            pickImagesFromGallery();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
-                    14, perms);
-        }
-    }
-
-    public String getPath(Uri uri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-
-        CursorLoader cursorLoader = new CursorLoader(
-                this,
-                uri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-
-        int column_index =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_index);
-        Log.d("THEPATH", "path : " + path);
-        cursor.close();
-        return path;
-    }
 
     private void createAsset() {
 
@@ -695,10 +591,10 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
         if (requestCode == 12) {
             getCurrentLocation();
-        } else if (requestCode == 13) {
-            takePhotoFromCamera();
-        } else if (requestCode == 14) {
-            pickImagesFromGallery();
+        } else if (requestCode == RC_PERMS_CAMERA) {
+            ImageUtils.takeMultiplePhotosFromCamera(this,CAMERA_REQUEST);
+        } else if (requestCode == RC_PERMS_GALLERY) {
+            ImageUtils.takeMultiplePhotosFromGallery(this,GALLERY_REQUEST);
         } else if (requestCode == LOCATION_REQUEST) {
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
@@ -714,14 +610,14 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY_RC && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data.getClipData() != null) {
                 ClipData mClipData = data.getClipData();
                 for (int i = 0; i < mClipData.getItemCount(); i++) {
 
                     ClipData.Item item = mClipData.getItemAt(i);
                     Uri uri = item.getUri();
-                    File file = new File(getPath(uri));
+                    File file = new File(ImageUtils.getPath(uri,this));
                     imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                     fileImages.add(file);
 
@@ -730,7 +626,7 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
 
             } else {
                 Uri imageUri = data.getData();
-                File file = new File(getPath(imageUri));
+                File file = new File(ImageUtils.getPath(imageUri,this));
                 imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                 fileImages.add(file);
             }
@@ -839,7 +735,12 @@ public class CreateNewAsset extends AppCompatActivity implements OnMapReadyCallb
                 validator.validate();
                 break;
             case R.id.select_image:
-                takePhoto();
+                ImageUtils.takeMultiplePhotos(this,
+                        CAMERA_REQUEST,
+                        GALLERY_REQUEST,
+                        RC_PERMS_GALLERY,
+                        RC_PERMS_CAMERA
+                        );
                 break;
             default:
                 break;

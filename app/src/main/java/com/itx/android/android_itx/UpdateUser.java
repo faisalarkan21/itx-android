@@ -42,6 +42,7 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
+import com.itx.android.android_itx.Utils.ImageUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -82,17 +83,19 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
     private static final int CAMERA_REQUEST = 1000;
+    private static final int RC_PERMS_CAMERA = 13;
+    private static final int RC_PERMS_GALLERY = 14;
     private static final int GALLERY_REQUEST = 1001;
 
     private SessionManager session;
-    private File filePhoto;
-    private Uri photoURI;
+    public static File filePhoto;
+    public static Uri photoURI;
     private Image imageFromServer;
 
     UsersService mUserService;
     APIService mApiService;
 
-    String mCurrentPhotoPath;
+    public static String mCurrentPhotoPath;
 
     ArrayAdapter spAdapterCity;
     ArrayAdapter spAdapterProvince;
@@ -415,55 +418,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
     }
 
-    private void takePhoto() {
-        //show dialog for user to choose between camera or gallery
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setTitle("Pilih Foto");
-        alertBuilder.setMessage("Ambil foto dari ?");
-        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takePhotoWithPermission();
-            }
-        });
-        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takeImageGalleryWithPermission();
-            }
-        });
-        AlertDialog alertDialog = alertBuilder.create();
-        alertDialog.show();
-    }
 
-    private void takePhotoFromGallery() {
-        /*
-            ambil foto dari gallery lalu hasilnya akan ada di onActivityResult
-        */
-
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        openGalleryIntent.setType("image/*");
-        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), GALLERY_REQUEST);
-    }
-
-    public String getPath(Uri uri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-
-        CursorLoader cursorLoader = new CursorLoader(
-                this,
-                uri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-
-        int column_index =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_index);
-        Log.d("THEPATH", "path : " + path);
-        cursor.close();
-        return path;
-    }
 
     public void saveUserToServer(JSONObject jsonParams) {
 
@@ -493,68 +448,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
-
-    private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                filePhoto = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                return;
-            }
-            // Continue only if the File was successfully created
-            if (filePhoto != null) {
-                photoURI = FileProvider.getUriForFile(UpdateUser.this,
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        filePhoto);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
-            }
-        }
-    }
-
-    @AfterPermissionGranted(13)
-    private void takePhotoWithPermission() {
-        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            takePhotoFromCamera();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
-                    13, perms);
-        }
-    }
-
-    @AfterPermissionGranted(14)
-    private void takeImageGalleryWithPermission() {
-        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            takePhotoFromGallery();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
-                    14, perms);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -577,7 +470,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             photoURI = data.getData();
             try {
-                filePhoto = new File(getPath(photoURI));
+                filePhoto = new File(ImageUtils.getPath(photoURI, this));
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -593,7 +486,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                 validator.validate();
                 break;
             case R.id.fab_add_foto:
-                takePhoto();
+                ImageUtils.takeOnePhoto(this,CAMERA_REQUEST,GALLERY_REQUEST,RC_PERMS_GALLERY,RC_PERMS_CAMERA);
                 break;
             default:
                 break;
@@ -636,9 +529,9 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
 
         if (requestCode == 13) {
-            takePhotoFromCamera();
+            ImageUtils.takeOnePhotoFromCamera(this, CAMERA_REQUEST);
         } else if (requestCode == 14) {
-            takePhotoFromGallery();
+            ImageUtils.takeOnePhotoFromGallery(this, GALLERY_REQUEST);
         }
 
     }

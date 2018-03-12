@@ -38,6 +38,7 @@ import com.itx.android.android_itx.Entity.Inventory;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.ImageUtils;
 import com.itx.android.android_itx.Utils.NumberTextWatcher;
 import com.itx.android.android_itx.Utils.RupiahCurrency;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -70,12 +71,14 @@ import retrofit2.Response;
 
 public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
-    private static final int RC_CAMERA = 1000;
-    private static final int RC_GALLERY = 1001;
+    private static final int CAMERA_REQUEST = 1000;
+    private static final int RC_PERMS_CAMERA = 13;
+    private static final int RC_PERMS_GALLERY = 14;
+    private static final int GALLERY_REQUEST = 1001;
 
 
-    ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
-    ArrayList<File> fileImages = new ArrayList<>();
+    public static ArrayList<ImageHolder> imagePreviews = new ArrayList<>();
+    public static ArrayList<File> fileImages = new ArrayList<>();
 
     private APIService mApiSevice;
     private PreviewAdapter mPreviewAdapter;
@@ -179,115 +182,6 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         prepareFacilitiesData();
 
 
-    }
-
-    private void takePhoto() {
-        //show dialog for user to choose between camera or gallery
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setTitle("Pilih Foto");
-        alertBuilder.setMessage("Ambil foto dari ?");
-        alertBuilder.setPositiveButton("Camera", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takePhotoWithPermission();
-            }
-        });
-        alertBuilder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                takeImageGalleryWithPermission();
-            }
-        });
-        AlertDialog alertDialog = alertBuilder.create();
-        alertDialog.show();
-    }
-
-    private void pickImagesFromGallery() {
-        Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        openGalleryIntent.setType("image/jpeg");
-        openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(openGalleryIntent, "Select Picture"), RC_GALLERY);
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        return image;
-    }
-
-
-    private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                fileImages.add(createImageFile());
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                return;
-            }
-            // Continue only if the File was successfully created
-            if (fileImages.get(fileImages.size() - 1) != null) {
-                Uri uri = FileProvider.getUriForFile(CreateNewInventory.this,
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        fileImages.get(fileImages.size() - 1));
-                imagePreviews.add(new ImageHolder(null, uri));
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imagePreviews.get(imagePreviews.size() - 1).getmUri());
-                startActivityForResult(takePictureIntent, RC_CAMERA);
-            }
-        }
-    }
-
-    @AfterPermissionGranted(13)
-    private void takePhotoWithPermission() {
-        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            takePhotoFromCamera();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses kamera dan storage",
-                    13, perms);
-        }
-    }
-
-    @AfterPermissionGranted(14)
-    private void takeImageGalleryWithPermission() {
-        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            pickImagesFromGallery();
-        } else {
-            // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk akses storage",
-                    14, perms);
-        }
-    }
-
-    public String getPath(Uri uri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-
-        CursorLoader cursorLoader = new CursorLoader(
-                this,
-                uri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-
-        int column_index =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_index);
-        cursor.close();
-        return path;
     }
 
     public void prepareFacilitiesData() {
@@ -467,21 +361,21 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_GALLERY && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data.getClipData() != null) {
                 ClipData mClipData = data.getClipData();
                 for (int i = 0; i < mClipData.getItemCount(); i++) {
 
                     ClipData.Item item = mClipData.getItemAt(i);
                     Uri uri = item.getUri();
-                    File file = new File(getPath(uri));
+                    File file = new File(ImageUtils.getPath(uri,this));
                     imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                     fileImages.add(file);
 
                 }
             } else {
                 Uri imageUri = data.getData();
-                File file = new File(getPath(imageUri));
+                File file = new File(ImageUtils.getPath(imageUri,this));
                 imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                 fileImages.add(file);
             }
@@ -490,7 +384,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             mPreviewAdapter.notifyDataSetChanged();
 
             Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
-        } else if (requestCode == RC_CAMERA && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
     }
@@ -542,7 +436,11 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 validator.validate();
                 break;
             case R.id.select_image_inventory:
-                takePhoto();
+                ImageUtils.takeMultiplePhotos(this,
+                        CAMERA_REQUEST,
+                        GALLERY_REQUEST,
+                        RC_PERMS_GALLERY,
+                        RC_PERMS_CAMERA);
                 break;
             default:
                 break;
@@ -552,10 +450,10 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        if (requestCode == 13) {
-            takePhotoFromCamera();
-        } else if (requestCode == 14) {
-            pickImagesFromGallery();
+        if (requestCode == RC_PERMS_CAMERA) {
+            ImageUtils.takeMultiplePhotosFromCamera(this,CAMERA_REQUEST);
+        } else if (requestCode == RC_PERMS_GALLERY) {
+            ImageUtils.takeMultiplePhotosFromGallery(this, GALLERY_REQUEST);
         }
     }
 
