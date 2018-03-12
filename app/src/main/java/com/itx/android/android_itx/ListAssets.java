@@ -156,10 +156,6 @@ public class ListAssets extends AppCompatActivity {
                             hideLoading();
                             Toast.makeText(ListAssets.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
-                        }else{
-
-                            Toast.makeText(ListAssets.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Assets",
-                                    Toast.LENGTH_SHORT).show();
                         }
 
                         for (int i = 0; i < jsonArray.size(); i++) {

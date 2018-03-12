@@ -219,9 +219,6 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
                             hideLoading();
                             Toast.makeText(ListInventory.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(ListInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Inventory",
-                                    Toast.LENGTH_SHORT).show();
                         }
 
                         for (int i = 0; i < jsonArray.size(); i++) {

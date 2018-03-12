@@ -134,11 +134,7 @@ public class ListUsers extends AppCompatActivity {
                             hideLoading();
                             Toast.makeText(ListUsers.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(ListUsers.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " Pengguna",
-                                    Toast.LENGTH_SHORT).show();
                         }
-
 
                         for (int i = 0; i < jsonArray.size(); i++) {
 
