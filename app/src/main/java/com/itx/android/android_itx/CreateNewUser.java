@@ -264,16 +264,14 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                     try {
                         JSONArray responseJson = new JSONArray(response.body().string());
                         JSONObject images = responseJson.getJSONObject(0);
-                        String urlFoto = images.getString("thumbnail");
+
 //                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-
-
-                        JSONObject object0 = new JSONObject();
-                        object0.put("firstName", firstName);
-                        object0.put("lastName", lastName);
-                        object0.put("ktp", noKTP);
-                        object0.put("email", email);
-                        object0.put("phone", phone);
+                        JSONObject Baseidentity = new JSONObject();
+                        Baseidentity.put("firstName", firstName);
+                        Baseidentity.put("lastName", lastName);
+                        Baseidentity.put("ktp", noKTP);
+                        Baseidentity.put("email", email);
+                        Baseidentity.put("phone", phone);
 
                         JSONObject location = new JSONObject();
                         location.put("address", address);
@@ -283,7 +281,7 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
                         location.put("country", country);
 
                         JSONObject object = new JSONObject();
-                        object.put("data", object0);
+                        object.put("data", Baseidentity);
                         object.put("location", location);
                         object.put("images", images);
 

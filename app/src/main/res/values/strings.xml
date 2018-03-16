@@ -8,7 +8,6 @@
     <string name="geocode_key">AIzaSyDU6YAkP2kWc-KYVlpHso33-SLaOz2rtns</string>
 
 
-
     <!-- Welcome Slider Text -->
 
     <string name="slide_1_title">SELLER</string>
@@ -21,10 +20,8 @@
     <string name="slide_3_desc">Anda dapat mempromosikan potensi pariwisata dan mendistribusikannya</string>
 
 
-
     <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
     <string name="play_again">Play Again</string>
-
 
 
 </resources>

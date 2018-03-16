@@ -4,9 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Rect;
@@ -32,10 +35,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -78,6 +83,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -100,7 +106,7 @@ import retrofit2.Response;
  * Created by faisal on 3/1/18.
  */
 
-public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback,
+public class UpdateAsset extends AppCompatActivity implements
         View.OnClickListener,
         Validator.ValidationListener,
         EasyPermissions.PermissionCallbacks {
@@ -134,6 +140,10 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     ArrayAdapter spAdapterCity;
     ArrayAdapter spAdapterProvince;
     String chosenCity, chosenProvince;
+
+    UpdateAsset.ReceiverBroadcastMap recieve;
+    IntentFilter filter;
+
 
     private PreviewAdapter mPreviewAdapter;
 
@@ -188,6 +198,12 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
+    @BindView(R.id.static_map)
+    ImageView staticMap;
+
+    @BindView(R.id.btn_add_location)
+    Button mBtnAddLocaion;
+
     String idUser, userAdress, userName, phone, imagesDetail, role;
     AssetService mAssetAPIService;
     SessionManager session;
@@ -212,25 +228,16 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         progressDialog.setMessage("Sedang Menyiapkan Data");
         progressDialog.show();
 
+        recieve = new ReceiverBroadcastMap();
+        filter = new IntentFilter("sendMapCoordinates");
+
         idUser = getIntent().getStringExtra("idUser");
-
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.asset_map);
-        mapFragment.getMapAsync(this);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mBtnAddImages.setOnClickListener(this);
         mBtnAddAsset.setOnClickListener(this);
+        mBtnAddLocaion.setOnClickListener(this);
+        mBtnAddLocaion.setText("Update / Detail Map");
 
-
-        // ask user to on the GPS when the activity is created
-        if (EasyPermissions.hasPermissions(this, locationPerm)) {
-            askUserToTurnOnGPS();
-        } else {
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
-        }
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         mSpCategories.setAdapter(spAdapter);
@@ -270,62 +277,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
         prepareAssetCategories();
     }
-
-    private void askUserToTurnOnGPS() {
-        try {
-            GoogleApiClient
-                    googleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(LocationServices.API)
-                    .build();
-
-            googleApiClient.connect();
-            LocationRequest request = new LocationRequest();
-            request.setInterval(1000000)
-                    .setFastestInterval(500000)
-                    .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-            builder.addLocationRequest(request);
-
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-                    final LocationSettingsStates state = result.getLocationSettingsStates();
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
-                            // All location settings are satisfied. The client can initialize location
-                            // requests here.
-                            if (state.isGpsUsable() && state.isLocationUsable() && state.isNetworkLocationUsable()) {
-                                return;
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(
-                                        UpdateAsset.this, LOCATION_SETTING_RC);
-                            } catch (IntentSender.SendIntentException e) {
-                                e.printStackTrace();
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
-                }
-            });
-        } catch (Exception exception) {
-            // Log exception
-        }
-    }
-
 
     public void setProvince(final String initProvince) {
 
@@ -474,8 +425,11 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
                         assetLocation = new LatLng(AssetCoordinates.get(0).getAsDouble(), AssetCoordinates.get(1).getAsDouble());
 
-                        getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
-                        updateMapUI();
+                        String fullAddress = jsonObject.get("address").getAsJsonObject().get("address").getAsString();
+                        mEtAssetAddress.setText(fullAddress);
+
+                        setStaticMap();
+
 
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
@@ -506,6 +460,37 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    private void setStaticMap() {
+
+        String formattedLangLat = assetLocation.latitude + "," + assetLocation.longitude;
+        Call<ResponseBody> staticMapRequest = null;
+        try {
+            staticMapRequest = mApiSevice.getStaticMap(formattedLangLat, "18", "600x600", "color:red" + java.net.URLDecoder.decode("%7C", "UTF-8") + formattedLangLat, getString(R.string.google_maps_key));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        staticMapRequest.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> rawResponse) {
+//
+                if (rawResponse.isSuccessful()) {
+
+                    Glide.with(UpdateAsset.this)
+                            .load(rawResponse.raw().request().url().toString())
+                            .into(staticMap);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     private void updateAsset() {
 
@@ -522,7 +507,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
-
 
 
         if (fileImages.size() < 1) {
@@ -695,68 +679,6 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private void updateMapUI() {
-        if (mMap != null && mAssetMarker != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
-            mAssetMarker.setPosition(assetLocation);
-            mEtAssetAddress.setText(mAddress);
-        }
-    }
-
-
-    private void getCurrentLocation() {
-
-        try {
-            Task<Location> result = mFusedLocationClient.getLastLocation();
-            result.addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Log.d("currlocation", "berhasil :" + location.getLongitude());
-                        assetLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                        getAddressByLocation(location.getLatitude(), location.getLongitude());
-                    }
-                }
-            });
-        } catch (SecurityException e) {
-
-            e.printStackTrace();
-        }
-    }
-
-    private void getAddressByLocation(double lat, double lng) {
-        String formattedLangLat = Double.toString(lat) + "," + Double.toString(lng);
-        Call<JsonObject> geoRequest = mApiSevice.reverseGeocode(formattedLangLat, getString(R.string.geocode_key));
-        geoRequest.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                JsonArray results = response.body().getAsJsonArray("results");
-                JsonObject firstAddress = results.get(0).getAsJsonObject();
-                mAddress = firstAddress.get("formatted_address").getAsString();
-                updateMapUI();
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-
-            }
-        });
-    }
-
-
-    @AfterPermissionGranted(12)
-    private void getCurrentLocationWithPermission() {
-
-        String[] locPerms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-        if (EasyPermissions.hasPermissions(this, locPerms)) {
-            getCurrentLocation();
-
-        } else {
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", 12, locPerms);
-        }
-    }
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -778,57 +700,14 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
                         RC_PERMS_GALLERY,
                         RC_PERMS_CAMERA);
                 break;
+            case R.id.btn_add_location:
+                Intent mapAsset = new Intent(UpdateAsset.this, ActivityMapAsset.class);
+                mapAsset.putExtra("lang", assetLocation.longitude);
+                mapAsset.putExtra("lat", assetLocation.latitude);
+                startActivity(mapAsset);
             default:
                 break;
         }
-
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
-        mMap.setIndoorEnabled(true);
-
-
-        if (EasyPermissions.hasPermissions(this, locationPerm)) {
-            mMap.setMyLocationEnabled(true);
-        } else {
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
-        }
-
-
-        mAssetMarkerOptions = new MarkerOptions();
-        mAssetMarkerOptions.position(assetLocation);
-        mAssetMarkerOptions.draggable(true);
-        mAssetMarkerOptions.title("Lokasi Asset");
-        mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
-        mAssetMarker.showInfoWindow();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 14.0f));
-
-
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-
-
-                mMap.getUiSettings().setMapToolbarEnabled(true);
-                // return true will prevent any further map action from happening
-                return false;
-
-            }
-        });
-
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng point) {
-                Log.d("new loc click", point.toString());
-                assetLocation = point;
-                Log.d("new loc asset", assetLocation.toString());
-//                Toast.makeText(UpdateAsset.this, assetLocation.toString(), Toast.LENGTH_SHORT).show();
-                getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
-            }
-        });
 
     }
 
@@ -861,7 +740,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
                     ClipData.Item item = mClipData.getItemAt(i);
                     Uri uri = item.getUri();
-                    File file = new File(ImageUtils.getPath(uri,this));
+                    File file = new File(ImageUtils.getPath(uri, this));
                     imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                     fileImages.add(file);
 
@@ -870,7 +749,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
 
             } else {
                 Uri imageUri = data.getData();
-                File file = new File(ImageUtils.getPath(imageUri,this));
+                File file = new File(ImageUtils.getPath(imageUri, this));
                 imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                 fileImages.add(file);
             }
@@ -909,11 +788,7 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
         if (requestCode == RC_PERMS_CAMERA) {
             ImageUtils.takeMultiplePhotosFromCamera(this, CAMERA_REQUEST);
         } else if (requestCode == RC_PERMS_GALLERY) {
-            ImageUtils.takeMultiplePhotosFromGallery(this,GALLERY_REQUEST);
-        } else if (requestCode == 12) {
-            getCurrentLocation();
-        } else if (requestCode == LOCATION_REQUEST) {
-            mMap.setMyLocationEnabled(true);
+            ImageUtils.takeMultiplePhotosFromGallery(this, GALLERY_REQUEST);
         }
     }
 
@@ -921,4 +796,36 @@ public class UpdateAsset extends AppCompatActivity implements OnMapReadyCallback
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(new ReceiverBroadcastMap(),
+                filter);
+        setStaticMap();
+    }
+
+
+    private class ReceiverBroadcastMap extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action != null && action.equals("sendMapCoordinates")) {
+                //do something
+
+                double lang = intent.getDoubleExtra("lang", 0);
+                double lat = intent.getDoubleExtra("lat", 0);
+                String address = intent.getStringExtra("address");
+
+                mEtAssetAddress.setText(address);
+                assetLocation = new LatLng(lat, lang);
+
+//                Toast.makeText(UpdateAsset.this, "Lokasi " + intent.getDoubleExtra("lang", 0), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+
 }

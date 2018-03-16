@@ -9,6 +9,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -31,6 +32,15 @@ public interface APIService {
 
     @POST("https://maps.googleapis.com/maps/api/geocode/json")
     Call<JsonObject> reverseGeocode(@Query("latlng") String langlat,
+                                    @Query("key") String key);
+
+
+    // https://maps.googleapis.com/maps/api/staticmap?center=60.714728,-73.998672&zoom=14&size=600x300
+    @POST("https://maps.googleapis.com/maps/api/staticmap")
+    Call<ResponseBody> getStaticMap(@Query("center") String staticMap,
+                                    @Query("zoom") String zoom,
+                                    @Query("size") String size,
+                                    @Query("markers") String marker,
                                     @Query("key") String key);
 
 

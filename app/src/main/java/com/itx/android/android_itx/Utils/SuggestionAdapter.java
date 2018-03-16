@@ -50,9 +50,6 @@ public class SuggestionAdapter extends ArrayAdapter<String> {
 
                     JsonArray gson = new JsonParser().parse(dataJson).getAsJsonObject().get("features").getAsJsonArray();
 
-
-
-
                     ArrayList<String> arrList = new ArrayList<String>();
                     for (int i = 0; i < gson.size(); i++) {
 
