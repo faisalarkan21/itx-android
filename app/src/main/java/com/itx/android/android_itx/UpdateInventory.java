@@ -143,6 +143,11 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         mBtnAddInvent.setOnClickListener(this);
         mBtnAddImage.setOnClickListener(this);
 
+        if(fileImages.size() > 0 || imagePreviews.size() > 0){
+            fileImages.clear();
+            imagePreviews.clear();
+        }
+
         session = new SessionManager(this);
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
 
