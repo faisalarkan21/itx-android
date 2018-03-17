@@ -134,7 +134,7 @@ public class UpdateAsset extends AppCompatActivity implements
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
-    private LatLng assetLocation = new LatLng(-7.348868, 108.535240);
+    private LatLng assetLocation = new LatLng(-3.5261626, 112.0149507);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     ArrayAdapter spAdapterCity;
