@@ -33,6 +33,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -78,7 +79,7 @@ import retrofit2.Response;
  * Created by faisal on 3/1/18.
  */
 
-public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener , EasyPermissions.PermissionCallbacks {
+public class UpdateUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = CreateNewUser.class.getSimpleName();
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
@@ -419,7 +420,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     }
 
 
-
     public void saveUserToServer(JSONObject jsonParams) {
 
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
@@ -458,12 +458,18 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        RequestOptions options = new RequestOptions()
+                .fitCenter()
+                .override(200, 200);
+
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
             try {
                 InputStream ims = new FileInputStream(file);
-                mIvPhoto.setImageBitmap(BitmapFactory.decodeStream(ims));
+                Glide.with(UpdateUser.this).asBitmap().apply(options)
+                        .load(BitmapFactory.decodeStream(ims)).into(mIvPhoto);
             } catch (FileNotFoundException e) {
                 return;
             }
@@ -471,10 +477,11 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
             photoURI = data.getData();
             try {
                 filePhoto = new File(ImageUtils.getPath(photoURI, this));
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            mIvPhoto.setImageURI(photoURI);
+            Glide.with(UpdateUser.this).asBitmap().apply(options)
+                    .load(photoURI).into(mIvPhoto);
         }
     }
 
@@ -486,7 +493,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                 validator.validate();
                 break;
             case R.id.fab_add_foto:
-                ImageUtils.takeOnePhoto(this,CAMERA_REQUEST,GALLERY_REQUEST,RC_PERMS_GALLERY,RC_PERMS_CAMERA);
+                ImageUtils.takeOnePhoto(this, CAMERA_REQUEST, GALLERY_REQUEST, RC_PERMS_GALLERY, RC_PERMS_CAMERA);
                 break;
             default:
                 break;
