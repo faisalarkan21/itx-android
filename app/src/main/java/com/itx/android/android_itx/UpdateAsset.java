@@ -439,15 +439,6 @@ public class UpdateAsset extends AppCompatActivity implements
 
                         setStaticMap();
 
-                        final Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Do something after 5s = 5000ms
-                                progressDialog.dismiss();
-                            }
-                        }, 3800);
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -487,6 +478,17 @@ public class UpdateAsset extends AppCompatActivity implements
                     Glide.with(UpdateAsset.this)
                             .load(rawResponse.raw().request().url().toString())
                             .into(staticMap);
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Do something after 5s = 5000ms
+                            progressDialog.dismiss();
+                        }
+                    }, 3800);
+
+
                 }
 
 

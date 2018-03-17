@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.itx.android.android_itx.Adapter.WelcomeSliderAdapter;
-import com.itx.android.android_itx.Utils.PrefManager;
+
 import com.itx.android.android_itx.Utils.SessionManager;
 
 import butterknife.BindView;
@@ -26,7 +26,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
 
     WelcomeSliderAdapter welcomeSliderAdapter;
     private int[] layouts;
-    private PrefManager prefManager;
 
     @BindView(R.id.btn_skip)
     Button btnSkip;
@@ -49,8 +48,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
         setContentView(R.layout.activity_welcome);
 
         ButterKnife.bind(this);
-
-        prefManager = new PrefManager(this);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -82,7 +79,6 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
     }
 
     private void launchHomeScreen() {
-        prefManager.setFirstTimeLaunch(true);
         SessionManager sessionManager = new SessionManager(WelcomeActivity.this);
         if (sessionManager.getToken().length() > 0) {
             startActivity(new Intent(WelcomeActivity.this, ListUsers.class));

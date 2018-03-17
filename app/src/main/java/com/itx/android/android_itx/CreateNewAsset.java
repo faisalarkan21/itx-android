@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
@@ -206,6 +207,11 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
         validator = new Validator(this);
         validator.setValidationListener(this);
 
+        progressDialog = new ProgressDialog(CreateNewAsset.this);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Sedang Menyiapkan Data");
+        progressDialog.show();
+
 
         idUser = getIntent().getStringExtra("idUser");
         userAdress = getIntent().getStringExtra("address");
@@ -296,6 +302,17 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
                     Glide.with(CreateNewAsset.this)
                             .load(rawResponse.raw().request().url().toString())
                             .into(staticMap);
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Do something after 5s = 5000ms
+                            progressDialog.dismiss();
+                        }
+                    }, 500);
+
+
                 }
             }
 

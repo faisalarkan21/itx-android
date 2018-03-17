@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 public class SessionManager {
 
     private SharedPreferences prefs;
+    private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
 
 
     public SessionManager(Context cntx) {
@@ -25,6 +26,10 @@ public class SessionManager {
     public String getToken() {
         String token = prefs.getString("token","");
         return token;
+    }
+
+    public void setFirstTimeLaunch(boolean isFirstTime) {
+        prefs.edit().putBoolean(IS_FIRST_TIME_LAUNCH, isFirstTime).commit();
     }
 
     public void removeToken(){

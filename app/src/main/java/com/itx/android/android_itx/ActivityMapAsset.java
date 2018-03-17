@@ -71,7 +71,7 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
-    private LatLng assetLocation = new LatLng(-5.0399639,111.9565712);
+    private LatLng assetLocation = new LatLng(-5.0399639, 111.9565712);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private String mAddress = "";
 
@@ -137,15 +137,6 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
             updateMapUI();
 
         }
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Do something after 5s = 5000ms
-                progressDialog.dismiss();
-            }
-        }, 3800);
 
 
     }
@@ -249,16 +240,24 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void updateMapUI() {
-        if (mMap != null && mAssetMarker != null) {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mMap != null && mAssetMarker != null) {
+                    // Do something after 5s = 5000ms
+                    if (mAddress.equals("")) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 1.0f));
+                    } else {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 16.0f));
+                        mAssetMarker.setPosition(assetLocation);
+                        mEtAssetAddress.setText(mAddress);
+                    }
+                    progressDialog.dismiss();
 
-            if (mAddress.equals("")){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 1.0f));
-            }else{
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 16.0f));
-                mAssetMarker.setPosition(assetLocation);
-                mEtAssetAddress.setText(mAddress);
+                }
             }
-        }
+        }, 3800);
     }
 
     @AfterPermissionGranted(12)

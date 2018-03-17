@@ -1,7 +1,9 @@
 package com.itx.android.android_itx;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
@@ -22,9 +24,14 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Email;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -38,7 +45,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class Login extends AppCompatActivity {
+public class Login extends AppCompatActivity implements Validator.ValidationListener {
 
     private static final String TAG = Login.class.getSimpleName();
     AuthService mAuthAPIService;
@@ -49,13 +56,17 @@ public class Login extends AppCompatActivity {
     // login button
     @BindView(R.id.btn_login)
     Button btnLogin;
+    @NotEmpty
+    @Email
     @BindView(R.id.input_email)
     EditText editEmaill;
     @BindView(R.id.input_password)
+    @NotEmpty
     EditText editPassword;
     @BindView(R.id.iv_blurry)
     ImageView mRootView;
 
+    Validator validator;
     ProgressDialog progressDialog;
 
     @Override
@@ -65,6 +76,9 @@ public class Login extends AppCompatActivity {
         getSupportActionBar().hide();
 
         ButterKnife.bind(this);
+
+        validator = new Validator(this);
+        validator.setValidationListener(this);
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bg_login_2);
 
@@ -77,15 +91,7 @@ public class Login extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-
-                String username = editEmaill.getText().toString().trim();
-                String password = editPassword.getText().toString().trim();
-                session = new SessionManager(getApplicationContext());
-                progressDialog = new ProgressDialog(Login.this);
-                progressDialog.setMessage("Mohon Tungggu");
-                progressDialog.show();
-
-                sendPost(username, password);
+                validator.validate();
             }
         });
     }
@@ -151,8 +157,37 @@ public class Login extends AppCompatActivity {
             }
         });
 
+
     }
 
+
+    @Override
+    public void onValidationSucceeded() {
+
+        String username = editEmaill.getText().toString().trim();
+        String password = editPassword.getText().toString().trim();
+        session = new SessionManager(getApplicationContext());
+        progressDialog = new ProgressDialog(Login.this);
+        progressDialog.setMessage("Mohon Tungggu");
+        progressDialog.show();
+        sendPost(username, password);
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+
+            // Display error messages ;)
+            if (view instanceof EditText) {
+                ((EditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
 }
 
 
