@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -70,7 +71,7 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
-    private LatLng assetLocation = new LatLng(-6.1880158, 106.8309161);
+    private LatLng assetLocation = new LatLng(-5.0399639,111.9565712);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private String mAddress = "";
 
@@ -93,6 +94,11 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
         validator = new Validator(this);
         validator.setValidationListener(this);
 
+        progressDialog = new ProgressDialog(ActivityMapAsset.this);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Sedang Menyiapkan Data");
+        progressDialog.show();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
@@ -110,15 +116,13 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
 
         String address = getIntent().getStringExtra("address");
         // checking if update or not with true if address was empty
-        if (address == null) {
+        if (address.equals("")) {
             // ask user to on the GPS when the activity is created
             if (EasyPermissions.hasPermissions(this, locationPerm)) {
                 askUserToTurnOnGPS();
             } else {
                 EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
             }
-
-            getCurrentLocationWithPermission();
             updateMapUI();
 
         } else {
@@ -133,6 +137,15 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
             updateMapUI();
 
         }
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 5s = 5000ms
+                progressDialog.dismiss();
+            }
+        }, 3800);
 
 
     }
@@ -166,6 +179,7 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
                         case LocationSettingsStatusCodes.SUCCESS:
                             // All location settings are satisfied. The client can initialize location
                             // requests here.
+                            getCurrentLocationWithPermission();
                             if (state.isGpsUsable() && state.isLocationUsable() && state.isNetworkLocationUsable()) {
                                 return;
                             }
@@ -236,9 +250,14 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
 
     private void updateMapUI() {
         if (mMap != null && mAssetMarker != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 16.0f));
-            mAssetMarker.setPosition(assetLocation);
-            mEtAssetAddress.setText(mAddress);
+
+            if (mAddress.equals("")){
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 1.0f));
+            }else{
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 16.0f));
+                mAssetMarker.setPosition(assetLocation);
+                mEtAssetAddress.setText(mAddress);
+            }
         }
     }
 
@@ -259,7 +278,7 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
 
         mMap = googleMap;
         mMap.setIndoorEnabled(true);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 16.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(assetLocation, 5.0f));
 
         if (EasyPermissions.hasPermissions(this, locationPerm)) {
             mMap.setMyLocationEnabled(true);
@@ -274,7 +293,6 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
         mAssetMarkerOptions.title("Lokasi Asset");
         mAssetMarker = mMap.addMarker(mAssetMarkerOptions);
         mAssetMarker.showInfoWindow();
-
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -375,7 +393,5 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
-
-
     }
 }

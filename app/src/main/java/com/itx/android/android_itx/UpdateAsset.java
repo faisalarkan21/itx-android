@@ -143,6 +143,7 @@ public class UpdateAsset extends AppCompatActivity implements
 
     UpdateAsset.ReceiverBroadcastMap recieve;
     IntentFilter filter;
+    String action;
 
 
     private PreviewAdapter mPreviewAdapter;
@@ -230,10 +231,11 @@ public class UpdateAsset extends AppCompatActivity implements
 
         recieve = new ReceiverBroadcastMap();
         filter = new IntentFilter("sendMapCoordinates");
+        registerReceiver(recieve, filter);
 
         idUser = getIntent().getStringExtra("idUser");
 
-        if(fileImages.size() > 0 || imagePreviews.size() > 0){
+        if (fileImages.size() > 0 || imagePreviews.size() > 0) {
             fileImages.clear();
             imagePreviews.clear();
         }
@@ -365,6 +367,10 @@ public class UpdateAsset extends AppCompatActivity implements
                             categoryIdSelected = null;
                         }
                     });
+
+                    // make it only if response isSuccessful true we can prepare assets
+                    // bug resolved sometimes categories asset not loaded
+                    prepareAsset();
                 }
             }
 
@@ -374,8 +380,6 @@ public class UpdateAsset extends AppCompatActivity implements
 
             }
         });
-
-        prepareAsset();
     }
 
 
@@ -408,8 +412,6 @@ public class UpdateAsset extends AppCompatActivity implements
                         }
 
                         mRbAsset.setRating(jsonObject.get("rating").getAsFloat());
-                        String assetCategory = jsonObject.get("assetCategory").getAsJsonObject().get("name").getAsString();
-
 
                         String selectedValueProv = jsonObject.get("address").getAsJsonObject().get("province").getAsString();
                         setProvince(selectedValueProv);
@@ -421,19 +423,21 @@ public class UpdateAsset extends AppCompatActivity implements
                         int selectionPositionCity = spAdapterCity.getPosition(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
                         mSpCity.setSelection(selectionPositionCity);
 
-
+                        String assetCategory = jsonObject.get("assetCategory").getAsJsonObject().get("name").getAsString();
                         int selectionPosition = spAdapter.getPosition(assetCategory);
                         categoryIdSelected = categories.get(selectionPosition);
                         mSpCategories.setSelection(selectionPosition);
+
                         JsonArray AssetCoordinates = jsonObject.get("address").getAsJsonObject().get("coordinates").getAsJsonArray();
 
-                        assetLocation = new LatLng(AssetCoordinates.get(0).getAsDouble(), AssetCoordinates.get(1).getAsDouble());
+                        if (AssetCoordinates != null) {
+                            assetLocation = new LatLng(AssetCoordinates.get(0).getAsDouble(), AssetCoordinates.get(1).getAsDouble());
+                        }
 
                         String fullAddress = jsonObject.get("address").getAsJsonObject().get("address").getAsString();
                         mEtAssetAddress.setText(fullAddress);
 
                         setStaticMap();
-
 
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
@@ -805,16 +809,22 @@ public class UpdateAsset extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(new ReceiverBroadcastMap(),
-                filter);
         setStaticMap();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (recieve != null) {
+            unregisterReceiver(recieve);
+        }
+        super.onDestroy();
     }
 
     private class ReceiverBroadcastMap extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+            action = intent.getAction();
             if (action != null && action.equals("sendMapCoordinates")) {
                 //do something
 
@@ -829,7 +839,6 @@ public class UpdateAsset extends AppCompatActivity implements
             }
         }
     }
-
 
 
 }

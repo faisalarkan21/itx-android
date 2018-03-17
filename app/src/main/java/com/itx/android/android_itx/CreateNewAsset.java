@@ -222,6 +222,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
 
         recieve = new ReceiverBroadcastMap();
         filter = new IntentFilter("sendMapCoordinates");
+        registerReceiver(recieve, filter);
 
 
         mSpCategories.setVisibility(View.GONE);
@@ -340,7 +341,6 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     }
 
     public void setCitybyProvince(String provinceName) {
-
 
         spAdapterCity = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
                 completeUtils.getArrayCityJson(provinceName));
@@ -611,6 +611,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
                 Intent mapAsset = new Intent(CreateNewAsset.this, ActivityMapAsset.class);
                 mapAsset.putExtra("lang", assetLocation.longitude);
                 mapAsset.putExtra("lat", assetLocation.latitude);
+                mapAsset.putExtra("address", mEtAssetAddress.getText().toString());
                 startActivity(mapAsset);
 
             default:
@@ -621,11 +622,15 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(new ReceiverBroadcastMap(),
-                filter);
-
         setStaticMap();
+    }
 
+    @Override
+    protected void onDestroy() {
+        if (recieve != null){
+            unregisterReceiver(recieve);
+        }
+        super.onDestroy();
     }
 
 
