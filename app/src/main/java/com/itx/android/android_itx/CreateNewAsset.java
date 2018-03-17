@@ -225,6 +225,10 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
         mBtnAddAsset.setOnClickListener(this);
         mBtnAddLocaion.setOnClickListener(this);
 
+        if (fileImages.size() > 0 || imagePreviews.size() > 0) {
+            fileImages.clear();
+            imagePreviews.clear();
+        }
 
         recieve = new ReceiverBroadcastMap();
         filter = new IntentFilter("sendMapCoordinates");
