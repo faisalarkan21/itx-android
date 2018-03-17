@@ -704,6 +704,7 @@ public class UpdateAsset extends AppCompatActivity implements
                 Intent mapAsset = new Intent(UpdateAsset.this, ActivityMapAsset.class);
                 mapAsset.putExtra("lang", assetLocation.longitude);
                 mapAsset.putExtra("lat", assetLocation.latitude);
+                mapAsset.putExtra("address", mEtAssetAddress.getText().toString());
                 startActivity(mapAsset);
             default:
                 break;
@@ -804,7 +805,6 @@ public class UpdateAsset extends AppCompatActivity implements
                 filter);
         setStaticMap();
     }
-
 
     private class ReceiverBroadcastMap extends BroadcastReceiver {
 

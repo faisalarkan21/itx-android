@@ -102,19 +102,38 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.asset_map);
         mapFragment.getMapAsync(this);
+        prepareMap();
 
-        // ask user to on the GPS when the activity is created
-        if (EasyPermissions.hasPermissions(this, locationPerm)) {
-            askUserToTurnOnGPS();
+    }
+
+    private void prepareMap() {
+
+        String address = getIntent().getStringExtra("address");
+        // checking if update or not with true if address was empty
+        if (address == null) {
+            // ask user to on the GPS when the activity is created
+            if (EasyPermissions.hasPermissions(this, locationPerm)) {
+                askUserToTurnOnGPS();
+            } else {
+                EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
+            }
+
+            getCurrentLocationWithPermission();
+            updateMapUI();
+
         } else {
-            EasyPermissions.requestPermissions(this, "Izinkan aplikasi untuk mengakses lokasi anda", LOCATION_REQUEST, locationPerm);
+
+            // prepare maps
+            double lang = getIntent().getDoubleExtra("lang", 0);
+            double lat = getIntent().getDoubleExtra("lat", 0);
+
+            // set lat/lang and address
+            assetLocation = new LatLng(lat, lang);
+            getAddressByLocation(assetLocation.latitude, assetLocation.longitude);
+            updateMapUI();
+
         }
 
-        // prepare maps
-        double lang = getIntent().getDoubleExtra("lang", 0);
-        double lat = getIntent().getDoubleExtra("lat", 0);
-
-        assetLocation = new LatLng(lat, lang);
 
     }
 
@@ -278,8 +297,6 @@ public class ActivityMapAsset extends AppCompatActivity implements OnMapReadyCal
 //                Toast.makeText(ActivityMapAsset.this, assetLocation.toString(), Toast.LENGTH_LONG).show();
             }
         });
-
-        getCurrentLocationWithPermission();
     }
 
 
