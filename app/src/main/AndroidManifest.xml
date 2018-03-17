@@ -71,6 +71,8 @@
         <activity
             android:name=".CreateNewAsset"
             android:label="New Asset"
+            android:largeHeap="true"
+            android:hardwareAccelerated="false"
             android:launchMode="singleTop"
             android:parentActivityName=".ListAssets" />
         <activity

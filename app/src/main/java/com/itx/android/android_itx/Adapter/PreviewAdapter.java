@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.itx.android.android_itx.Entity.ImageHolder;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -25,7 +26,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
     private Context mContext;
     private previewInterface mClickHandler;
 
-    public PreviewAdapter(ArrayList<ImageHolder> images, Context activity, previewInterface handler){
+    public PreviewAdapter(ArrayList<ImageHolder> images, Context activity, previewInterface handler) {
         imageList = images;
         mContext = activity;
         mClickHandler = handler;
@@ -43,8 +44,15 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewViewHolder> {
     public void onBindViewHolder(final PreviewViewHolder holder, int position) {
         ImageHolder currentImage = imageList.get(position);
         Uri currentUri = currentImage.getmUri();
-        if(currentUri != null){
-            holder.mIvPreview.setImageURI(currentUri);
+
+        RequestOptions options = new RequestOptions()
+                .fitCenter()
+                .override(200, 200);
+
+        if (currentUri != null) {
+
+            Glide.with(mContext).asBitmap().apply(options).load(currentUri).into(holder.mIvPreview);
+
         } else {
             Glide.with(mContext)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + currentImage.getmImage().getmMedium())
