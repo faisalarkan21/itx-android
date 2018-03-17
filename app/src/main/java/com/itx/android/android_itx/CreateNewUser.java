@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -356,12 +358,18 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        RequestOptions options = new RequestOptions()
+                .fitCenter()
+                .override(200, 200);
+
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
             try {
                 InputStream ims = new FileInputStream(file);
-                mIvPhoto.setImageBitmap(BitmapFactory.decodeStream(ims));
+                Glide.with(CreateNewUser.this).asBitmap().apply(options)
+                        .load(BitmapFactory.decodeStream(ims)).into(mIvPhoto);
             } catch (FileNotFoundException e) {
                 return;
             }
@@ -372,7 +380,8 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            mIvPhoto.setImageURI(photoURI);
+            Glide.with(CreateNewUser.this).asBitmap().apply(options)
+                    .load(photoURI).into(mIvPhoto);
         }
     }
 
