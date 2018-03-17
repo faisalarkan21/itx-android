@@ -233,6 +233,10 @@ public class UpdateAsset extends AppCompatActivity implements
 
         idUser = getIntent().getStringExtra("idUser");
 
+        if(fileImages.size() > 0 || imagePreviews.size() > 0){
+            fileImages.clear();
+            imagePreviews.clear();
+        }
         mBtnAddImages.setOnClickListener(this);
         mBtnAddAsset.setOnClickListener(this);
         mBtnAddLocaion.setOnClickListener(this);
