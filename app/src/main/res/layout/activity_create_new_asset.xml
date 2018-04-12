@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,9 +9,11 @@
         android:id="@+id/sv_new_asset"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btn_add_new_asset">
+        android:layout_above="@id/btn_add_new_asset"
+        android:fillViewport="true">
 
         <LinearLayout
+            android:focusableInTouchMode="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -35,7 +36,7 @@
                     android:id="@+id/et_add_asset_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Asset Name"
+                    android:hint="Nama"
                     android:inputType="text" />
 
 
@@ -52,7 +53,8 @@
                     android:id="@+id/et_add_asset_brand"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Brand"/>
+                    android:hint="Brand"
+                    android:inputType="text"/>
 
 
             </android.support.design.widget.TextInputLayout>
@@ -63,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="15dp"
-                android:text="Category" />
+                android:text="Pilih Kategori" />
 
             <Spinner
                 android:id="@+id/sp_add_asset_categories"
@@ -93,20 +95,11 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp">
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_weight="1"
-                    android:id="@+id/btn_add_location"
-                    android:text="Pilih lokasi" />
-
                 <EditText
                     android:id="@+id/et_add_asset_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone"
+                    android:hint="Telpon"
                     android:inputType="number"
                     />
 
@@ -119,13 +112,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="0dp"
-                android:text="Lokasi Assets" />
+                android:text="Lokasi Assets \n* klik peta untuk menyesuaikan lokasi" />
 
             <ImageView
                 android:id="@+id/static_map"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginBottom="20dp" />
 
 
@@ -141,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     android:focusable="false"
-                    android:hint="Lokasi" />
+                    android:hint="Lokasi"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -169,7 +161,7 @@
                         android:id="@+id/sp_add_asset_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Province"
+                        android:hint="Provinsi"
                         android:inputType="text" />
 
 
@@ -206,7 +198,7 @@
                         android:id="@+id/sp_add_asset_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="City"
+                        android:hint="Kota"
                         android:inputType="text" />
 
 
@@ -230,7 +222,7 @@
                         android:id="@+id/et_add_asset_postal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Postal Code"
+                        android:hint="Kode Pos"
                         android:inputType="number" />
 
 
@@ -248,7 +240,7 @@
                         android:id="@+id/et_add_asset_country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Country"
+                        android:hint="Negara"
                         android:inputType="text" />
 
 
@@ -256,15 +248,13 @@
 
             </LinearLayout>
 
-
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="5dp"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
-                android:text="Beri Rating" />
+                android:text="Kelas (bintang)" />
 
             <RatingBar
                 android:id="@+id/rb_new_asset"
@@ -273,6 +263,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:isIndicator="false"
                 android:numStars="5"
                 android:stepSize="1" />
@@ -283,7 +274,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Add Assets Images" />
+                android:text="Unggah Foto" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_preview_img_new_asset"
@@ -301,7 +292,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
-        android:text="SUBMIT"
+        android:text="TAMBAH"
         android:textColor="@android:color/white" />
 
 

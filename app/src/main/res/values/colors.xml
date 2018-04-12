@@ -7,6 +7,7 @@
     <color name="dot_inactive">#ccc</color>
     <color name="dot_active">#666</color>
 
+    <color name="bg_color">#e3e3e3</color>
 
 
     <!-- Intro Slider -->

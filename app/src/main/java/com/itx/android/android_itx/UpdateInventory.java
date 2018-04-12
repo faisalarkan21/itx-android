@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -69,6 +70,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by faisal on 3/2/18.
@@ -137,11 +139,14 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_inventory);
 
+        getSupportActionBar().setTitle("Ubah Inventory");
+
         ButterKnife.bind(this);
         validator = new Validator(this);
         validator.setValidationListener(this);
         mBtnAddInvent.setOnClickListener(this);
         mBtnAddImage.setOnClickListener(this);
+        mBtnAddInvent.setText("SIMPAN");
 
         if(fileImages.size() > 0 || imagePreviews.size() > 0){
             fileImages.clear();
@@ -491,7 +496,6 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
 
             mPreviewAdapter.notifyDataSetChanged();
 
-            Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
@@ -590,5 +594,10 @@ public class UpdateInventory extends AppCompatActivity implements View.OnClickLi
             mListFacilitiesChecked.remove(DataChecked.get("_id").getAsString());
             Log.i("checkboxList", mListFacilitiesChecked.toString());
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

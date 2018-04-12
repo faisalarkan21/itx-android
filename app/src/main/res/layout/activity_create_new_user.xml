@@ -78,7 +78,7 @@
                         android:id="@+id/et_add_user_firstname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Firstname"
+                        android:hint="Nama Depan"
                         android:inputType="text" />
 
 
@@ -96,7 +96,7 @@
                         android:id="@+id/et_add_user_lastname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Lastname"
+                        android:hint="Nama Belakang"
                         android:inputType="text" />
 
 
@@ -131,7 +131,7 @@
                     android:id="@+id/et_add_asset_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone"
+                    android:hint="Telpon"
                     android:inputType="number"
                     />
 
@@ -150,7 +150,7 @@
                     android:id="@+id/et_add_user_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Address"
+                    android:hint="Alamat"
                     android:inputType="text" />
 
 
@@ -180,7 +180,7 @@
                         android:id="@+id/sp_add_user_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Province"
+                        android:hint="Provinsi"
                         android:inputType="text" />
 
 
@@ -217,7 +217,7 @@
                         android:id="@+id/sp_add_user_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="City"
+                        android:hint="Kota"
                         android:inputType="text" />
 
 
@@ -240,7 +240,7 @@
                         android:id="@+id/et_add_user_postal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Postal Code"
+                        android:hint="Kode Pos"
                         android:inputType="number" />
 
 
@@ -257,7 +257,7 @@
                         android:id="@+id/et_add_user_country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Country"
+                        android:hint="Negara"
                         android:inputType="text" />
 
 
@@ -273,7 +273,7 @@
     <Button
         android:id="@+id/btn_add_new_user"
         android:background="@color/colorPrimary"
-        android:text="SUBMIT"
+        android:text="TAMBAH"
         android:textColor="@android:color/white"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"

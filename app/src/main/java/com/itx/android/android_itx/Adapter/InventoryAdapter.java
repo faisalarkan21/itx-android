@@ -81,7 +81,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
 
         holder.inventoryStock.setText("Stock : " + invent.getStock());
         holder.inventorySpace.setText("Space : " + invent.getSpace());
-        holder.inventoryPrice.setText("@ " + RupiahCurrency.toRupiahFormat(invent.getPrice()) + ",00");
+        holder.inventoryPrice.setText(RupiahCurrency.toRupiahFormat(invent.getPrice()) + ",00");
 
 
         holder.ivInventoptions.setOnClickListener(new View.OnClickListener() {

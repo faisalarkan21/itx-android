@@ -4,7 +4,7 @@
 
     <item
         app:showAsAction="never"
-        android:title="Logout"
+        android:title="Keluar"
         android:id="@+id/menu_logout"
         />
 

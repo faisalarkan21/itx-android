@@ -3,24 +3,21 @@ package com.itx.android.android_itx;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.itx.android.android_itx.Entity.Users;
-import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -36,13 +33,12 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import jp.wasabeef.blurry.Blurry;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
 public class Login extends AppCompatActivity implements Validator.ValidationListener {
@@ -87,6 +83,18 @@ public class Login extends AppCompatActivity implements Validator.ValidationList
                 .sampling(5)
                 .from(bitmap)
                 .into(mRootView);
+
+        editPassword.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    validator.validate();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -132,7 +140,7 @@ public class Login extends AppCompatActivity implements Validator.ValidationList
                             }
                             public void onFinish() {
                                 progressDialog.dismiss();
-                                Intent dashboard = new Intent(Login.this, DashboardUtama.class);
+                                Intent dashboard = new Intent(Login.this, ListUsers.class);
                                 startActivity(dashboard);
                                 finish();
 
@@ -187,6 +195,11 @@ public class Login extends AppCompatActivity implements Validator.ValidationList
             }
         }
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }
 

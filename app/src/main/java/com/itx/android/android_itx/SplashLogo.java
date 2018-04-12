@@ -16,6 +16,7 @@ import com.itx.android.android_itx.Utils.SessionManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by faisal on 2/21/18.
@@ -101,5 +102,10 @@ public class SplashLogo extends AppCompatActivity {
         // TODO Auto-generated method stub
         super.onPause();
         finish();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
-    android:layout_marginTop="0dp"
-    android:orientation="horizontal"
-    android:padding="5dip">
+    tools:ignore="MissingPrefix"
+    android:padding="5dp">
 
     <!--  ListRow Left sied Thumbnail image -->
     <LinearLayout
@@ -13,111 +12,92 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="5dip"
-
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="12dip"
         android:padding="3dip">
 
         <ImageView
             android:id="@+id/iv_asset_inventory"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
-            android:src="@drawable/icon_tentang_03"
-           />
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_tentang_03" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_inventory_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail_asset_layout"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="3dp"
-        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-        android:text="Inventory Name"
-        android:textColor="#040404"
-        android:textStyle="bold"
-        android:typeface="sans" />
-
-    <TextView
-        android:id="@+id/tv_inventory_facilities"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_alignLeft="@+id/tv_inventory_name"
-        android:layout_alignStart="@+id/tv_inventory_name"
-        android:layout_below="@+id/tv_inventory_name"
-
-
-
-        android:layout_marginTop="3dp"
-        android:text="Facilities : Wifi, AC, Parking"
-        android:textColor="#343434"
-        android:textSize="15sp" />
 
     <LinearLayout
-        android:id="@+id/ll_stock_harga"
-        android:layout_alignLeft="@+id/tv_inventory_facilities"
-        android:layout_alignStart="@+id/tv_inventory_facilities"
-        android:layout_below="@+id/tv_inventory_facilities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <TextView
-            android:id="@+id/tv_inventory_stock"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-
-
-
-            android:layout_marginTop="5dp"
-            android:text="Stock"
-            android:textColor="#343434"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/tv_inventory_price"
-            android:layout_width="73dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:imeOptions="actionNext"
-
-            android:inputType="text"
-            android:maxLines="1"
-            android:text="harga" />
-
-    </LinearLayout>
-
-
-
-
-    <!-- Rightend Arrow -->
-    <TextView
-        android:id="@+id/tv_inventory_space"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/ll_stock_harga"
-        android:layout_alignStart="@+id/ll_stock_harga"
-        android:layout_below="@+id/ll_stock_harga"
-        android:text="Space"
-        android:textColor="#343434"
-        android:textSize="15sp" />
+        android:orientation="vertical"
+        android:layout_toRightOf="@+id/thumbnail_asset_layout"
+        android:layout_toLeftOf="@+id/iv_invent_options">
 
-    <ImageView
+        <TextView
+            fontPath="fonts/segoeuib.ttf"
+            android:id="@+id/tv_inventory_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Inventory Name"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tv_inventory_facilities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="Facilities : Wifi, AC, Parking"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:id="@+id/ll_stock_harga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_inventory_stock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stock"
+                android:textColor="@android:color/primary_text_light"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_inventory_space"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Space"
+                android:textColor="@android:color/primary_text_light"
+                android:layout_marginLeft="10dp"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <TextView
+            fontPath="fonts/segoeuib.ttf"
+            android:id="@+id/tv_inventory_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/primary_text_light"
+            android:text="harga"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+    <!-- Rightend Arrow -->
+
+    <TextView
         android:id="@+id/iv_invent_options"
+        fontPath="fonts/segoeuib.ttf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="2.2dp"
-        android:src="@drawable/ic_more_vert" />
-
-
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:paddingLeft="32dp"
+        android:text="&#8942;"
+        android:textColor="@android:color/primary_text_light"
+        android:textSize="18sp" />
 
 </RelativeLayout>

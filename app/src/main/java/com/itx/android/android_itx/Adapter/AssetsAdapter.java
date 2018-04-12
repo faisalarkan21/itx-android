@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -15,16 +14,15 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.itx.android.android_itx.Entity.Assets;
-import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Entity.Asset;
 import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.UpdateAsset;
-import com.itx.android.android_itx.UpdateUser;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.itx.android.android_itx.ViewHolder.AssetsViewHolder;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -39,13 +37,13 @@ import retrofit2.Callback;
 public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     private Context mContext;
-    private List<Assets> mListAssets;
+    private List<Asset> mListAssets;
     AssetService mListAssetsAPIService;
     private SessionManager session;
     ProgressDialog progressDialog;
 
 
-    public AssetsAdapter(List<Assets> assets, Context context) {
+    public AssetsAdapter(List<Asset> assets, Context context) {
         this.mContext = context;
         this.mListAssets = assets;
 
@@ -62,13 +60,13 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     @Override
     public void onBindViewHolder(final AssetsViewHolder holder, int position) {
-        final Assets currentAsset = mListAssets.get(position);
+        final Asset currentAsset = mListAssets.get(position);
         holder.mTvAssetName.setText(currentAsset.getName());
         holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
         holder.mRatingBar.setRating(Math.round(currentAsset.getRating()));
 
         if (currentAsset.getImages() != null) {
-            Glide.with(mContext)
+            Picasso.with(mContext)
                     .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages())
                     .into(holder.mIvGambarAsset);
         }
@@ -119,7 +117,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     }
 
 
-    public void deleteUser(Assets asset) {
+    public void deleteUser(Asset asset) {
         session = new SessionManager(mContext);
         mListAssetsAPIService = ApiUtils.getListAssetsService(session.getToken());
 

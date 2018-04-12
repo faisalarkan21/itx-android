@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by faisal on 2/21/18.
  */
 
-public class Assets {
+public class Asset {
 
     @SerializedName("idAsset")
     @Expose

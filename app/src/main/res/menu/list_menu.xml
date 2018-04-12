@@ -9,13 +9,13 @@
 
         android:id="@+id/menu_edit"
         android:enabled="true"
-        android:title="Update"
+        android:title="Ubah"
         android:visible="true" />
 
     <item
         android:id="@+id/menu_delete"
         android:enabled="true"
-        android:title="Delete"
+        android:title="Hapus"
         app:showAsAction="never" />
 
 

@@ -1,65 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
-    android:layout_marginTop="0dp"
     android:orientation="horizontal"
+    tools:ignore="MissingPrefix">
 
-    android:padding="5dip">
-
-    <!--  ListRow Left sied Thumbnail image -->
-    <LinearLayout
-        android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="5dip"
-
-        android:padding="3dip">
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="5dp">
 
         <ImageView
             android:id="@+id/list_image_users"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
-            android:src="@drawable/icon_tentang_04"
-             />
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_tentang_04" />
 
-    </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/topLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/list_image_users">
 
-    <TextView
-        android:id="@+id/userName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="3dp"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Name"
-        android:textColor="#040404"
-        android:textStyle="bold"
-        android:typeface="sans" />
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="3dp"
+                android:layout_toLeftOf="@+id/iv_users_options"
+                android:ellipsize="end"
+                android:lines="2"
+                android:maxLines="2"
+                android:text="Name"
+                android:textColor="@android:color/primary_text_light"
+                android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/assets"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/userName"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="3dp"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Assets"
-        android:textColor="#343434"
-        android:textSize="15sp" />
+            <TextView
+                android:id="@+id/iv_users_options"
+                fontPath="fonts/segoeuib.ttf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="3dp"
+                android:clickable="true"
+                android:paddingLeft="32dp"
+                android:text="&#8942;"
+                android:textColor="@android:color/primary_text_light"
+                android:textSize="18sp" />
 
+        </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/iv_users_options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="2.2dp"
-        android:src="@drawable/ic_more_vert" />
+        <TextView
+            android:id="@+id/asset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/topLayout"
+            android:text="Assets"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

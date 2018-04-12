@@ -41,7 +41,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'/**/
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
     compile 'id.zelory:compressor:2.1.0'
@@ -50,4 +50,8 @@ dependencies {
 
 
     implementation 'com.android.support:mediarouter-v7:27.0.2'
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'jp.wasabeef:picasso-transformations:2.2.1'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 }

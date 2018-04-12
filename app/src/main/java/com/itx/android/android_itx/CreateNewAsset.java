@@ -40,6 +40,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -73,6 +74,7 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
+import com.itx.android.android_itx.Utils.Helper;
 import com.itx.android.android_itx.Utils.ImageUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -103,6 +105,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CreateNewAsset extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
@@ -121,7 +124,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     public static ArrayList<File> fileImages = new ArrayList<>();
     ArrayList<String> categories = new ArrayList<>();
 
-    private LatLng assetLocation = new LatLng(-3.5261626, 112.0149507);
+    private LatLng assetLocation = new LatLng(-0.8784862,113.6934566);
 
     private AssetService mAssetService;
     private String categoryIdSelected;
@@ -186,9 +189,6 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     @BindView(R.id.select_image)
     Button mBtnAddImages;
 
-    @BindView(R.id.btn_add_location)
-    Button mBtnAddLocaion;
-
     @BindView(R.id.static_map)
     ImageView staticMap;
 
@@ -196,11 +196,16 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     @BindView(R.id.et_add_asset_address)
     EditText mEtAssetAddress;
 
+    @BindView(R.id.sv_new_asset)
+    ScrollView scrollView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_asset);
+
+        getSupportActionBar().setTitle("Tambah Asset");
 
         ButterKnife.bind(this);
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
@@ -223,7 +228,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
 
         mBtnAddImages.setOnClickListener(this);
         mBtnAddAsset.setOnClickListener(this);
-        mBtnAddLocaion.setOnClickListener(this);
+        staticMap.setOnClickListener(this);
 
         if (fileImages.size() > 0 || imagePreviews.size() > 0) {
             fileImages.clear();
@@ -278,53 +283,19 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
 
 
     private void setStaticMap() {
-
-        String formattedLangLat = assetLocation.latitude + "," + assetLocation.longitude;
-        Call<ResponseBody> staticMapRequest = null;
-
-        String initZoomLevel = null;
-
         // check if address editText was null make it zoom level 4
         // for init map get full indonesia map
         if (mEtAssetAddress.getText().toString().isEmpty()) {
-            initZoomLevel = "4";
+            Glide.with(CreateNewAsset.this)
+                    .load(Helper.getStaticMapWithoutMarker(CreateNewAsset.this, assetLocation.latitude, assetLocation.longitude, 4 ))
+                    .into(staticMap);
         }else{
-            initZoomLevel = "18";
+            Glide.with(CreateNewAsset.this)
+                    .load(Helper.getStaticMapWithMarker(CreateNewAsset.this, assetLocation.latitude, assetLocation.longitude, 18 ))
+                    .into(staticMap);
         }
 
-        try {
-            staticMapRequest = mApiSevice.getStaticMap(formattedLangLat, initZoomLevel, "600x600", "color:red" + java.net.URLDecoder.decode("%7C", "UTF-8") + formattedLangLat, getString(R.string.google_maps_key));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        staticMapRequest.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> rawResponse) {
-
-                if (rawResponse.isSuccessful()) {
-                    Glide.with(CreateNewAsset.this)
-                            .load(rawResponse.raw().request().url().toString())
-                            .into(staticMap);
-
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Do something after 5s = 5000ms
-                            progressDialog.dismiss();
-                        }
-                    }, 500);
-
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+        progressDialog.dismiss();
     }
 
 
@@ -628,7 +599,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
                         RC_PERMS_CAMERA
                 );
                 break;
-            case R.id.btn_add_location:
+            case R.id.static_map:
                 Intent mapAsset = new Intent(CreateNewAsset.this, ActivityMapAsset.class);
                 mapAsset.putExtra("lang", assetLocation.longitude);
                 mapAsset.putExtra("lat", assetLocation.latitude);
@@ -675,5 +646,9 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
 }

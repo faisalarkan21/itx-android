@@ -1,12 +1,13 @@
 package com.itx.android.android_itx;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,10 +26,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Adapter.UsersAdapter;
+import com.itx.android.android_itx.Utils.GridSpacingItemDecoration;
 import com.itx.android.android_itx.Utils.SessionManager;
 
 
@@ -39,10 +41,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ListUsers extends AppCompatActivity {
 
-    private List<Users> userList = new ArrayList<>();
+    private List<User> userList = new ArrayList<>();
     private UsersAdapter uAdapter;
     SessionManager session;
 
@@ -87,11 +90,12 @@ public class ListUsers extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
 
         recyclerView.setLayoutManager(mLayoutManager);
 
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(3
+                , 10, true));
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -140,7 +144,7 @@ public class ListUsers extends AppCompatActivity {
 
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
                             Log.d("TEST", Data.toString());
-                            Users user = new Users();
+                            User user = new User();
                             user.setIdUser(Data.get("_id").getAsString());
                             user.setRole(Data.get("role").getAsJsonObject().get("name").getAsString());
                             user.setFullName(Data.get("fullName").getAsString());
@@ -217,6 +221,11 @@ public class ListUsers extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
 }

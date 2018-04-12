@@ -47,8 +47,7 @@
                     android:id="@+id/input_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Username"
-                    android:text=""
+                    android:hint="Nama Pengguna"
                     android:inputType="textEmailAddress" />
 
 
@@ -67,11 +66,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="Password"
-                    android:text=""
+                    android:hint="Kata Sandi"
                     android:inputType="textPassword"
                     android:paddingTop="30px"
                     android:shadowColor="@android:color/background_dark"
+                    android:imeOptions="actionDone"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -88,8 +87,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:layout_marginTop="20dp"
-                android:background="#01579B"
-                android:text="Login"
+                android:background="@color/colorPrimary"
+                android:text="Masuk"
                 android:textColor="#FAFAFA" />
 
 

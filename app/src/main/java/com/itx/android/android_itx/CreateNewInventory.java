@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -68,6 +69,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
 
@@ -128,6 +130,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_inventory);
+
+        getSupportActionBar().setTitle("Tambah Inventory");
 
         ButterKnife.bind(this);
         validator = new Validator(this);
@@ -388,7 +392,6 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
             mPreviewAdapter.notifyDataSetChanged();
 
-            Toast.makeText(this, "images : " + fileImages.size(), Toast.LENGTH_SHORT).show();
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             mPreviewAdapter.notifyDataSetChanged();
         }
@@ -465,5 +468,10 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

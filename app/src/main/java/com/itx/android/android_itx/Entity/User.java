@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by faisal on 2/19/18.
  */
 
-public class Users {
+public class User {
 
     @SerializedName("idUser")
     @Expose

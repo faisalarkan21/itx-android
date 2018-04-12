@@ -1,26 +1,16 @@
 package com.itx.android.android_itx;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,10 +25,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Entity.Image;
-import com.itx.android.android_itx.Entity.Users;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -58,8 +46,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -69,11 +55,11 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by faisal on 3/1/18.
@@ -161,12 +147,15 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
 
+        getSupportActionBar().setTitle("Ubah Pengguna");
+
         session = new SessionManager(this);
         ButterKnife.bind(this);
 
         validator = new Validator(this);
         validator.setValidationListener(this);
 
+        mBtnAddUser.setText("SIMPAN");
         mBtnAddUser.setOnClickListener(this);
         mIvPhoto.setOnClickListener(this);
         mFabAddPhoto.setOnClickListener(this);
@@ -546,5 +535,10 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

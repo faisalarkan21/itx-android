@@ -46,6 +46,7 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ListInventory extends AppCompatActivity implements Callback<JsonObject> {
 
@@ -149,6 +150,7 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         String images = getIntent().getStringExtra("images");
         float rating = getIntent().getFloatExtra("rating", 0);
 
+        getSupportActionBar().setTitle(assetName);
         mAssetName.setText(assetName);
         mAssetAddress.setText(assetAdress);
         mAssetCategory.setText(categoryName);
@@ -404,5 +406,10 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
             View view = (View) object;
             container.removeView(view);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

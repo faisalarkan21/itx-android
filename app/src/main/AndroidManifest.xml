@@ -18,6 +18,7 @@
         android:required="true" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/seller"
         android:label="@string/app_name"
@@ -38,69 +39,83 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".SplashLogo">
+        <activity android:name=".SplashLogo"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
+        <activity android:name=".Login"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".DashboardUtama"
-            android:label="Dahsboard Utama" />
+            android:label="Dahsboard Utama"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ListUsers"
             android:label="List Pengguna"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ListAssets"
             android:label="List Assets"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListUsers" />
+            android:parentActivityName=".ListUsers"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ListInventory"
             android:label="List Inventory"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets" />
+            android:parentActivityName=".ListAssets"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".CreateNewUser"
             android:label="New User"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListUsers" />
+            android:parentActivityName=".ListUsers"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".CreateNewAsset"
             android:label="New Asset"
             android:largeHeap="true"
             android:hardwareAccelerated="false"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets" />
+            android:parentActivityName=".ListAssets"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".CreateNewInventory"
             android:label="New Inventory"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListInventory" />
+            android:parentActivityName=".ListInventory"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UpdateUser"
             android:label="Update User"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListUsers" />
+            android:parentActivityName=".ListUsers"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UpdateAsset"
             android:label="Update Asset"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListAssets" />
+            android:parentActivityName=".ListAssets"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UpdateInventory"
             android:label="Update Inventory"
             android:launchMode="singleTop"
-            android:parentActivityName=".ListInventory" />
-        <activity android:name=".WelcomeActivity" />
+            android:parentActivityName=".ListInventory"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".WelcomeActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ActivityMapAsset"
             android:label="Pilih Lokasi"
             android:parentActivityName=".CreateNewAsset"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -35,6 +35,15 @@ public class SessionManager {
     public void removeToken(){
         prefs.edit().remove("token").apply();
     }
+
+    public void setRole(String role) {
+        prefs.edit().putString("role", role).apply();;
+    }
+
+    public String getRole() {
+        String role = prefs.getString("role", "");
+        return role;
+    }
 }
 
 

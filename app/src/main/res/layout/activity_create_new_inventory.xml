@@ -32,7 +32,7 @@
                     android:id="@+id/et_add_inventory_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Name"
+                    android:hint="Nama"
                     android:inputType="text" />
 
 
@@ -49,7 +49,7 @@
                     android:id="@+id/et_add_inventory_deskripsi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Description"
+                    android:hint="Deskripsi"
 
                     android:inputType="text|textMultiLine" />
 
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
-                android:text="Facility" />
+                android:text="Facilitas" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="12dp"
-                android:text="Add Inventory Images" />
+                android:text="Unggah Foto" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_preview_img_new_invent"
@@ -161,7 +161,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
-        android:text="SUBMIT"
+        android:text="TAMBAH"
         android:textColor="@android:color/white" />
 
 </RelativeLayout>

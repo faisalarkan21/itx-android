@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -72,6 +73,7 @@ import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.AutoCompleteUtils;
+import com.itx.android.android_itx.Utils.Helper;
 import com.itx.android.android_itx.Utils.ImageUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -101,6 +103,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by faisal on 3/1/18.
@@ -134,7 +137,7 @@ public class UpdateAsset extends AppCompatActivity implements
     private Marker mAssetMarker;
     private MarkerOptions mAssetMarkerOptions;
     Validator validator;
-    private LatLng assetLocation = new LatLng(-3.5261626, 112.0149507);
+    private LatLng assetLocation = new LatLng(-0.8784862,113.6934566);
     private String[] locationPerm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     ArrayAdapter spAdapterCity;
@@ -202,8 +205,9 @@ public class UpdateAsset extends AppCompatActivity implements
     @BindView(R.id.static_map)
     ImageView staticMap;
 
-    @BindView(R.id.btn_add_location)
-    Button mBtnAddLocaion;
+    @BindView(R.id.sv_new_asset)
+    ScrollView scrollView;
+
 
     String idUser, userAdress, userName, phone, imagesDetail, role;
     AssetService mAssetAPIService;
@@ -217,6 +221,8 @@ public class UpdateAsset extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_asset);
+
+        getSupportActionBar().setTitle("Ubah Asset");
 
         ButterKnife.bind(this);
         mApiSevice = ApiUtils.getAPIService(new SessionManager(this).getToken());
@@ -240,9 +246,9 @@ public class UpdateAsset extends AppCompatActivity implements
             imagePreviews.clear();
         }
         mBtnAddImages.setOnClickListener(this);
+        mBtnAddAsset.setText("SIMPAN");
         mBtnAddAsset.setOnClickListener(this);
-        mBtnAddLocaion.setOnClickListener(this);
-        mBtnAddLocaion.setText("Update / Detail Map");
+        staticMap.setOnClickListener(this);
 
         mSpCategories.setVisibility(View.GONE);
         spAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
@@ -460,45 +466,19 @@ public class UpdateAsset extends AppCompatActivity implements
     }
 
     private void setStaticMap() {
-
-        String formattedLangLat = assetLocation.latitude + "," + assetLocation.longitude;
-        Call<ResponseBody> staticMapRequest = null;
-        try {
-            staticMapRequest = mApiSevice.getStaticMap(formattedLangLat, "18", "600x600", "color:red" + java.net.URLDecoder.decode("%7C", "UTF-8") + formattedLangLat, getString(R.string.google_maps_key));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        // check if address editText was null make it zoom level 4
+        // for init map get full indonesia map
+        if (mEtAssetAddress.getText().toString().isEmpty()) {
+            Glide.with(UpdateAsset.this)
+                    .load(Helper.getStaticMapWithoutMarker(UpdateAsset.this, assetLocation.latitude, assetLocation.longitude, 4 ))
+                    .into(staticMap);
+        }else{
+            Glide.with(UpdateAsset.this)
+                    .load(Helper.getStaticMapWithMarker(UpdateAsset.this, assetLocation.latitude, assetLocation.longitude, 18 ))
+                    .into(staticMap);
         }
 
-        staticMapRequest.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> rawResponse) {
-//
-                if (rawResponse.isSuccessful()) {
-
-                    Glide.with(UpdateAsset.this)
-                            .load(rawResponse.raw().request().url().toString())
-                            .into(staticMap);
-
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Do something after 5s = 5000ms
-                            progressDialog.dismiss();
-                        }
-                    }, 3800);
-
-
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
+        progressDialog.dismiss();
     }
 
 
@@ -710,7 +690,7 @@ public class UpdateAsset extends AppCompatActivity implements
                         RC_PERMS_GALLERY,
                         RC_PERMS_CAMERA);
                 break;
-            case R.id.btn_add_location:
+            case R.id.static_map:
                 Intent mapAsset = new Intent(UpdateAsset.this, ActivityMapAsset.class);
                 mapAsset.putExtra("lang", assetLocation.longitude);
                 mapAsset.putExtra("lat", assetLocation.latitude);
@@ -764,7 +744,6 @@ public class UpdateAsset extends AppCompatActivity implements
                 imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                 fileImages.add(file);
             }
-
 
             mPreviewAdapter.notifyDataSetChanged();
 
@@ -842,5 +821,8 @@ public class UpdateAsset extends AppCompatActivity implements
         }
     }
 
-
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 }

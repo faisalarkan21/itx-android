@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_color">
 
-    <include layout="@layout/content_users" />
+        <include layout="@layout/content_users" />
 
-    <ProgressBar
-        android:id="@+id/pb_list_user"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        <ProgressBar
+            android:id="@+id/pb_list_user"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
 
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_add_user"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_add_user"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="14dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_add"
+            app:backgroundTint="@color/colorAccent"
+            app:fabSize="normal" />
 
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/pb_list_user"
-        android:layout_marginBottom="14dp"
-        android:foregroundGravity="center_vertical"
-        android:scaleType="center"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/colorAccent"
-        app:fabSize="normal" />
+    </RelativeLayout>
 
 </RelativeLayout>

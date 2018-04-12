@@ -1,10 +1,12 @@
 package com.itx.android.android_itx;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,10 +21,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.itx.android.android_itx.Adapter.AssetsAdapter;
-import com.itx.android.android_itx.Entity.Assets;
-import com.itx.android.android_itx.Entity.Users;
+import com.itx.android.android_itx.Entity.Asset;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.GridSpacingItemDecoration;
 import com.itx.android.android_itx.Utils.SessionManager;
 
 import java.util.ArrayList;
@@ -30,12 +32,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ListAssets extends AppCompatActivity {
 
-    private List<Assets> mListAsset = new ArrayList<>();
+    private List<Asset> mListAsset = new ArrayList<>();
     @BindView(R.id.btn_add_asset)
     FloatingActionButton mBtnAddAsset;
 
@@ -55,7 +59,7 @@ public class ListAssets extends AppCompatActivity {
     RecyclerView mRecyclerView;
 
     @BindView(R.id.iv_user_images)
-    ImageView mIvUserImages;
+    CircleImageView mIvUserImages;
 
     @BindView(R.id.pb_list_asset)
     ProgressBar mPbListAsset;
@@ -80,12 +84,12 @@ public class ListAssets extends AppCompatActivity {
 
         showLoading();
 
-        RecyclerView.LayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
 
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2
+                , 10, true));
 
         mRecyclerView.setAdapter(mAdapter);
         idUser = getIntent().getStringExtra("id");
@@ -95,6 +99,7 @@ public class ListAssets extends AppCompatActivity {
         images = getIntent().getStringExtra("photo");
         role = getIntent().getStringExtra("role");
 
+        getSupportActionBar().setTitle("Pengguna");
         mUserName.setText(userName);
         mUserRole.setText(role);
         mUserAddress.setText(userAdress);
@@ -161,24 +166,24 @@ public class ListAssets extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject Data = jsonArray.get(i).getAsJsonObject();
 
-                            Assets assets = new Assets();
-                            assets.setId(Data.get("_id").getAsString());
-                            assets.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
-                            assets.setName(Data.get("name").getAsString());
+                            Asset asset = new Asset();
+                            asset.setId(Data.get("_id").getAsString());
+                            asset.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
+                            asset.setName(Data.get("name").getAsString());
 
                             if (Data.get("images").getAsJsonArray().size() != 0) {
                                 JsonArray imagesLoop = Data.get("images").getAsJsonArray();
                                 JsonObject DataImageAseets = imagesLoop.get(0).getAsJsonObject();
-                                assets.setImages(DataImageAseets.get("thumbnail").getAsString());
+                                asset.setImages(DataImageAseets.get("thumbnail").getAsString());
                             }
 
-                            assets.setPhone(Data.get("phone").getAsString());
-                            assets.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
+                            asset.setPhone(Data.get("phone").getAsString());
+                            asset.setAssetCategory(Data.get("assetCategory").getAsJsonObject().get("name").getAsString());
                             if (Data.get("rating") != null) {
-                                assets.setRating(Data.get("rating").getAsFloat());
+                                asset.setRating(Data.get("rating").getAsFloat());
                             }
 
-                            mListAsset.add(assets);
+                            mListAsset.add(asset);
 
                         }
 
@@ -208,5 +213,10 @@ public class ListAssets extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         prepareUserData();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    tools:ignore="MissingPrefix">
 
     <ProgressBar
         android:id="@+id/pb_list_asset"
@@ -13,143 +13,108 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
 
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add_asset"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="23dp"
-        android:layout_marginTop="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="14dp"
+        android:foregroundGravity="center_horizontal"
         android:scaleType="center"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal" />
 
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.CardView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_margin="8dp"
-            app:cardElevation="8dp">
-
+            android:layout_height="match_parent"
+            android:background="@color/bg_color">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginRight="5dip"
-                android:orientation="horizontal"
-                android:padding="8dp">
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/thumbnail_asset_layout"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginRight="5dip"
+                    android:padding="18dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg">
 
-                    android:padding="3dip">
-
-                    <ImageView
+                    <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/iv_user_images"
-                        android:layout_width="47dp"
-                        android:layout_height="47dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="18dp"
                         android:src="@drawable/icon_tentang_06" />
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="128dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/userName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@+id/thumbnail_asset_layout"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Nama Orang"
-                        android:textColor="#040404"
-                        android:textStyle="bold"
-                        android:typeface="sans" />
-
-                    <TextView
-                        android:id="@+id/tv_user_role"
+                    <LinearLayout
+                        android:layout_below="@+id/iv_user_images"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/userName"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Member"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tv_user_address"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_user_role"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="JL. USA 15 Ciseeng"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                        <TextView
+                            android:id="@+id/userName"
+                            fontPath="fonts/segoeuib.ttf"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Nama Orang"
+                            android:textColor="@android:color/primary_text_light"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:typeface="sans" />
 
-                    <TextView
-                        android:id="@+id/tv_user_no_telp"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_user_address"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="+628986121212"
-                        android:textColor="#343434"
-                        android:textSize="15sp" />
+                        <TextView
+                            fontPath="fonts/segoeuil.ttf"
+                            android:id="@+id/tv_user_role"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Member"
+                            android:textColor="@android:color/secondary_text_dark"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            fontPath="fonts/segoeuil.ttf"
+                            android:id="@+id/tv_user_no_telp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="+628986121212"
+                            android:textColor="@android:color/primary_text_light"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tv_user_address"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="JL. USA 15 Ciseeng"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="16sp" />
+                    </LinearLayout>
 
 
-                </LinearLayout>
+                </RelativeLayout>
 
+                <include layout="@layout/content_assets" />
 
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_margin="16dp"
-            android:background="@android:color/darker_gray" />
+        </RelativeLayout>
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="List Asset" />
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_margin="16dp"
-            android:background="@android:color/darker_gray" />
-
-        <include layout="@layout/content_assets" />
-
-    </LinearLayout>
-
+    </ScrollView>
 
 </RelativeLayout>

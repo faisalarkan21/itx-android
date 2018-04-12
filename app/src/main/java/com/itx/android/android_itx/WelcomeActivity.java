@@ -1,5 +1,6 @@
 package com.itx.android.android_itx;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -20,6 +21,7 @@ import com.itx.android.android_itx.Utils.SessionManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
@@ -173,5 +175,10 @@ public class WelcomeActivity extends AppCompatActivity implements ViewPager.OnPa
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }
