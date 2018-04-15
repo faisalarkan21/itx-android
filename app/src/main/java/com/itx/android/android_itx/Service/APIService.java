@@ -1,6 +1,7 @@
 package com.itx.android.android_itx.Service;
 
 import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Entity.Response;
 
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -18,11 +19,15 @@ public interface APIService {
 
     @Multipart
     @POST("/api/upload")
-    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part photo);
+    Call<Response.UploadResponse> uploadPhoto(@Part MultipartBody.Part photo);
 
     @Multipart
     @POST("/api/upload")
-    Call<ResponseBody> uploadPhotos(@Part MultipartBody.Part[] photos);
+    Call<Response.UploadResponse> uploadPhotos(@Part MultipartBody.Part[] photos);
+
+    @Multipart
+    @POST("/api/upload")
+    Call<ResponseBody> uploadPhotos2(@Part MultipartBody.Part[] photos);
 
     @POST("https://maps.googleapis.com/maps/api/geocode/json")
     Call<JsonObject> reverseGeocode(@Query("latlng") String langlat,

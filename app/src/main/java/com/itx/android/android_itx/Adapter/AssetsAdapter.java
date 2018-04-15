@@ -13,8 +13,9 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.itx.android.android_itx.Entity.Asset;
+import com.itx.android.android_itx.Entity.Response;
 import com.itx.android.android_itx.ListInventory;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Service.AssetService;
@@ -42,7 +43,6 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     private SessionManager session;
     ProgressDialog progressDialog;
 
-
     public AssetsAdapter(List<Asset> assets, Context context) {
         this.mContext = context;
         this.mListAssets = assets;
@@ -60,14 +60,17 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
 
     @Override
     public void onBindViewHolder(final AssetsViewHolder holder, int position) {
+        Gson gson = new Gson();
         final Asset currentAsset = mListAssets.get(position);
+        final String data = gson.toJson(currentAsset, Asset.class);
+
         holder.mTvAssetName.setText(currentAsset.getName());
-        holder.mTvAssetCategory.setText(currentAsset.getAssetCategory());
+        holder.mTvAssetCategory.setText(currentAsset.getAssetCategory().getName());
         holder.mRatingBar.setRating(Math.round(currentAsset.getRating()));
 
         if (currentAsset.getImages() != null) {
             Picasso.with(mContext)
-                    .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages())
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + currentAsset.getImages().get(0).getmMedium())
                     .into(holder.mIvGambarAsset);
         }
 
@@ -83,11 +86,11 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                         switch (item.getItemId()) {
                             case R.id.menu_edit:
                                 Intent updateAsset = new Intent(mContext, UpdateAsset.class);
-                                updateAsset.putExtra("id", currentAsset.getId());
+                                updateAsset.putExtra("DATA", data);
                                 mContext.startActivity(updateAsset);
                                 break;
                             case R.id.menu_delete:
-                                deleteUser(currentAsset);
+                                deleteAsset(currentAsset);
                                 break;
                         }
                         return false;
@@ -103,13 +106,7 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
             public void onClick(View v) {
 
                 Intent listInventory = new Intent(mContext, ListInventory.class);
-                listInventory.putExtra("idAsset", currentAsset.getId());
-                listInventory.putExtra("address", currentAsset.getAddress());
-                listInventory.putExtra("images", currentAsset.getImages());
-                listInventory.putExtra("assetName", currentAsset.getName());
-                listInventory.putExtra("categoryName", currentAsset.getAssetCategory());
-                listInventory.putExtra("phone", currentAsset.getPhone());
-                listInventory.putExtra("rating", currentAsset.getRating());
+                listInventory.putExtra("DATA", data);
                 mContext.startActivity(listInventory);
 
             }
@@ -117,11 +114,11 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
     }
 
 
-    public void deleteUser(Asset asset) {
+    public void deleteAsset(Asset asset) {
         session = new SessionManager(mContext);
         mListAssetsAPIService = ApiUtils.getListAssetsService(session.getToken());
 
-        final Call<ResponseBody> response = mListAssetsAPIService.deleteAssets(asset.getId());
+        final Call<Response.DeleteAsset> response = mListAssetsAPIService.deleteAssets(asset.getId());
 
         android.app.AlertDialog.Builder alertBuilder = new android.app.AlertDialog.Builder(mContext);
         alertBuilder.setTitle("Konfirmasi");
@@ -135,33 +132,34 @@ public class AssetsAdapter extends RecyclerView.Adapter<AssetsViewHolder> {
                 progressDialog.show();
 
                 dialog.dismiss();
-                response.enqueue(new Callback<ResponseBody>() {
+                response.enqueue(new Callback<Response.DeleteAsset>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
-                        if (rawResponse.isSuccessful()) {
+                    public void onResponse(Call<Response.DeleteAsset> call, retrofit2.Response<Response.DeleteAsset> response) {
+                        if(response.isSuccessful()){
                             progressDialog.dismiss();
+                            if(response.body().getStatus().getCode() == 200){
+                                Toast.makeText(mContext, "Berhasil Mengapus",
+                                        Toast.LENGTH_LONG).show();
 
-                            Toast.makeText(mContext, "Berhasil Mengapus",
-                                    Toast.LENGTH_LONG).show();
-
-                            ((Activity) mContext).finish();
-                            mContext.startActivity(((Activity) mContext).getIntent());
-                            progressDialog.dismiss();
-
-                        } else {
+                                ((Activity) mContext).finish();
+                                mContext.startActivity(((Activity) mContext).getIntent());
+                                progressDialog.dismiss();
+                            }else{
+                                Toast.makeText(mContext, response.body().getStatus().getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }else{
                             Toast.makeText(mContext, "Gagal",
                                     Toast.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
-                        Toast.makeText(mContext, throwable.getMessage(),
+                    public void onFailure(Call<Response.DeleteAsset> call, Throwable t) {
+                        Toast.makeText(mContext, t.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-
             }
         });
         alertBuilder.setNegativeButton("Tidak", new DialogInterface.OnClickListener() {

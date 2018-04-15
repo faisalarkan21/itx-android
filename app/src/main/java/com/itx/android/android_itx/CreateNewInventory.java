@@ -1,28 +1,18 @@
 package com.itx.android.android_itx;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.CountDownTimer;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -31,11 +21,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
+import com.itx.android.android_itx.Entity.Asset;
+import com.itx.android.android_itx.Entity.Facility;
 import com.itx.android.android_itx.Entity.ImageHolder;
-import com.itx.android.android_itx.Entity.Inventory;
+import com.itx.android.android_itx.Entity.InventoryCategory;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -47,14 +40,9 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,12 +51,9 @@ import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CreateNewInventory extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
@@ -84,7 +69,7 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
 
     private APIService mApiSevice;
     private PreviewAdapter mPreviewAdapter;
-    private List<String> mListFacilitiesChecked = new ArrayList<>();
+    private List<Facility> mListFacilitiesChecked = new ArrayList<>();
 
     SessionManager session;
     InventoryService mInventoryAPIService;
@@ -125,6 +110,8 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     EditText mEtAddPrice;
 
     CheckBox[] checkFacilities;
+    private List<Facility> facilities = new ArrayList<>();
+    private Asset mAsset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +119,9 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_create_new_inventory);
 
         getSupportActionBar().setTitle("Tambah Inventory");
+
+        Gson gson = new Gson();
+        mAsset = gson.fromJson(getIntent().getStringExtra("DATA"), Asset.class);
 
         ButterKnife.bind(this);
         validator = new Validator(this);
@@ -158,14 +148,10 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                     if (currentImage.getmUri() == null) continue;
                     String fileName = Uri.fromFile(fileImages.get(i)).getLastPathSegment();
                     String currentUriName = currentImage.getmUri().getLastPathSegment();
-                    Log.d("filename : ", fileName);
-                    Log.d("Uriname : ", currentUriName);
                     if (currentImage.getmUri() != null && fileName.equals(currentUriName)) {
                         fileImages.remove(i);
                     }
                 }
-
-                Log.d("SIZE ", "The size image : " + imagePreviews.size() + " and files size : " + fileImages.size());
                 imagePreviews.remove(position);
                 mPreviewAdapter.notifyDataSetChanged();
             }
@@ -194,72 +180,51 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
     }
 
     public void prepareFacilitiesData() {
-
-        Call<JsonObject> response = mInventoryAPIService.getAllFacilities();
-
-        response.enqueue(new Callback<JsonObject>() {
+        Call<Response.GetFacillity> response = mInventoryAPIService.getAllFacilities();
+        response.enqueue(new Callback<Response.GetFacillity>() {
             @Override
-            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
-                if (rawResponse.isSuccessful()) {
-                    try {
-                        final JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
-                        checkFacilities = new CheckBox[jsonArray.size()];
-                        for (int i = 0; i < jsonArray.size(); i++) {
+            public void onResponse(Call<Response.GetFacillity> call, retrofit2.Response<Response.GetFacillity> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        facilities.addAll(response.body().getData().getFacility());
+                        checkFacilities = new CheckBox[facilities.size()];
+                        for (int i = 0; i < facilities.size(); i++) {
 
-                            final JsonObject Data = jsonArray.get(i).getAsJsonObject();
-                            Inventory invent = new Inventory();
-
+                            final Facility facility = facilities.get(i);
                             checkFacilities[i] = new CheckBox(CreateNewInventory.this);
-                            checkFacilities[i].setText(Data.get("name").getAsString());
+                            checkFacilities[i].setText(facility.getName());
                             checkFacilities[i].setTextSize(12);
                             checkFacilities[i].setId(i);
                             checkFacilities[i].setTextColor(Color.BLACK);
                             layoutFacilities.addView(checkFacilities[i]);
 
-
                             progressDialog.dismiss();
-
 
                             checkFacilities[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                     if (isChecked == true) {
-                                        int getChecked = buttonView.getId();
-
-                                        final JsonObject DataChecked = jsonArray.get(getChecked).getAsJsonObject();
-
-                                        Log.i("checkbox", DataChecked.get("_id").getAsString());
-                                        mListFacilitiesChecked.add(DataChecked.get("_id").getAsString());
-                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
+                                        mListFacilitiesChecked.add(facility);
                                     } else {
-                                        int getChecked = buttonView.getId();
-
-                                        final JsonObject DataChecked = jsonArray.get(getChecked).getAsJsonObject();
-
-                                        Log.i("checkbox", DataChecked.get("_id").getAsString());
-                                        mListFacilitiesChecked.remove(DataChecked.get("_id").getAsString());
-                                        Log.i("checkboxList", mListFacilitiesChecked.toString());
+                                        mListFacilitiesChecked.remove(facility);
                                     }
                                 }
                             });
 
                         }
-//                        Toast.makeText(CreateNewInventory.this, "Terdapat : " + Integer.toString(jsonArray.size()) + " data",
-//                                Toast.LENGTH_LONG).show();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    }else{
+                        Toast.makeText(CreateNewInventory.this, response.body().getStatus().getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(CreateNewInventory.this, "Gagal",
+                }else{
+                    Toast.makeText(CreateNewInventory.this, "Gagal mengambil data",
                             Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
-
-                Toast.makeText(CreateNewInventory.this, throwable.getMessage(),
+            public void onFailure(Call<Response.GetFacillity> call, Throwable t) {
+                Toast.makeText(CreateNewInventory.this, t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -278,7 +243,14 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
         final String inventorySpace = mEtInventSpace.getText().toString().trim();
         final String inventoryPrice = mEtAddPrice.getText().toString().trim();
 
-        Log.d("getAllChecked", mListFacilitiesChecked.toString());
+        final InventoryCategory newInventory = new InventoryCategory();
+        newInventory.setAsset(mAsset.getId());
+        newInventory.setName(inventoryName);
+        newInventory.setDescription(inventoryDescription);
+        newInventory.setStock(Integer.parseInt(inventoryStock));
+        newInventory.setSpace(Integer.parseInt(inventorySpace));
+        newInventory.setPrice(Integer.parseInt(RupiahCurrency.unformatRupiah(inventoryPrice)));
+        newInventory.setFacilities(mListFacilitiesChecked);
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
@@ -300,69 +272,58 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 }
             }
         }
-        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+        Call<Response.UploadResponse> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+        uploadPhotoReq.enqueue(new Callback<Response.UploadResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    try {
-
-                        JSONArray images = new JSONArray(response.body().string());
-                        String idAsset = getIntent().getStringExtra("idAsset");
-                        JSONObject objectData = new JSONObject();
-                        objectData.put("asset", idAsset);
-                        objectData.put("name", inventoryName);
-                        objectData.put("description", inventoryDescription);
-                        objectData.put("space", inventorySpace);
-                        objectData.put("price", RupiahCurrency.unformatRupiah(inventoryPrice));
-                        objectData.put("stock", inventoryStock);
-
-                        JSONArray jsonArrayChecked = new JSONArray(mListFacilitiesChecked);
-                        objectData.put("facilities", jsonArrayChecked);
-
-                        JSONObject baseObject = new JSONObject();
-                        baseObject.put("data", objectData);
-                        baseObject.put("images", images);
-                        saveInventoryToServer(baseObject);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            public void onResponse(Call<Response.UploadResponse> call, retrofit2.Response<Response.UploadResponse> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        newInventory.setImages(response.body().getData().getImage());
+                        callAddInventory(newInventory);
+                    }else{
+                        progressDialog.dismiss();
+                        Toast.makeText(CreateNewInventory.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                }else{
+                    progressDialog.dismiss();
+                    Toast.makeText(CreateNewInventory
+                            .this, "Gagal unggah foto", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            public void onFailure(Call<Response.UploadResponse> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewInventory.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
-    public void saveInventoryToServer(JSONObject jsonParams) {
+    public void callAddInventory(InventoryCategory inventory) {
+        Request.CreateInventory inventoryRequest = new Request().new CreateInventory();
+        inventoryRequest.setInventoryCategory(inventory);
 
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                (jsonParams).toString());
-
-        Call<ResponseBody> addInventoryRequest = mInventoryAPIService.createInventoryCategory(body);
-
-        addInventoryRequest.enqueue(new Callback<ResponseBody>() {
+        Call<Response.CreateInventory> addInventoryRequest = mInventoryAPIService.createInventoryCategory(inventoryRequest);
+        addInventoryRequest.enqueue(new Callback<Response.CreateInventory>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<Response.CreateInventory> call, retrofit2.Response<Response.CreateInventory> response) {
                 progressDialog.dismiss();
-                if (response.isSuccessful()) {
-                    Log.d("Post", response.body().toString());
-                    //success then send back the user to the list user and destroy this activity
-//                    startActivity(new Intent(CreateNewInventory.this, ListUsers.class));
-                    finish();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        Toast.makeText(CreateNewInventory.this, "Inventory telah dibuat", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }else{
+                        Toast.makeText(CreateNewInventory.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    Toast.makeText(CreateNewInventory.this, "Gagal membuat inventory", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Response.CreateInventory> call, Throwable t) {
                 progressDialog.dismiss();
-                Toast.makeText(CreateNewInventory.this, "Gagal Membuat Inventory", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateNewInventory.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -389,6 +350,9 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
                 fileImages.add(file);
             }
 
+            if(fileImages.size()>0){
+                mBtnAddImage.setText("TAMBAH FOTO");
+            }
 
             mPreviewAdapter.notifyDataSetChanged();
 
@@ -416,8 +380,6 @@ public class CreateNewInventory extends AppCompatActivity implements View.OnClic
             Toast.makeText(this, "Isi Foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        Toast.makeText(this, "Sedang Membuat Inventory", Toast.LENGTH_SHORT).show();
         uploadImagesToServer();
 
 

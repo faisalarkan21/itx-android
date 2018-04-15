@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.google.gson.Gson;
+import com.itx.android.android_itx.Entity.User;
+
 /**
  * Created by faisal on 2/21/18.
  */
@@ -24,7 +27,7 @@ public class SessionManager {
     }
 
     public String getToken() {
-        String token = prefs.getString("token","");
+        String token = prefs.getString("token", "");
         return token;
     }
 
@@ -32,17 +35,29 @@ public class SessionManager {
         prefs.edit().putBoolean(IS_FIRST_TIME_LAUNCH, isFirstTime).commit();
     }
 
-    public void removeToken(){
+    public void removeToken() {
         prefs.edit().remove("token").apply();
     }
 
-    public void setRole(String role) {
-        prefs.edit().putString("role", role).apply();;
+    public void setUserData(String user) {
+        prefs.edit().putString("user", user).apply();
+        ;
     }
 
-    public String getRole() {
-        String role = prefs.getString("role", "");
+    public String getUserData() {
+        String role = prefs.getString("user", "");
         return role;
+    }
+
+    public void remoceUserData() {
+        prefs.edit().remove("user").apply();
+    }
+
+    public User getUser(){
+        Gson gson = new Gson();
+        String role = prefs.getString("user", "");
+        User user = gson.fromJson(role, User.class);
+        return user;
     }
 }
 

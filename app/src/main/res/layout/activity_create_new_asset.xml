@@ -13,12 +13,12 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:focusableInTouchMode="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:focusableInTouchMode="true"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingLeft="30dp"
@@ -36,8 +36,9 @@
                     android:id="@+id/et_add_asset_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nama"
-                    android:inputType="text" />
+                    android:hint="Nama Badan Usaha"
+                    android:inputType="text"
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -54,7 +55,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Brand"
-                    android:inputType="text"/>
+                    android:inputType="text"
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -65,13 +67,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="15dp"
-                android:text="Pilih Kategori" />
+                android:text="Pilih Kategori"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <Spinner
                 android:id="@+id/sp_add_asset_categories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                />
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -85,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:hint="NPWP"
                     android:inputType="number"
-                    />
+                    android:textSize="14sp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -101,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Telpon"
                     android:inputType="number"
-                    />
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -112,7 +117,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="0dp"
-                android:text="Lokasi Assets \n* klik peta untuk menyesuaikan lokasi" />
+                android:text="Lokasi Assets \n* klik peta untuk menyesuaikan lokasi"
+                android:textSize="14sp"/>
 
             <ImageView
                 android:id="@+id/static_map"
@@ -133,7 +139,8 @@
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     android:focusable="false"
-                    android:hint="Lokasi"/>
+                    android:hint="Lokasi"
+                    android:textSize="14sp"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -155,19 +162,19 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:layout_marginTop="8dp"
-                        android:text="Pilih Provinsi" />
+                        android:text="Pilih Provinsi"
+                        android:textSize="14sp"/>
 
                     <Spinner
                         android:id="@+id/sp_add_asset_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Provinsi"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
-
-
 
 
             </LinearLayout>
@@ -176,7 +183,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
 
 
                 <android.support.design.widget.TextInputLayout
@@ -192,14 +198,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:layout_marginTop="5dp"
-                        android:text="Pilih Kota" />
+                        android:text="Pilih Kota"
+                        android:textSize="14sp"/>
 
                     <Spinner
                         android:id="@+id/sp_add_asset_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Kota"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -223,7 +231,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Kode Pos"
-                        android:inputType="number" />
+                        android:inputType="number"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -234,14 +243,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:visibility="gone">
 
                     <AutoCompleteTextView
                         android:id="@+id/et_add_asset_country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Negara"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -254,7 +265,9 @@
                 android:paddingBottom="5dp"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
-                android:text="Kelas (bintang)" />
+                android:text="Kelas (bintang)"
+                android:textSize="14sp"
+                android:visibility="gone"/>
 
             <RatingBar
                 android:id="@+id/rb_new_asset"
@@ -262,11 +275,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
                 android:isIndicator="false"
                 android:numStars="5"
-                android:stepSize="1" />
+                android:stepSize="1"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/select_image"
@@ -279,7 +293,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_preview_img_new_asset"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

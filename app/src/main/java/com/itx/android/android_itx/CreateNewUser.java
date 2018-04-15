@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +22,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.itx.android.android_itx.Entity.Address;
+import com.itx.android.android_itx.Entity.Image;
+import com.itx.android.android_itx.Entity.Photo;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -33,9 +38,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,11 +52,9 @@ import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CreateNewUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
@@ -133,13 +133,12 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
     @BindView(R.id.et_add_asset_phone)
     EditText mEtAssetPhone;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
 
-        getSupportActionBar().setTitle("Tambah Pengguna");
+        getSupportActionBar().setTitle("Tambah Pemilik");
 
         sessManager = new SessionManager(this);
         ButterKnife.bind(this);
@@ -149,7 +148,6 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
 
         mBtnAddUser.setOnClickListener(this);
         mFabAddPhoto.setOnClickListener(this);
-
 
         setProvince();
     }
@@ -232,6 +230,21 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
+        final User newUser = new User();
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setEmail(email);
+        newUser.setKtp(noKTP);
+        newUser.setPassword("telkom2018");
+
+        Address updatedAddress = new Address();
+        updatedAddress.setAddress(address);
+        updatedAddress.setPostalCode(postal);
+        updatedAddress.setCountry("Indonesia");
+        updatedAddress.setCity(mSpCity.getSelectedItem().toString());
+        updatedAddress.setProvince(mSpProvince.getSelectedItem().toString());
+        newUser.setAddress(updatedAddress);
+        newUser.setPhone(phone);
 
         File compressedImageFile = null;
 
@@ -244,79 +257,66 @@ public class CreateNewUser extends AppCompatActivity implements View.OnClickList
         //Upload Photo first then on callback save the new User
         RequestBody uploadBody = RequestBody.create(MediaType.parse("image/jpeg"), compressedImageFile);
         MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
-        Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
-
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+        Call<Response.UploadResponse> uploadPhotoReq = mApiService.uploadPhoto(multipart);
+        uploadPhotoReq.enqueue(new Callback<Response.UploadResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d(TAG, response.body().toString());
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray responseJson = new JSONArray(response.body().string());
-                        JSONObject images = responseJson.getJSONObject(0);
+            public void onResponse(Call<Response.UploadResponse> call, retrofit2.Response<Response.UploadResponse> response) {
+                if(response.isSuccessful()) {
+                    if (response.body().getStatus().getCode() == 200) {
+                        Image image = response.body().getData().getImage().get(0);
+                        Photo photo = new Photo();
+                        photo.setAlt(image.getmAlt());
+                        photo.setFullsize(image.getmFullsize());
+                        photo.setLarge(image.getmLarge());
+                        photo.setMedium(image.getmMedium());
+                        photo.setThumbnail(image.getmThumbnail());
 
-//                        Toast.makeText(CreateNewUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-                        JSONObject Baseidentity = new JSONObject();
-                        Baseidentity.put("firstName", firstName);
-                        Baseidentity.put("lastName", lastName);
-                        Baseidentity.put("ktp", noKTP);
-                        Baseidentity.put("email", email);
-                        Baseidentity.put("phone", phone);
-
-                        JSONObject location = new JSONObject();
-                        location.put("address", address);
-                        location.put("province", chosenProvince);
-                        location.put("city", chosenCity);
-                        location.put("postalCode", postal);
-                        location.put("country", country);
-
-                        JSONObject object = new JSONObject();
-                        object.put("data", Baseidentity);
-                        object.put("location", location);
-                        object.put("images", images);
-
-                        saveUserToServer(object);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        newUser.setPhoto(photo);
+                        saveUserToServer(newUser);
+                    }else{
+                        progressDialog.dismiss();
+                        Toast.makeText(CreateNewUser.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
                     }
-
+                }else{
+                    progressDialog.dismiss();
+                    Toast.makeText(CreateNewUser.this, "Upload foto gagal", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Response.UploadResponse> call, Throwable t) {
+                progressDialog.dismiss();
                 Toast.makeText(CreateNewUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-
             }
         });
     }
 
 
 
-    public void saveUserToServer(JSONObject jsonParams) {
+    public void saveUserToServer(User user) {
+        Request.CreateUser requestUser = new Request().new CreateUser();
+        requestUser.setUser(user);
 
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                (jsonParams).toString());
-
-        Call<ResponseBody> addUserRequest = mUserService.createUser(body);
-
-
-        addUserRequest.enqueue(new Callback<ResponseBody>() {
+        Call<Response.CreateUser> addUserRequest = mUserService.createUser(requestUser);
+        addUserRequest.enqueue(new Callback<Response.CreateUser>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<Response.CreateUser> call, retrofit2.Response<Response.CreateUser> response) {
                 progressDialog.dismiss();
-                if (response.isSuccessful()) {
-                    Log.d(TAG, response.body().toString());
-                    //success then send back the user to the list user and destroy this activity
-//                    startActivity(new Intent(CreateNewUser.this, ListUsers.class));
-                    finish();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        finish();
+                    }else{
+                        Toast.makeText(CreateNewUser.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(CreateNewUser.this, "Proses gagal", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Response.CreateUser> call, Throwable t) {
                 progressDialog.dismiss();
-                Toast.makeText(CreateNewUser.this, "Gagal Membuat User", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateNewUser.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -2,19 +2,17 @@ package com.itx.android.android_itx;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.CountDownTimer;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.DividerItemDecoration;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +23,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import com.itx.android.android_itx.Adapter.InventoryAdapter;
-import com.itx.android.android_itx.Entity.Inventory;
-import com.itx.android.android_itx.Service.AssetService;
+import com.itx.android.android_itx.Entity.Asset;
+import com.itx.android.android_itx.Entity.InventoryCategory;
+import com.itx.android.android_itx.Entity.Response;
 import com.itx.android.android_itx.Service.InventoryService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -45,12 +43,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class ListInventory extends AppCompatActivity implements Callback<JsonObject> {
+public class ListInventory extends AppCompatActivity {
 
-    private List<Inventory> mListInventory = new ArrayList<>();
+    private List<InventoryCategory> mListInventory = new ArrayList<>();
     private List<String> mAssetImages = new ArrayList<>();
 
     @BindView(R.id.recycler_view)
@@ -89,38 +86,37 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     @BindView(R.id.pb_asset_details)
     ProgressBar mPbAssetImages;
 
+    @BindView(R.id.swipeRefreshLayout)
+    PullRefreshLayout mPullRefreshLayout;
+
+
     InventoryService mInventoryAPIService;
     SessionManager session;
     private TextView[] dots;
     private int currentPage = 0;
 
-    private String idAsset;
-
-
     private InventoryAdapter mAdapter;
+    private Asset mAsset;
+    private String data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_inventory);
 
-
         ButterKnife.bind(this);
 
-        mAdapter = new InventoryAdapter(mListInventory, this);
+        Gson gson = new Gson();
+        data = getIntent().getStringExtra("DATA");
+        mAsset = gson.fromJson(data, Asset.class);
+        prepareImage();
 
-        showLoading();
-
-        idAsset = getIntent().getStringExtra("idAsset");
+        mAdapter = new InventoryAdapter(mListInventory, this, mAsset);
 
         session = new SessionManager(this);
 
         mInventoryAPIService = ApiUtils.getListInventoryService(session.getToken());
         mRecyclerView.setHasFixedSize(true);
-
-        AssetService assetService = ApiUtils.getListAssetsService(session.getToken());
-        Call<JsonObject> imagesResponse = assetService.getAssetImages(idAsset);
-        imagesResponse.enqueue(this);
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -134,34 +130,25 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         mBtnAddInvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 Intent createInventory = new Intent(ListInventory.this, CreateNewInventory.class);
-                createInventory.putExtra("idAsset", idAsset);
+                createInventory.putExtra("DATA", data);
                 startActivity(createInventory);
             }
         });
 
-        String idAsset = getIntent().getStringExtra("idAsset");
-        String assetAdress = getIntent().getStringExtra("address");
-        String assetName = getIntent().getStringExtra("assetName");
-        String categoryName = getIntent().getStringExtra("categoryName");
-        String phone = getIntent().getStringExtra("phone");
-        String images = getIntent().getStringExtra("images");
-        float rating = getIntent().getFloatExtra("rating", 0);
+        getSupportActionBar().setTitle(mAsset.getName());
+        mAssetName.setText(mAsset.getName());
+        mAssetAddress.setText(mAsset.getAddress().getAddress());
+        mAssetCategory.setText(mAsset.getAssetCategory().getName());
+        mAssetPhone.setText(mAsset.getPhone());
+        mAssetRating.setRating(mAsset.getRating().floatValue());
 
-        getSupportActionBar().setTitle(assetName);
-        mAssetName.setText(assetName);
-        mAssetAddress.setText(assetAdress);
-        mAssetCategory.setText(categoryName);
-        mAssetPhone.setText(phone);
-        mAssetRating.setRating(rating);
-
-        if (images != null) {
-            Glide.with(ListInventory.this)
-                    .load(ApiUtils.BASE_URL_USERS_IMAGE + images)
-                    .into(mImagesAssets);
-        }
+        mPullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                prepareData();
+            }
+        });
     }
 
     private void showLoading() {
@@ -194,82 +181,40 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
         }
     }
 
-    private void prepareUserData() {
-
+    private void prepareData() {
+        mListInventory.clear();
         showLoading();
-        if (mListInventory.size() >= 1) {
-            mListInventory.clear();
-            mAdapter.notifyDataSetChanged();
-        }
 
-
-        Call<JsonObject> response = mInventoryAPIService.getUserInventories(idAsset);
-
-        response.enqueue(new Callback<JsonObject>() {
+        Call<Response.GetInventory> response = mInventoryAPIService.getUserInventories(mAsset.getId());
+        response.enqueue(new Callback<Response.GetInventory>() {
             @Override
-            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+            public void onResponse(Call<Response.GetInventory> call, retrofit2.Response<Response.GetInventory> response) {
+                mPullRefreshLayout.setRefreshing(false);
                 hideLoading();
-                if (rawResponse.isSuccessful()) {
-                    try {
-
-                        JsonElement json = rawResponse.body().get("data").getAsJsonObject().get("inventoryCategories").getAsJsonArray();
-                        Log.d("lnes 102", Boolean.toString(json.isJsonArray()));
-
-                        JsonArray jsonArray = json.getAsJsonArray();
-
-                        if (jsonArray.size() == 0) {
-                            hideLoading();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        if(response.body().getData().getTotal() == 0){
                             Toast.makeText(ListInventory.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
+                        }else{
+                            mListInventory.addAll(response.body().getData().getInventoryCategory());
+                            mAdapter.notifyDataSetChanged();
                         }
-
-                        for (int i = 0; i < jsonArray.size(); i++) {
-                            JsonObject Data = jsonArray.get(i).getAsJsonObject();
-
-                            Inventory invent = new Inventory();
-                            invent.setIdAsset(Data.get("_id").getAsString());
-                            invent.setName(Data.get("name").getAsString());
-
-                            if (Data.get("images").getAsJsonArray().size() != 0) {
-                                JsonArray imagesLoop = Data.get("images").getAsJsonArray();
-                                JsonObject DataImageInvent = imagesLoop.get(0).getAsJsonObject();
-                                invent.setImage(DataImageInvent.get("thumbnail").getAsString());
-
-                            }
-
-                            JsonArray facilitiesLoop = Data.get("facilities").getAsJsonArray();
-                            String tempFacilities = "";
-
-                            for (int a = 0; a < facilitiesLoop.size(); a++) {
-                                JsonObject DataFacilities = facilitiesLoop.get(a).getAsJsonObject();
-                                tempFacilities += DataFacilities.get("name").getAsString() + ", ";
-                                invent.setFacilities(tempFacilities.substring(0, tempFacilities.length() - 2));
-                            }
-
-                            invent.setStock(Data.get("stock").getAsString());
-                            invent.setSpace(Data.get("space").getAsString());
-                            invent.setPrice(Data.get("price").getAsDouble());
-
-                            mListInventory.add(invent);
-
-                        }
-
-                        mAdapter.notifyDataSetChanged();
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    }else{
+                        Toast.makeText(ListInventory.this, response.body().getStatus().getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
-                } else {
+                }else{
                     Toast.makeText(ListInventory.this, "Gagal Mengambil Data",
                             Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+            public void onFailure(Call<Response.GetInventory> call, Throwable t) {
+                mPullRefreshLayout.setRefreshing(false);
                 hideLoading();
-                Toast.makeText(ListInventory.this, throwable.getMessage(),
+                Toast.makeText(ListInventory.this, t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -295,79 +240,40 @@ public class ListInventory extends AppCompatActivity implements Callback<JsonObj
     @Override
     protected void onResume() {
         super.onResume();
-        prepareUserData();
+        prepareData();
     }
 
-    @Override
-    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+    public void prepareImage(){
         mPbAssetImages.setVisibility(View.INVISIBLE);
-        if (response.isSuccessful()) {
-            JsonArray imagesResponse = response.body().getAsJsonArray("images");
-            for (int i = 0; i < imagesResponse.size(); i++) {
-                JsonObject image = imagesResponse.get(i).getAsJsonObject();
-                mAssetImages.add(image.get("medium").getAsString());
-            }
-            if (mAssetImages.size() != 0) {
-                addBottomDots(0);
-                mVpAssetImages.addOnPageChangeListener(Listener);
-                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages, this));
-                final Handler handler = new Handler();
+        for (int i = 0; i < mAsset.getImages().size(); i++) {
+            mAssetImages.add(mAsset.getImages().get(i).getmMedium());
+        }
+        if (mAssetImages.size() != 0) {
+            addBottomDots(0);
+            mVpAssetImages.addOnPageChangeListener(Listener);
+            mVpAssetImages.setAdapter(new ImageSlider(mAssetImages, this));
+            final Handler handler = new Handler();
 
-                final Runnable update = new Runnable() {
-                    public void run() {
+            final Runnable update = new Runnable() {
+                public void run() {
 
-                        if (currentPage == mAssetImages.size()) {
-                            currentPage = 0;
-                        }
-                        mVpAssetImages.setCurrentItem(currentPage++, true);
+                    if (currentPage == mAssetImages.size()) {
+                        currentPage = 0;
                     }
-                };
+                    mVpAssetImages.setCurrentItem(currentPage++, true);
+                }
+            };
 
 
-                new Timer().schedule(new TimerTask() {
+            new Timer().schedule(new TimerTask() {
 
-                    @Override
-                    public void run() {
-                        handler.post(update);
-                    }
-                }, 500, 3000);
-            }
-        } else {
-            mAssetImages.add("http://baak.gunadarma.ac.id/public/images/ugcoba24.jpg");
-            mAssetImages.add("http://mherman.org/assets/img/blog/on-demand-environments/on-demand-envs.png");
-            if (mAssetImages.size() != 0) {
-                addBottomDots(0);
-                mVpAssetImages.addOnPageChangeListener(Listener);
-                mVpAssetImages.setAdapter(new ImageSlider(mAssetImages, this));
-                final Handler handler = new Handler();
-
-                final Runnable update = new Runnable() {
-                    public void run() {
-
-                        if (currentPage == mAssetImages.size()) {
-                            currentPage = 0;
-                        }
-                        mVpAssetImages.setCurrentItem(currentPage++, true);
-                    }
-                };
-
-
-                new Timer().schedule(new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        handler.post(update);
-                    }
-                }, 500, 3000);
-            }
+                @Override
+                public void run() {
+                    handler.post(update);
+                }
+            }, 500, 3000);
         }
     }
-
-    @Override
-    public void onFailure(Call<JsonObject> call, Throwable t) {
-
-    }
-
 
     class ImageSlider extends PagerAdapter {
 

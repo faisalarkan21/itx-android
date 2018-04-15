@@ -26,95 +26,103 @@
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal" />
 
-    <ScrollView
+    <com.baoyz.widget.PullRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:refreshColor="@color/colorPrimary"
+        app:refreshType="smartisan">
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/bg_color">
+            android:layout_height="match_parent">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:background="@color/bg_color">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="18dp"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/iv_user_images"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="18dp"
-                        android:src="@drawable/icon_tentang_06" />
-
-                    <LinearLayout
-                        android:layout_below="@+id/iv_user_images"
-                        android:layout_width="fill_parent"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:background="@drawable/bg"
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                        <TextView
-                            android:id="@+id/userName"
-                            fontPath="fonts/segoeuib.ttf"
-                            android:layout_width="wrap_content"
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/iv_user_images"
+                            android:layout_width="150dp"
+                            android:layout_height="150dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="18dp"
+                            android:src="@drawable/icon_tentang_06" />
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="Nama Orang"
-                            android:textColor="@android:color/primary_text_light"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:typeface="sans" />
+                            android:layout_below="@+id/iv_user_images"
+                            android:orientation="vertical">
 
-                        <TextView
-                            fontPath="fonts/segoeuil.ttf"
-                            android:id="@+id/tv_user_role"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="Member"
-                            android:textColor="@android:color/secondary_text_dark"
-                            android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/userName"
+                                fontPath="fonts/segoeuib.ttf"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="Nama Orang"
+                                android:textColor="@android:color/primary_text_light"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:typeface="sans" />
 
-                        <TextView
-                            fontPath="fonts/segoeuil.ttf"
-                            android:id="@+id/tv_user_no_telp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="+628986121212"
-                            android:textColor="@android:color/primary_text_light"
-                            android:textSize="13sp" />
+                            <TextView
+                                android:id="@+id/tv_user_role"
+                                fontPath="fonts/segoeuil.ttf"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="Member"
+                                android:textColor="@android:color/secondary_text_dark"
+                                android:textSize="12sp" />
 
-                        <TextView
-                            android:id="@+id/tv_user_address"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:text="JL. USA 15 Ciseeng"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="16sp" />
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/tv_user_no_telp"
+                                fontPath="fonts/segoeuil.ttf"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="+628986121212"
+                                android:textColor="@android:color/primary_text_light"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tv_user_address"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="JL. USA 15 Ciseeng"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="16sp" />
+                        </LinearLayout>
 
 
-                </RelativeLayout>
+                    </RelativeLayout>
 
-                <include layout="@layout/content_assets" />
+                    <include layout="@layout/content_assets" />
 
-            </LinearLayout>
+                </LinearLayout>
 
 
-        </RelativeLayout>
+            </RelativeLayout>
 
-    </ScrollView>
+        </ScrollView>
+    </com.baoyz.widget.PullRefreshLayout>
 
 </RelativeLayout>

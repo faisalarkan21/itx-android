@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -25,8 +24,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Entity.Address;
 import com.itx.android.android_itx.Entity.Image;
+import com.itx.android.android_itx.Entity.Photo;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -58,7 +61,6 @@ import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
@@ -77,7 +79,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
     private SessionManager session;
     public static File filePhoto;
     public static Uri photoURI;
-    private Image imageFromServer;
+    private Photo imageFromServer;
 
     UsersService mUserService;
     APIService mApiService;
@@ -93,6 +95,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
 
     ProgressDialog progressDialog;
 
+    private User mUser;
 
     @BindView(R.id.fab_add_foto)
     FloatingActionButton mFabAddPhoto;
@@ -147,7 +150,7 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_user);
 
-        getSupportActionBar().setTitle("Ubah Pengguna");
+        getSupportActionBar().setTitle("Ubah Pemilik");
 
         session = new SessionManager(this);
         ButterKnife.bind(this);
@@ -159,11 +162,6 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         mBtnAddUser.setOnClickListener(this);
         mIvPhoto.setOnClickListener(this);
         mFabAddPhoto.setOnClickListener(this);
-
-        progressDialog = new ProgressDialog(UpdateUser.this);
-        progressDialog.setMessage("Menyiapkan Data");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
 
         prepareUserData();
 
@@ -226,81 +224,41 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
      * Prepares sample data to provide data set to adapter
      */
     private void prepareUserData() {
-        idUser = getIntent().getStringExtra("id");
-        mUserService = ApiUtils.getListUsersService(session.getToken());
-        Call<JsonObject> response = mUserService.getUser(idUser);
+        Gson gson = new Gson();
+        mUser = gson.fromJson(getIntent().getStringExtra("DATA"), User.class);
 
-        response.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
-                if (rawResponse.isSuccessful()) {
-                    try {
-                        JsonObject jsonObject = rawResponse.body().get("data").getAsJsonObject();
+        mEtFirstname.setText(mUser.getFirstName());
+        mEtLastname.setText(mUser.getLastName());
+        mEtNoKTP.setText(mUser.getKtp());
+        mEtEmail.setText(mUser.getEmail());
+        mEtAddress.setText(mUser.getAddress().getAddress());
+        mEtPostalCode.setText(mUser.getAddress().getPostalCode());
+        mAcCountry.setText(mUser.getAddress().getCountry());
+        mEtAssetPhone.setText(mUser.getPhone());
 
-                        Log.d("Data", jsonObject.toString());
-                        mEtFirstname.setText(jsonObject.get("firstName").getAsString());
-                        mEtLastname.setText(jsonObject.get("lastName").getAsString());
-                        mEtNoKTP.setText(jsonObject.get("ktp").getAsString());
-                        mEtEmail.setText(jsonObject.get("email").getAsString());
-                        mEtAddress.setText(jsonObject.get("address").getAsJsonObject().get("address").getAsString());
-                        mEtPostalCode.setText(jsonObject.get("address").getAsJsonObject().get("postalCode").getAsString());
-                        mAcCountry.setText(jsonObject.get("address").getAsJsonObject().get("country").getAsString());
-                        mEtAssetPhone.setText(jsonObject.get("phone").getAsString());
-                        JsonObject image = jsonObject.get("photo").getAsJsonObject();
+        imageFromServer = mUser.getPhoto();
+        if (mUser.getPhoto().getMedium() != null) {
+            Glide.with(UpdateUser.this)
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + mUser.getPhoto().getMedium())
+                    .into(mIvPhoto);
+        }
 
-                        Gson gson = new Gson();
-                        imageFromServer = gson.fromJson(image, Image.class);
+        String selectedValueProv = mUser.getAddress().getProvince();
+        setProvince(selectedValueProv);
 
-                        if (image != null) {
-                            Glide.with(UpdateUser.this)
-                                    .load(ApiUtils.BASE_URL_USERS_IMAGE + imageFromServer.getmThumbnail())
-                                    .into(mIvPhoto);
-                        }
+        int selectionPositionProv = spAdapterProvince.getPosition(selectedValueProv);
+        mSpProvince.setSelection(selectionPositionProv);
+        setCitybyProvince(selectedValueProv);
 
-                        String selectedValueProv = jsonObject.get("address").getAsJsonObject().get("province").getAsString();
-                        setProvince(selectedValueProv);
-
-                        int selectionPositionProv = spAdapterProvince.getPosition(selectedValueProv);
-                        mSpProvince.setSelection(selectionPositionProv);
-                        setCitybyProvince(selectedValueProv);
-
-                        int selectionPositionCity = spAdapterCity.getPosition(jsonObject.get("address").getAsJsonObject().get("city").getAsString());
-                        mSpCity.setSelection(selectionPositionCity);
-
-                        final Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Do something after 5s = 5000ms
-                                progressDialog.dismiss();
-                            }
-                        }, 3800);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(UpdateUser.this, "Gagal",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
-
-                Toast.makeText(UpdateUser.this, throwable.getMessage(),
-                        Toast.LENGTH_LONG).show();
-            }
-        });
+        int selectionPositionCity = spAdapterCity.getPosition(mUser.getAddress().getCity());
+        mSpCity.setSelection(selectionPositionCity);
     }
 
     private void updateUser(String token) {
-
         progressDialog = new ProgressDialog(UpdateUser.this);
         progressDialog.setMessage("Menyimpan Data");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-
 
         mUserService = ApiUtils.getListUsersService(token);
         mApiService = ApiUtils.getAPIService(token);
@@ -314,6 +272,21 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
         final String country = mAcCountry.getText().toString().trim();
         final String phone = mEtAssetPhone.getText().toString().trim();
 
+        final User updatedUser = new User();
+        updatedUser.setFirstName(firstName);
+        updatedUser.setLastName(lastName);
+        updatedUser.setEmail(email);
+        updatedUser.setKtp(noKTP);
+
+        Address updatedAddress = new Address();
+        updatedAddress.setAddress(address);
+        updatedAddress.setPostalCode(postal);
+        updatedAddress.setCountry("Indonesia");
+        updatedAddress.setCity(mSpCity.getSelectedItem().toString());
+        updatedAddress.setProvince(mSpProvince.getSelectedItem().toString());
+        updatedUser.setAddress(updatedAddress);
+        updatedUser.setPhone(phone);
+
         if (photoURI != null) {
 
             File compressedImageFile = null;
@@ -324,115 +297,83 @@ public class UpdateUser extends AppCompatActivity implements View.OnClickListene
                 e.printStackTrace();
             }
 
-//        Upload Photo first then on callback save the new User
+            /*Upload Photo first then on callback save the new User*/
+
             RequestBody uploadBody = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)), compressedImageFile);
             MultipartBody.Part multipart = MultipartBody.Part.createFormData("photos", filePhoto.getName(), uploadBody);
-            Call<ResponseBody> uploadPhotoReq = mApiService.uploadPhoto(multipart);
 
-            uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+            Call<Response.UploadResponse> uploadPhotoReq = mApiService.uploadPhoto(multipart);
+            uploadPhotoReq.enqueue(new Callback<Response.UploadResponse>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d(TAG, response.body().toString());
-                    if (response.isSuccessful()) {
-                        try {
-                            JSONArray responseJson = new JSONArray(response.body().string());
-                            JSONObject images = responseJson.getJSONObject(0);
+                public void onResponse(Call<Response.UploadResponse> call, retrofit2.Response<Response.UploadResponse> response) {
+                    if(response.isSuccessful()){
+                        if(response.body().getStatus().getCode() == 200){
+                            Image image = response.body().getData().getImage().get(0);
+                            Photo photo = new Photo();
+                            photo.setAlt(image.getmAlt());
+                            photo.setFullsize(image.getmFullsize());
+                            photo.setLarge(image.getmLarge());
+                            photo.setMedium(image.getmMedium());
+                            photo.setThumbnail(image.getmThumbnail());
 
-//                            Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-
-                            JSONObject object0 = new JSONObject();
-                            object0.put("firstName", firstName);
-                            object0.put("lastName", lastName);
-                            object0.put("ktp", noKTP);
-                            object0.put("email", email);
-                            object0.put("phone", phone);
-
-                            JSONObject location = new JSONObject();
-                            location.put("address", address);
-                            location.put("province", chosenProvince);
-                            location.put("city", chosenCity);
-                            location.put("postalCode", postal);
-                            location.put("country", country);
-
-                            JSONObject object = new JSONObject();
-                            object.put("data", object0);
-                            object.put("location", location);
-                            object.put("images", images);
-
-                            saveUserToServer(object);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            updatedUser.setPhoto(photo);
+                            saveUserToServer(updatedUser);
+                        }else{
+                            progressDialog.dismiss();
+                            Toast.makeText(UpdateUser.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
                         }
-
+                    }else{
+                        progressDialog.dismiss();
+                        Toast.makeText(UpdateUser.this, "Upload foto gagal", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(Call<Response.UploadResponse> call, Throwable t) {
+                    progressDialog.dismiss();
                     Toast.makeText(UpdateUser.this, "Upload foto gagal karna: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-
                 }
             });
+
         } else {
             try {
-
-                Toast.makeText(UpdateUser.this, "Upload foto berhasil", Toast.LENGTH_SHORT).show();
-
-                Gson gson = new Gson();
-
-                String image = gson.toJson(imageFromServer);
-                JSONObject object0 = new JSONObject();
-                object0.put("firstName", firstName);
-                object0.put("lastName", lastName);
-                object0.put("ktp", noKTP);
-                object0.put("email", email);
-                object0.put("phone", phone);
-
-                JSONObject location = new JSONObject();
-                location.put("address", address);
-                location.put("province", chosenProvince);
-                location.put("city", chosenCity);
-                location.put("postalCode", postal);
-                location.put("country", country);
-
-                JSONObject object = new JSONObject();
-                object.put("data", object0);
-                object.put("location", location);
-                object.put("images", new JSONObject(image));
-
-                saveUserToServer(object);
+                imageFromServer.setId(null);
+                imageFromServer.setV(null);
+                imageFromServer.setCreatedAt(null);
+                updatedUser.setPhoto(imageFromServer);
+                saveUserToServer(updatedUser);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
     }
 
+    public void saveUserToServer(User user) {
+        Request.UpdateUser requestUpdate = new Request().new UpdateUser();
+        requestUpdate.setUser(user);
 
-    public void saveUserToServer(JSONObject jsonParams) {
-
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                (jsonParams).toString());
-
-        Call<ResponseBody> addUserRequest = mUserService.updateUser(idUser, body);
-
-
-        addUserRequest.enqueue(new Callback<ResponseBody>() {
+        Call<Response.UpdateUser> request = mUserService.updateUser(mUser.get_id(), requestUpdate);
+        request.enqueue(new Callback<Response.UpdateUser>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<Response.UpdateUser> call, retrofit2.Response<Response.UpdateUser> response) {
                 progressDialog.dismiss();
-                if (response.isSuccessful()) {
-                    Log.d(TAG, response.body().toString());
-                    //success then send back the user to the list user and destroy this activity
-//                    startActivity(new Intent(UpdateUser.this, ListUsers.class));
-                    finish();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        Toast.makeText(UpdateUser.this, "Data telah disimpan", Toast.LENGTH_SHORT).show();
+                        UpdateUser.this.finish();
+                    }else{
+                        Toast.makeText(UpdateUser.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(UpdateUser.this, "Data gagal disimpan", Toast.LENGTH_SHORT).show();
                 }
+
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Response.UpdateUser> call, Throwable t) {
                 progressDialog.dismiss();
-                Toast.makeText(UpdateUser.this, "Gagal Membuat User", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateUser.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

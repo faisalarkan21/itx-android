@@ -1,36 +1,19 @@
 package com.itx.android.android_itx;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.CountDownTimer;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,31 +28,16 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import com.itx.android.android_itx.Adapter.PreviewAdapter;
-import com.itx.android.android_itx.Entity.Image;
+import com.itx.android.android_itx.Entity.Address;
+import com.itx.android.android_itx.Entity.Asset;
+import com.itx.android.android_itx.Entity.AssetCategory;
 import com.itx.android.android_itx.Entity.ImageHolder;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.APIService;
 import com.itx.android.android_itx.Service.AssetService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -81,16 +49,9 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -99,12 +60,9 @@ import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CreateNewAsset extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener, EasyPermissions.PermissionCallbacks {
@@ -113,9 +71,6 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     private static final int RC_PERMS_CAMERA = 13;
     private static final int RC_PERMS_GALLERY = 14;
     private static final int GALLERY_REQUEST = 1001;
-
-
-    String idUser, userAdress, userName, phone, role, imagesDetail;
 
     final AutoCompleteUtils completeUtils = new AutoCompleteUtils(this);
 
@@ -199,6 +154,7 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     @BindView(R.id.sv_new_asset)
     ScrollView scrollView;
 
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,14 +173,8 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
         progressDialog.setMessage("Sedang Menyiapkan Data");
         progressDialog.show();
 
-
-        idUser = getIntent().getStringExtra("idUser");
-        userAdress = getIntent().getStringExtra("address");
-        userName = getIntent().getStringExtra("name");
-        phone = getIntent().getStringExtra("phone");
-        imagesDetail = getIntent().getStringExtra("photo");
-        role = getIntent().getStringExtra("role");
-
+        Gson gson = new Gson();
+        mUser = gson.fromJson(getIntent().getStringExtra("DATA"), User.class);
 
         mBtnAddImages.setOnClickListener(this);
         mBtnAddAsset.setOnClickListener(this);
@@ -355,36 +305,39 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
 
 
     private void prepareAssetCategories() {
-//        Toast.makeText(this, idUser, Toast.LENGTH_SHORT).show();
-        Call<JsonObject> categoriesRequest = mAssetService.getAssetCategories();
-        categoriesRequest.enqueue(new Callback<JsonObject>() {
+        Call<Response.GetAssetCategory> categoriesRequest = mAssetService.getAssetCategories();
+        categoriesRequest.enqueue(new Callback<Response.GetAssetCategory>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    JsonArray res = response.body().get("data").getAsJsonArray();
-                    for (int i = 0; i < res.size(); i++) {
-                        JsonObject category = res.get(i).getAsJsonObject();
-                        spAdapter.add(category.get("name").getAsString());
-                        categories.add(category.get("_id").getAsString());
-                    }
-                    mSpCategories.setVisibility(View.VISIBLE);
-                    mSpCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            categoryIdSelected = categories.get(i);
+            public void onResponse(Call<Response.GetAssetCategory> call, retrofit2.Response<Response.GetAssetCategory> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        for (int i = 0; i < response.body().getData().getAssetCategory().size(); i++) {
+                            AssetCategory category = response.body().getData().getAssetCategory().get(i);
+                            spAdapter.add(category.getName());
+                            categories.add(category.getId());
                         }
+                        mSpCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                categoryIdSelected = categories.get(i);
+                            }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                            categoryIdSelected = null;
-                        }
-                    });
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+                                categoryIdSelected = null;
+                            }
+                        });
+                    }else{
+                        Toast.makeText(CreateNewAsset.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(CreateNewAsset.this, "Gagal unduh category", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-
+            public void onFailure(Call<Response.GetAssetCategory> call, Throwable t) {
+                Toast.makeText(CreateNewAsset.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -405,6 +358,33 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
         final String postal = mEtAssetPostal.getText().toString().trim();
         final String country = mAcAssetCountry.getText().toString().trim();
         final int rating = Math.round(mRbAsset.getRating());
+
+        final Asset newAsset = new Asset();
+        newAsset.setName(name);
+        newAsset.setBrand(brand);
+        newAsset.setNpwp(npwp);
+        newAsset.setPhone(phone);
+
+        Address newAddress = new Address();
+        newAddress.setAddress(address);
+        newAddress.setPostalCode(postal);
+        newAddress.setCountry("Indonesia");
+        newAddress.setCity(mSpCity.getSelectedItem().toString());
+        newAddress.setProvince(mSpProvince.getSelectedItem().toString());
+
+        List<Double> mListCoordinates = new ArrayList<>();
+        mListCoordinates.add(assetLocation.latitude);
+        mListCoordinates.add(assetLocation.longitude);
+        newAddress.setCoordinates(mListCoordinates);
+        newAsset.setAddress(newAddress);
+
+        AssetCategory category = new AssetCategory();
+        category.setId("5a8acddd0478dc160241c358");
+        category.setName("Homestay");
+        newAsset.setAssetCategory(category);
+
+        newAsset.setUser(mUser);
+        newAsset.setRating(1);
 
         MultipartBody.Part[] parts = new MultipartBody.Part[fileImages.size()];
         for (int i = 0; i < fileImages.size(); i++) {
@@ -427,71 +407,59 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
             }
 
         }
-        Call<ResponseBody> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
-        uploadPhotoReq.enqueue(new Callback<ResponseBody>() {
+        Call<Response.UploadResponse> uploadPhotoReq = mApiSevice.uploadPhotos(parts);
+        uploadPhotoReq.enqueue(new Callback<Response.UploadResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    List<Double> mListCoordinates = new ArrayList<>();
-                    mListCoordinates.add(assetLocation.latitude);
-                    mListCoordinates.add(assetLocation.longitude);
-
-                    final JSONArray images = new JSONArray(response.body().string());
-                    JSONObject data = new JSONObject();
-                    data.put("assetCategory", categoryIdSelected);
-                    data.put("name", name);
-                    data.put("brand", brand);
-                    data.put("npwp", npwp);
-                    data.put("phone", phone);
-                    data.put("user", idUser);
-                    data.put("rating", rating);
-
-
-                    JSONObject location = new JSONObject();
-                    location.put("address", address);
-                    location.put("province", chosenProvince);
-                    location.put("city", chosenCity);
-                    location.put("postalCode", postal);
-                    location.put("country", country);
-
-                    JSONArray jsonArrayCoordinates = new JSONArray(mListCoordinates);
-                    location.put("coordinates", jsonArrayCoordinates);
-
-                    JSONObject request = new JSONObject();
-                    request.put("data", data);
-                    request.put("location", location);
-                    request.put("images", images);
-
-                    RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-
-                    Call<ResponseBody> res = mAssetService.createAsset(requestBody);
-                    res.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            progressDialog.dismiss();
-                            if (response.isSuccessful()) {
-                                finish();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            progressDialog.dismiss();
-                            Toast.makeText(CreateNewAsset.this, "Gagal Membuat asset", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+            public void onResponse(Call<Response.UploadResponse> call, retrofit2.Response<Response.UploadResponse> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        newAsset.setImages(response.body().getData().getImage());
+                        callAddAsset(newAsset);
+                    }else{
+                        progressDialog.dismiss();
+                        Toast.makeText(CreateNewAsset.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    progressDialog.dismiss();
+                    Toast.makeText(CreateNewAsset.this, "Gagal unggah foto", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(CreateNewAsset.this, "Gagal upload foto : " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<Response.UploadResponse> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewAsset.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    public void callAddAsset(Asset newAsset){
+        Request.CreateAsset requestAsset = new Request(). new CreateAsset();
+        requestAsset.setAsset(newAsset);
 
+        Call<Response.CreateAsset> call = mAssetService.createAsset(requestAsset);
+        call.enqueue(new Callback<Response.CreateAsset>() {
+            @Override
+            public void onResponse(Call<Response.CreateAsset> call, retrofit2.Response<Response.CreateAsset> response) {
+                progressDialog.dismiss();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        Toast.makeText(CreateNewAsset.this, "Asset berhasil dibuat", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }else{
+                        Toast.makeText(CreateNewAsset.this, response.body().getStatus().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(CreateNewAsset.this, "Gagal membuat asset", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Response.CreateAsset> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(CreateNewAsset.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -532,13 +500,15 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
                     fileImages.add(file);
 
                 }
-
-
             } else {
                 Uri imageUri = data.getData();
                 File file = new File(ImageUtils.getPath(imageUri, this));
                 imagePreviews.add(new ImageHolder(null, Uri.fromFile(file)));
                 fileImages.add(file);
+            }
+
+            if(fileImages.size() > 0){
+                mBtnAddImages.setText("TAMBAH FOTO");
             }
 
             mPreviewAdapter.notifyDataSetChanged();
@@ -552,10 +522,11 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onValidationSucceeded() {
 
-        if (mRbAsset.getRating() == 0) {
-            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
-            return;
-        } else if (imagePreviews.size() == 0) {
+//        if (mRbAsset.getRating() == 0) {
+//            Toast.makeText(this, "Isi Rating terlebih dahulu", Toast.LENGTH_SHORT).show();
+//            return;
+//        } else
+            if (imagePreviews.size() == 0) {
             Toast.makeText(this, "Pilih foto terlebih dahulu", Toast.LENGTH_SHORT).show();
             return;
         } else if (mSpProvince.getSelectedItem() == null) {
@@ -640,8 +611,6 @@ public class CreateNewAsset extends AppCompatActivity implements View.OnClickLis
 
                 mEtAssetAddress.setText(address);
                 assetLocation = new LatLng(lat, lang);
-
-//                Toast.makeText(CreateNewAsset.this, "Lokasi " + intent.getDoubleExtra("lang", 0), Toast.LENGTH_LONG).show();
             }
         }
     }

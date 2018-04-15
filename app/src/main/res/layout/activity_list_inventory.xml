@@ -19,156 +19,163 @@
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal" />
 
-    <ScrollView
+    <com.baoyz.widget.PullRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:refreshColor="@color/colorPrimary"
+        app:refreshType="smartisan">
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/bg_color">
+            android:layout_height="match_parent">
 
             <RelativeLayout
-                android:id="@+id/topSlider"
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
-
-                <ProgressBar
-                    android:id="@+id/pb_asset_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
-
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/vp_asset_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <LinearLayout
-                    android:id="@+id/layoutDots_asset_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dots_height"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="@dimen/dots_margin_bottom"
-                    android:gravity="center"
-                    android:orientation="horizontal" />
-
-            </RelativeLayout>
-
-
-            <LinearLayout
-                android:id="@+id/info"
-                android:layout_below="@+id/topSlider"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:background="@android:color/white">
+                android:background="@color/bg_color">
+
+                <RelativeLayout
+                    android:id="@+id/topSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp">
+
+                    <ProgressBar
+                        android:id="@+id/pb_asset_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/vp_asset_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutDots_asset_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dots_height"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+
+                </RelativeLayout>
+
 
                 <LinearLayout
-                    android:id="@+id/thumbnail_asset_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginRight="5dip"
-                    android:padding="3dip"
-                    android:visibility="gone">
+                    android:id="@+id/info"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/topSlider"
+                    android:background="@android:color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
-                    <ImageView
-                        android:id="@+id/iv_asset_images"
-                        android:layout_width="47dp"
-                        android:layout_height="47dp"
-                        android:src="@drawable/icon_tentang_06" />
+                    <LinearLayout
+                        android:id="@+id/thumbnail_asset_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginRight="5dip"
+                        android:padding="3dip"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/iv_asset_images"
+                            android:layout_width="47dp"
+                            android:layout_height="47dp"
+                            android:src="@drawable/icon_tentang_06" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_asset_name"
+                            fontPath="fonts/segoeuib.ttf"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@+id/thumbnail_asset_layout"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="Kontrakan Emas"
+                            android:textColor="#040404"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:typeface="sans"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_address"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_category"
+                            android:layout_marginTop="3dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="JL. USA 15 Ciseeng"
+                            android:textColor="@android:color/primary_text_light"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_no_telp"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_address"
+                            android:layout_marginTop="3dp"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="+628986121212"
+                            android:textColor="@android:color/primary_text_light"
+                            android:textSize="14sp" />
+
+                        <RatingBar
+                            android:id="@+id/rating_bar_assets"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:progressTint="@color/colorAccent" />
+
+                        <TextView
+                            android:id="@+id/tv_asset_category"
+                            fontPath="fonts/segoeuib.ttf"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_asset_name"
+                            android:layout_toRightOf="@+id/thumbnail_asset_layout"
+                            android:text="Premium"
+                            android:textAllCaps="true"
+                            android:textColor="@android:color/primary_text_light"
+                            android:textSize="13sp" />
+
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_below="@+id/info">
 
-                    <TextView
-                        android:id="@+id/tv_asset_name"
-                        fontPath="fonts/segoeuib.ttf"
-                        android:layout_width="wrap_content"
+                    <ProgressBar
+                        android:id="@+id/pb_list_invent"
+                        style="@style/Widget.AppCompat.ProgressBar"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignTop="@+id/thumbnail_asset_layout"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Kontrakan Emas"
-                        android:textColor="#040404"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:typeface="sans"
-                        android:visibility="gone" />
+                        android:layout_centerInParent="true" />
 
-                    <TextView
-                        android:id="@+id/tv_asset_address"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_category"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="JL. USA 15 Ciseeng"
-                        android:textColor="@android:color/primary_text_light"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tv_asset_no_telp"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_address"
-                        android:layout_marginTop="3dp"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="+628986121212"
-                        android:textColor="@android:color/primary_text_light"
-                        android:textSize="14sp" />
-
-                    <RatingBar
-                        android:id="@+id/rating_bar_assets"
-                        style="?android:attr/ratingBarStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:progressTint="@color/colorAccent" />
-
-                    <TextView
-                        fontPath="fonts/segoeuib.ttf"
-                        android:id="@+id/tv_asset_category"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_asset_name"
-                        android:layout_toRightOf="@+id/thumbnail_asset_layout"
-                        android:text="Premium"
-                        android:textColor="@android:color/primary_text_light"
-                        android:textSize="13sp"
-                        android:textAllCaps="true"/>
+                    <include layout="@layout/content_inventory" />
 
 
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_below="@+id/info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ProgressBar
-                    android:id="@+id/pb_list_invent"
-                    style="@style/Widget.AppCompat.ProgressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
-
-                <include layout="@layout/content_inventory" />
-
+                </RelativeLayout>
 
             </RelativeLayout>
 
-        </RelativeLayout>
-
-    </ScrollView>
-
+        </ScrollView>
+    </com.baoyz.widget.PullRefreshLayout>
 
 </RelativeLayout>

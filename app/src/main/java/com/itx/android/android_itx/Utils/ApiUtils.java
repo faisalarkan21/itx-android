@@ -16,7 +16,7 @@ public class ApiUtils {
     }
 
     public static final String BASE_URL_USERS_IMAGE = "https://s3-ap-southeast-1.amazonaws.com/itx-storage/userdata/image/";
-    public static final String BASE_URL = "http://itx-backend.apps.playcourt.id/";
+    public static final String BASE_URL = "http://itx-backend-v2.apps.playcourt.id";
 
     public static AuthService getAuthAPIService() {
 

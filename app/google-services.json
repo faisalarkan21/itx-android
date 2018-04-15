@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "369377667976",
+    "firebase_url": "https://telkomhbali.firebaseio.com",
+    "project_id": "telkomhbali",
+    "storage_bucket": "telkomhbali.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369377667976:android:8295a39fa0c007ff",
+        "android_client_info": {
+          "package_name": "com.itx.android.android_itx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369377667976-b5e3nn4n77f8bbf0agbhj8m440r3a5cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6JeGHL60SFUGoH5VDFLi8fT_oybX2rvA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

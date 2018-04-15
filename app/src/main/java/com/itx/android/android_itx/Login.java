@@ -18,6 +18,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.AuthService;
 import com.itx.android.android_itx.Utils.ApiUtils;
 import com.itx.android.android_itx.Utils.SessionManager;
@@ -107,31 +111,24 @@ public class Login extends AppCompatActivity implements Validator.ValidationList
     public void sendPost(String email, String password) {
 
         mAuthAPIService = ApiUtils.getAuthAPIService();
+        Request.Login login = new Request().new Login();
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        login.setUser(user);
 
-        Map<String, Object> jsonParams = new ArrayMap<>();
-        jsonParams.put("email", email);
-        jsonParams.put("password", password);
-
-
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), (new JSONObject(jsonParams)).toString());
-
-
-        Call<ResponseBody> response = mAuthAPIService.loginPost("login", body);
-
-        response.enqueue(new Callback<ResponseBody>() {
+        Call<Response.Login> response = mAuthAPIService.loginPost(login);
+        response.enqueue(new Callback<Response.Login>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
-                if (rawResponse.isSuccessful()) {
-                    try {
+            public void onResponse(Call<Response.Login> call, final retrofit2.Response<Response.Login> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        Gson gson = new Gson();
+                        String token = response.body().getData().getToken();
+                        String userData = gson.toJson(response.body().getData().getUser(), User.class);
 
-                        JSONObject jsonObject = new JSONObject(rawResponse.body().string());
-                        String data = jsonObject.getString("data");
-
-                        JSONObject jsonToken = new JSONObject(data);
-                        String dataToken = jsonToken.getString("token");
-
-
-                        session.setSession(dataToken);
+                        session.setSession(token);
+                        session.setUserData(userData);
 
                         new CountDownTimer(1000, 1000) {
 
@@ -140,32 +137,38 @@ public class Login extends AppCompatActivity implements Validator.ValidationList
                             }
                             public void onFinish() {
                                 progressDialog.dismiss();
-                                Intent dashboard = new Intent(Login.this, ListUsers.class);
-                                startActivity(dashboard);
+                                Intent listUser = new Intent(Login.this, ListUsers.class);
+                                Intent listAsset = new Intent(Login.this, ListAssets.class);
+
+                                if(response.body().getData().getUser().getRole().getName().equals("Admin")){
+                                    startActivity(listUser);
+                                }else{
+                                    startActivity(listAsset);
+                                }
+
                                 finish();
 
                             }
                         }.start();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    }else{
+                        Toast.makeText(Login.this, response.body().getStatus().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
                     }
-                } else {
+                }else{
                     Toast.makeText(Login.this, "Password / Username Salah",
                             Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                 }
-
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
-                Toast.makeText(Login.this, throwable.getMessage(),
+            public void onFailure(Call<Response.Login> call, Throwable t) {
+                Toast.makeText(Login.this, t.getMessage(),
                         Toast.LENGTH_LONG).show();
+                progressDialog.dismiss();
             }
         });
-
-
     }
 
 

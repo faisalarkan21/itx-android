@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by faisal on 2/19/18.
@@ -11,83 +12,101 @@ import java.util.Date;
 
 public class User {
 
-    @SerializedName("idUser")
+    @SerializedName("assets")
     @Expose
-    private String idUser;
- 
-    @SerializedName("firstName")
+    private List<Asset> assets;
+    @SerializedName("isVerified")
     @Expose
-    private String firstName;
-
-    @SerializedName("fullname")
+    private Boolean isVerified;
+    @SerializedName("createdAt")
     @Expose
-    private String fullName;
-
-    @SerializedName("lastName")
+    private String createdAt;
+    @SerializedName("deletedAt")
     @Expose
-    private String lastName;
-
-    @SerializedName("ktp")
-    @Expose
-    private String ktp;
-
+    private Object deletedAt;
     @SerializedName("email")
     @Expose
     private String email;
- 
+    @SerializedName("firstName")
+    @Expose
+    private String firstName;
+    @SerializedName("lastName")
+    @Expose
+    private String lastName;
     @SerializedName("password")
     @Expose
     private String password;
-
+    @SerializedName("role")
+    @Expose
+    private Role role;
+    @SerializedName("address")
+    @Expose
+    private Address address;
+    @SerializedName("__v")
+    @Expose
+    private Integer v;
+    @SerializedName("photo")
+    @Expose
+    private Photo photo;
     @SerializedName("phone")
     @Expose
     private String phone;
-
-    @SerializedName("socials")
+    @SerializedName("ktp")
     @Expose
-    private String socials;
-
-    @SerializedName("address")
+    private String ktp;
+    @SerializedName("fullName")
     @Expose
-    private String address;
-
-    @SerializedName("assets")
+    private String fullName;
+    @SerializedName("_id")
     @Expose
-    private String assets;
+    private String _id;
 
-    @SerializedName("photo")
-    @Expose
-    private String photo;
-
-    @SerializedName("isVerified")
-    @Expose
-    private boolean isVerified;
-
-    @SerializedName("updatedAt")
-    @Expose
-    private Date updatedAt;
-
-    @SerializedName("createdAt")
-    @Expose
-    private Date createdAt;    
-
-    @SerializedName("deletedAt")   
-    @Expose
-    private Date deletedAt;
-
-    @SerializedName("token")
-    @Expose
-    private String token;
-
-    private String role;
-
-
-    public String getIdUser() {
-        return idUser;
+    public List<Asset> getAssets() {
+        return assets;
     }
 
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
+    public void setAssets(List<Asset> assets) {
+        this.assets = assets;
+    }
+
+    public Boolean getVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(Boolean verified) {
+        isVerified = verified;
+    }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Object getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Object deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -106,36 +125,44 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getKtp() {
-        return ktp;
-    }
-
-    public void setKtp(String ktp) {
-        this.ktp = ktp;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Integer getV() {
+        return v;
+    }
+
+    public void setV(Integer v) {
+        this.v = v;
+    }
+
+    public Photo getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
     }
 
     public String getPhone() {
@@ -146,83 +173,27 @@ public class User {
         this.phone = phone;
     }
 
-    public String getSocials() {
-        return socials;
+    public String getKtp() {
+        return ktp;
     }
 
-    public void setSocials(String socials) {
-        this.socials = socials;
+    public void setKtp(String ktp) {
+        this.ktp = ktp;
     }
 
-    public String getAddress() {
-        return address;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getAssets() {
-        return assets;
+    public String get_id() {
+        return _id;
     }
 
-    public void setAssets(String assets) {
-        this.assets = assets;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public boolean isVerified() {
-        return isVerified;
-    }
-
-    public void setVerified(boolean verified) {
-        isVerified = verified;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(Date deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }

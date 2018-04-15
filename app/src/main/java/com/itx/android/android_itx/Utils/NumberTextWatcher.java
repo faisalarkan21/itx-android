@@ -24,7 +24,7 @@ public class NumberTextWatcher implements TextWatcher {
     public NumberTextWatcher(EditText editText, String pattern) {
         df = new DecimalFormat(pattern);
         df.setDecimalSeparatorAlwaysShown(true);
-        dfnd = new DecimalFormat("#,###.00");
+        dfnd = new DecimalFormat("#,###");
         this.et = editText;
         hasFractionalPart = false;
     }
@@ -53,8 +53,6 @@ public class NumberTextWatcher implements TextWatcher {
                 int sel = (cp + (endlen - inilen));
                 if (sel > 0 && sel < et.getText().length()) {
                     et.setSelection(sel);
-                } else if (trailingZeroCount > -1) {
-                    et.setSelection(et.getText().length() - 3);
                 } else {
                     et.setSelection(et.getText().length());
                 }

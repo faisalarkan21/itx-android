@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.itx.android.android_itx.Entity.Response;
 import com.itx.android.android_itx.ListAssets;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Entity.User;
@@ -58,7 +60,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
     @Override
     public void onBindViewHolder(final UsersViewHolder holder, final int position) {
+        Gson gson = new Gson();
         final User user = userList.get(position);
+        final String data = gson.toJson(user, User.class);
 
         holder.iv_users_options.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +76,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
                         switch (item.getItemId()) {
                             case R.id.menu_edit:
                                 Intent updateUser = new Intent(mContext, UpdateUser.class);
-                                updateUser.putExtra("id", user.getIdUser());
+                                updateUser.putExtra("DATA", data);
                                 mContext.startActivity(updateUser);
                                 break;
                             case R.id.menu_delete:
@@ -87,32 +91,20 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
         });
 
         holder.userName.setText(user.getFullName());
-        holder.assets.setText(user.getAssets() + " ASSET");
+        holder.assets.setText(user.getAssets().size() + " ASSET");
 
         if (user.getPhoto() != null) {
             Picasso.with(mContext)
-                    .load(ApiUtils.BASE_URL_USERS_IMAGE + user.getPhoto())
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + user.getPhoto().getMedium())
                     .into(holder.imageUsers);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.d("inidia", Integer.toString(position));
-                Log.d("ini stringnya", user.getIdUser());
                 Intent listAsset = new Intent(mContext, ListAssets.class);
-                listAsset.putExtra("id", user.getIdUser());
-                listAsset.putExtra("name", user.getFullName());
-                listAsset.putExtra("address", user.getAddress());
-                listAsset.putExtra("phone", user.getPhone());
-                listAsset.putExtra("photo", user.getPhoto());
-                listAsset.putExtra("role", user.getRole());
+                listAsset.putExtra("DATA", data);
                 mContext.startActivity(listAsset);
-
-
-
-
             }
         });
 
@@ -123,7 +115,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
         session = new SessionManager(mContext);
         mListUsersAPIService = ApiUtils.getListUsersService(session.getToken());
 
-        final Call<ResponseBody> response = mListUsersAPIService.deleteUser(user.getIdUser());
+        final Call<Response.DeleteUser> response = mListUsersAPIService.deleteUser(user.get_id());
 
         android.app.AlertDialog.Builder alertBuilder = new android.app.AlertDialog.Builder(mContext);
         alertBuilder.setTitle("Konfirmasi");
@@ -137,33 +129,34 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersViewHolder> {
                 progressDialog.show();
 
                 dialog.dismiss();
-                response.enqueue(new Callback<ResponseBody>() {
+                response.enqueue(new Callback<Response.DeleteUser>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
-                        if (rawResponse.isSuccessful()) {
-                            progressDialog.dismiss();
+                    public void onResponse(Call<Response.DeleteUser> call, retrofit2.Response<Response.DeleteUser> response) {
+                        progressDialog.dismiss();
+                        if(response.isSuccessful()){
+                            if(response.body().getStatus().getCode() == 200){
+                                Toast.makeText(mContext, "Data telah dihapus",
+                                        Toast.LENGTH_LONG).show();
 
-                            Toast.makeText(mContext, "Berhasil Mengapus",
-                                    Toast.LENGTH_LONG).show();
-
-                            ((Activity) mContext).finish();
-                            mContext.startActivity(((Activity) mContext).getIntent());
-                            progressDialog.dismiss();
-
-                        } else {
-                            Toast.makeText(mContext, "Gagal",
+                                ((Activity) mContext).finish();
+                                mContext.startActivity(((Activity) mContext).getIntent());
+                                progressDialog.dismiss();
+                            }else{
+                                Toast.makeText(mContext, response.body().getStatus().getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }else {
+                            Toast.makeText(mContext, "Data gagal dihapus",
                                     Toast.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
-                        Toast.makeText(mContext, throwable.getMessage(),
+                    public void onFailure(Call<Response.DeleteUser> call, Throwable t) {
+                        Toast.makeText(mContext, t.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-
             }
         });
         alertBuilder.setNegativeButton("Tidak", new DialogInterface.OnClickListener() {

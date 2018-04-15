@@ -23,6 +23,7 @@ public class RupiahCurrency {
         formatRp.setMonetaryDecimalSeparator(',');
         formatRp.setGroupingSeparator('.');
 
+        kursIndonesia.setMaximumFractionDigits(0);
         kursIndonesia.setDecimalFormatSymbols(formatRp);
         return kursIndonesia.format(nominal) ;
 
@@ -33,8 +34,7 @@ public class RupiahCurrency {
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
         unformatedRp = nominal.replaceAll("[Rp,]", "");
         removeDots = unformatedRp.replaceAll("\\.", "");
-        removedTwoLastNumber =removeDots.substring(0, removeDots.length() - 2);
-        return removedTwoLastNumber;
+        return removeDots;
     }
 
 }

@@ -3,27 +3,41 @@ package com.itx.android.android_itx.Entity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by faisal on 2/21/18.
  */
 
 public class Asset {
 
-    @SerializedName("idAsset")
+    @SerializedName("inventoryCategories")
+    @Expose
+    private List<InventoryCategory> inventoryCategories = null;
+    @SerializedName("images")
+    @Expose
+    private List<Image> images = null;
+    @SerializedName("isVerified")
+    @Expose
+    private Boolean isVerified;
+    @SerializedName("isPublished")
+    @Expose
+    private Boolean isPublished;
+    @SerializedName("createdAt")
+    @Expose
+    private String createdAt;
+    @SerializedName("deletedAt")
+    @Expose
+    private Object deletedAt;
+    @SerializedName("_id")
     @Expose
     private String id;
-    @SerializedName("user")
-    @Expose
-    private String user;
     @SerializedName("assetCategory")
     @Expose
-    private String assetCategory;
+    private AssetCategory assetCategory;
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("name")
-    @Expose
-    private String fullName;
     @SerializedName("brand")
     @Expose
     private String brand;
@@ -33,36 +47,66 @@ public class Asset {
     @SerializedName("phone")
     @Expose
     private String phone;
-    @SerializedName("address")
+    @SerializedName("user")
     @Expose
-    private String address;
+    private User user;
     @SerializedName("rating")
     @Expose
-    private float rating;
-    @SerializedName("inventories")
+    private Integer rating;
+    @SerializedName("address")
     @Expose
-    private String inventories;
-    @SerializedName("inventoryCategories")
+    private Address address;
+    @SerializedName("__v")
     @Expose
-    private String inventoryCategories;
-    @SerializedName("images")
-    @Expose
-    private String images;
-    @SerializedName("accountHolder")
-    @Expose
-    private String accountHolder;
-    @SerializedName("isVerified")
-    @Expose
-    private String isVerified;
-    @SerializedName("updatedAt")
-    @Expose
-    private String updatedAt;
-    @SerializedName("createdAt")
-    @Expose
-    private String createdAt;
-    @SerializedName("deletedAt")
-    @Expose
-    private String deletedAt;
+    private Integer v;
+
+    public List<InventoryCategory> getInventoryCategories() {
+        return inventoryCategories;
+    }
+
+    public void setInventoryCategories(List<InventoryCategory> inventoryCategories) {
+        this.inventoryCategories = inventoryCategories;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public Boolean getIsPublished() {
+        return isPublished;
+    }
+
+    public void setIsPublished(Boolean isPublished) {
+        this.isPublished = isPublished;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Object getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Object deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 
     public String getId() {
         return id;
@@ -72,28 +116,11 @@ public class Asset {
         this.id = id;
     }
 
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-
-    public String getAssetCategory() {
+    public AssetCategory getAssetCategory() {
         return assetCategory;
     }
 
-    public void setAssetCategory(String assetCategory) {
+    public void setAssetCategory(AssetCategory assetCategory) {
         this.assetCategory = assetCategory;
     }
 
@@ -129,83 +156,36 @@ public class Asset {
         this.phone = phone;
     }
 
-    public String getAddress() {
-        return address;
+    public User getUser() {
+        return user;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public float getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 
-    public String getInventories() {
-        return inventories;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setInventories(String inventories) {
-        this.inventories = inventories;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
-    public String getInventoryCategories() {
-        return inventoryCategories;
+    public Integer getV() {
+        return v;
     }
 
-    public void setInventoryCategories(String inventoryCategories) {
-        this.inventoryCategories = inventoryCategories;
+    public void setV(Integer v) {
+        this.v = v;
     }
 
-    public String getImages() {
-        return images;
-    }
-
-    public void setImages(String images) {
-        this.images = images;
-    }
-
-    public String getAccountHolder() {
-        return accountHolder;
-    }
-
-    public void setAccountHolder(String accountHolder) {
-        this.accountHolder = accountHolder;
-    }
-
-    public String getIsVerified() {
-        return isVerified;
-    }
-
-    public void setIsVerified(String isVerified) {
-        this.isVerified = isVerified;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(String deletedAt) {
-        this.deletedAt = deletedAt;
-    }
 }

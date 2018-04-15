@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -15,15 +14,18 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.itx.android.android_itx.Entity.Inventory;
+import com.google.gson.Gson;
+import com.itx.android.android_itx.Entity.Asset;
+import com.itx.android.android_itx.Entity.InventoryCategory;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.InventoryDetail;
 import com.itx.android.android_itx.R;
 import com.itx.android.android_itx.Service.InventoryService;
-import com.itx.android.android_itx.UpdateAsset;
 import com.itx.android.android_itx.UpdateInventory;
 import com.itx.android.android_itx.Utils.ApiUtils;
+import com.itx.android.android_itx.Utils.RupiahCurrency;
 import com.itx.android.android_itx.Utils.SessionManager;
 import com.itx.android.android_itx.ViewHolder.InventoryViewHolder;
-import com.itx.android.android_itx.Utils.RupiahCurrency;
 
 import java.util.List;
 
@@ -38,17 +40,19 @@ import retrofit2.Callback;
 
 public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> {
 
-    private List<Inventory> inventoryList;
+    private List<InventoryCategory> inventoryList;
     private Context mContext;
 
     private SessionManager session;
     InventoryService mListInventAPIService;
     ProgressDialog progressDialog;
+    private Asset mAsset;
 
 
-    public InventoryAdapter(List<Inventory> inventoryList, Context activity) {
+    public InventoryAdapter(List<InventoryCategory> inventoryList, Context activity, Asset asset) {
         this.mContext = activity;
         this.inventoryList = inventoryList;
+        this.mAsset = asset;
     }
 
     @Override
@@ -61,27 +65,37 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
 
     @Override
     public void onBindViewHolder(final InventoryViewHolder holder, int position) {
-        final Inventory invent = inventoryList.get(position);
+        Gson gson = new Gson();
+        final InventoryCategory invent = inventoryList.get(position);
+        final String data = gson.toJson(invent, InventoryCategory.class);
+        final String dataAsset = gson.toJson(mAsset, Asset.class);
+
         holder.inventoryName.setText(invent.getName());
 
 
-        if (invent.getImage() != null) {
+        if (invent.getImages().get(0).getmMedium() != null) {
             Glide.with(mContext)
-                    .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImage())
+                    .load(ApiUtils.BASE_URL_USERS_IMAGE + invent.getImages().get(0).getmMedium())
                     .into(holder.inventoryImage);
         }
 
 
         if (invent.getFacilities() != null) {
-            holder.inventoryFacilities.setText("Facilities : " + invent.getFacilities());
+            for (int i = 0; i < invent.getFacilities().size(); i++) {
+                if(i == 0){
+                    holder.inventoryFacilities.setText("Fasilitas : " + invent.getFacilities().get(i).getName());
+                }else{
+                    holder.inventoryFacilities.append(", " + invent.getFacilities().get(i).getName());
+                }
+            }
         } else {
 
             holder.inventoryFacilities.setText("Facilities : Tidak ada fasilitas");
         }
 
-        holder.inventoryStock.setText("Stock : " + invent.getStock());
-        holder.inventorySpace.setText("Space : " + invent.getSpace());
-        holder.inventoryPrice.setText(RupiahCurrency.toRupiahFormat(invent.getPrice()) + ",00");
+        holder.inventoryStock.setText("Persediaan : " + invent.getStock());
+        holder.inventorySpace.setText("Kapasitas : " + invent.getSpace());
+        holder.inventoryPrice.setText(RupiahCurrency.toRupiahFormat(invent.getPrice()));
 
 
         holder.ivInventoptions.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +110,8 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
                         switch (item.getItemId()) {
                             case R.id.menu_edit:
                                 Intent updateInvent = new Intent(mContext, UpdateInventory.class);
-                                updateInvent.putExtra("id", invent.getIdAsset());
+                                updateInvent.putExtra("DATA", data);
+                                updateInvent.putExtra("ASSET", dataAsset);
                                 mContext.startActivity(updateInvent);
                                 break;
                             case R.id.menu_delete:
@@ -111,15 +126,23 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
         });
 
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent updateInvent = new Intent(mContext, InventoryDetail.class);
+                updateInvent.putExtra("DATA", data);
+                mContext.startActivity(updateInvent);
+            }
+        });
     }
 
 
-    public void deleteUser(Inventory invent) {
+    public void deleteUser(InventoryCategory invent) {
 
         session = new SessionManager(mContext);
         mListInventAPIService = ApiUtils.getListInventoryService(session.getToken());
 
-        final Call<ResponseBody> response = mListInventAPIService.deleteInventoryCategory(invent.getIdAsset());
+        final Call<Response.DeleteInventory> response = mListInventAPIService.deleteInventoryCategory(invent.getId());
 
         android.app.AlertDialog.Builder alertBuilder = new android.app.AlertDialog.Builder(mContext);
         alertBuilder.setTitle("Konfirmasi");
@@ -133,9 +156,9 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
                 progressDialog.show();
 
                 dialog.dismiss();
-                response.enqueue(new Callback<ResponseBody>() {
+                response.enqueue(new Callback<Response.DeleteInventory>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse) {
+                    public void onResponse(Call<Response.DeleteInventory> call, retrofit2.Response<Response.DeleteInventory> rawResponse) {
                         if (rawResponse.isSuccessful()) {
                             progressDialog.dismiss();
 
@@ -153,7 +176,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryViewHolder> 
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                    public void onFailure(Call<Response.DeleteInventory> call, Throwable throwable) {
 
                         Toast.makeText(mContext, throwable.getMessage(),
                                 Toast.LENGTH_LONG).show();

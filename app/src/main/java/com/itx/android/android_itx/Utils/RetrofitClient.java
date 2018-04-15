@@ -1,7 +1,8 @@
 package com.itx.android.android_itx.Utils;
 
-import android.support.compat.BuildConfig;
 import android.util.Log;
+
+import com.itx.android.android_itx.BuildConfig;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,9 @@ public class RetrofitClient {
 
     private static Retrofit retrofit = null;
 
-    static OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+    static OkHttpClient okHttpClient = new OkHttpClient()
+            .newBuilder()
+            .addInterceptor(provideHttpLoggingInterceptor())
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)

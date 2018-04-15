@@ -1,5 +1,9 @@
 package com.itx.android.android_itx.Service;
 
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
+import com.itx.android.android_itx.Entity.User;
+
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -13,7 +17,7 @@ import retrofit2.http.Path;
 
 public interface AuthService {
 
-    @POST("/api/{login}")
-    Call<ResponseBody> loginPost(@Path("login") String postfix, @Body RequestBody params);
+    @POST("/api/login")
+    Call<Response.Login> loginPost(@Body Request.Login login);
 
 }

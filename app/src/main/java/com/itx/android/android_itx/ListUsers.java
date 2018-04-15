@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Entity.Response;
 import com.itx.android.android_itx.Entity.User;
 import com.itx.android.android_itx.Service.UsersService;
 import com.itx.android.android_itx.Utils.ApiUtils;
@@ -49,14 +51,6 @@ public class ListUsers extends AppCompatActivity {
     private UsersAdapter uAdapter;
     SessionManager session;
 
-    GoogleApiClient mGoogleApiClient;
-    GoogleMap mMap;
-
-    private LatLng mPosMarker = new LatLng(-6.3660756, 106.8346144);
-
-    private MarkerOptions markerOptions;
-    private Marker marker;
-
     UsersService mListUsersAPIService;
 
     @BindView(R.id.btn_add_user)
@@ -68,11 +62,15 @@ public class ListUsers extends AppCompatActivity {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
+    @BindView(R.id.swipeRefreshLayout)
+    PullRefreshLayout mPullRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
+
+        getSupportActionBar().setTitle("List Pemilik");
 
         ButterKnife.bind(this);
         session = new SessionManager(this);
@@ -101,6 +99,13 @@ public class ListUsers extends AppCompatActivity {
 
         recyclerView.setAdapter(uAdapter);
 
+        mPullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                prepareUserData();
+            }
+        });
+
     }
 
     private void showLoading() {
@@ -124,73 +129,39 @@ public class ListUsers extends AppCompatActivity {
             uAdapter.notifyDataSetChanged();
         }
         mListUsersAPIService = ApiUtils.getListUsersService(session.getToken());
-        Call<JsonObject> response = mListUsersAPIService.getAUsers();
-
-        response.enqueue(new Callback<JsonObject>() {
+        Call<Response.GetAllUser> response = mListUsersAPIService.getAUsers();
+        response.enqueue(new Callback<Response.GetAllUser>() {
             @Override
-            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> rawResponse) {
+            public void onResponse(Call<Response.GetAllUser> call, retrofit2.Response<Response.GetAllUser> response) {
+                mPullRefreshLayout.setRefreshing(false);
                 hideLoading();
-                if (rawResponse.isSuccessful()) {
-                    try {
-                        JsonArray jsonArray = rawResponse.body().get("data").getAsJsonArray();
-
-                        if (jsonArray.size() == 0) {
-                            hideLoading();
+                if(response.isSuccessful()){
+                    if(response.body().getStatus().getCode() == 200){
+                        if(response.body().getData().getTotal() == 0){
                             Toast.makeText(ListUsers.this, "Tidak ada data.",
                                     Toast.LENGTH_LONG).show();
+                        }else{
+                            userList.addAll(response.body().getData().getUser());
+                            uAdapter.notifyDataSetChanged();
                         }
-
-                        for (int i = 0; i < jsonArray.size(); i++) {
-
-                            JsonObject Data = jsonArray.get(i).getAsJsonObject();
-                            Log.d("TEST", Data.toString());
-                            User user = new User();
-                            user.setIdUser(Data.get("_id").getAsString());
-                            user.setRole(Data.get("role").getAsJsonObject().get("name").getAsString());
-                            user.setFullName(Data.get("fullName").getAsString());
-
-                            user.setAssets(Data.get("totalAssets").getAsString());
-
-                            if (Data.get("phone") != null) {
-                                user.setPhone(Data.get("phone").getAsString());
-                            }
-
-                            if (Data.get("address").getAsJsonObject().get("address") != null) {
-                                user.setAddress(Data.get("address").getAsJsonObject().get("address").getAsString());
-                            }
-
-                            if (Data.get("photo") != null) {
-                                user.setPhoto(Data.get("photo").getAsJsonObject().get("thumbnail").getAsString());
-                            }
-
-
-                            userList.add(user);
-
-
-                        }
-
-                        uAdapter.notifyDataSetChanged();
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    }else{
+                        Toast.makeText(ListUsers.this, response.body().getStatus().getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
-                } else {
+                }else{
                     Toast.makeText(ListUsers.this, "Gagal Mengambil Data",
                             Toast.LENGTH_LONG).show();
                 }
-
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+            public void onFailure(Call<Response.GetAllUser> call, Throwable t) {
+                mPullRefreshLayout.setRefreshing(false);
                 hideLoading();
-                Toast.makeText(ListUsers.this, throwable.getMessage(),
+                Toast.makeText(ListUsers.this, t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
-
-
     }
 
     @Override
@@ -211,11 +182,9 @@ public class ListUsers extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_logout:
                 session.removeToken();
+                session.remoceUserData();
                 startActivity(new Intent(ListUsers.this, Login.class));
                 finish();
-                return true;
-            case R.id.menu_edit:
-                Toast.makeText(ListUsers.this, "kena", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

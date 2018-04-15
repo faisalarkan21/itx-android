@@ -1,6 +1,8 @@
 package com.itx.android.android_itx.Service;
 
 import com.google.gson.JsonObject;
+import com.itx.android.android_itx.Entity.Request;
+import com.itx.android.android_itx.Entity.Response;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -16,19 +18,19 @@ import retrofit2.http.Path;
 
 public interface UsersService {
 
-    @GET("/api/users")
-    Call<JsonObject> getAUsers();
+    @GET("/api/users?page=1&limit=1000")
+    Call<Response.GetAllUser> getAUsers();
 
     @POST("/api/user/create")
-    Call<ResponseBody> createUser(@Body RequestBody params);
+    Call<Response.CreateUser> createUser(@Body Request.CreateUser user);
 
     @GET("/api/user/{id}")
     Call<JsonObject> getUser(@Path("id") String postfix);
 
     @POST("/api/user/update/{id}")
-    Call<ResponseBody> updateUser(@Path("id") String postfix, @Body RequestBody params);
+    Call<Response.UpdateUser> updateUser(@Path("id") String postfix, @Body Request.UpdateUser user);
 
     @POST("/api/user/delete/{id}")
-    Call<ResponseBody> deleteUser(@Path("id") String postfix);
+    Call<Response.DeleteUser> deleteUser(@Path("id") String postfix);
 
 }

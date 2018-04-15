@@ -8,9 +8,9 @@
 
     <ScrollView
         android:id="@+id/sv_add_user"
-        android:layout_above="@id/btn_add_new_user"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/btn_add_new_user"
         android:layout_marginBottom="16dp">
 
         <LinearLayout
@@ -28,21 +28,21 @@
                 android:layout_height="110dp">
 
                 <ImageView
-                    android:layout_centerInParent="true"
                     android:id="@+id/iv_add_user"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_centerInParent="true"
                     android:background="@color/colorPrimaryDark" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab_add_foto"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
                     android:scaleType="center"
                     android:src="@drawable/ic_add_a_photo"
-                    app:backgroundTint="@android:color/white"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp" />
+                    app:backgroundTint="@android:color/white" />
 
             </RelativeLayout>
 
@@ -57,7 +57,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="No. KTP"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -79,7 +80,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Nama Depan"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp" />
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -97,7 +99,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Nama Belakang"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp" />
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -115,7 +118,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Email"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -133,11 +137,10 @@
                     android:layout_height="wrap_content"
                     android:hint="Telpon"
                     android:inputType="number"
-                    />
+                    android:textSize="14sp" />
 
 
             </android.support.design.widget.TextInputLayout>
-
 
 
             <android.support.design.widget.TextInputLayout
@@ -151,7 +154,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Alamat"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textSize="14sp"/>
 
 
             </android.support.design.widget.TextInputLayout>
@@ -174,19 +178,19 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:layout_marginTop="8dp"
-                        android:text="Pilih Provinsi" />
+                        android:text="Pilih Provinsi"
+                        android:textSize="14sp"/>
 
                     <Spinner
                         android:id="@+id/sp_add_user_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Provinsi"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
-
-
 
 
             </LinearLayout>
@@ -195,7 +199,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
 
 
                 <android.support.design.widget.TextInputLayout
@@ -211,14 +214,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:layout_marginTop="5dp"
-                        android:text="Pilih Kota" />
+                        android:text="Pilih Kota"
+                        android:textSize="14sp"/>
 
                     <Spinner
                         android:id="@+id/sp_add_user_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Kota"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -241,7 +246,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Kode Pos"
-                        android:inputType="number" />
+                        android:inputType="number"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -251,14 +257,16 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:visibility="gone">
 
                     <AutoCompleteTextView
                         android:id="@+id/et_add_user_country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Negara"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="14sp"/>
 
 
                 </android.support.design.widget.TextInputLayout>
@@ -272,12 +280,12 @@
 
     <Button
         android:id="@+id/btn_add_new_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
         android:text="TAMBAH"
-        android:textColor="@android:color/white"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:textColor="@android:color/white"/>
 
 
 </RelativeLayout>
